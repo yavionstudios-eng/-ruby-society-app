@@ -409,15 +409,18 @@ async function initFirebase() {
 
     unsubscribers = [unsubMembers, unsubPayments, unsubExpenses, unsubSettings];
 
-    // Seed initial members if empty
+    // Only seed once — check a permanent flag in Firebase
     setLoadingStatus('Checking data...');
-    const membersSnap = await getDocs(collection(db, 'members'));
-    if (membersSnap.empty) {
+    const settingsSnap = await getDoc(doc(db, 'settings', 'main'));
+    const alreadySeeded = settingsSnap.exists() && settingsSnap.data().seeded === true;
+    if (!alreadySeeded) {
       setLoadingStatus('Setting up initial data...');
       await seedInitialData();
     }
 
     setLoadingStatus('Ready!');
+    // Mark as seeded immediately so auto-seed never runs again
+    await setDoc(doc(db, 'settings', 'main'), {seeded: true}, {merge: true});
     setTimeout(() => {
       document.getElementById('loadingScreen').classList.add('hidden');
     }, 600);
@@ -502,7 +505,7 @@ async function seedInitialData() {
   initialPayments.forEach((p, i) => {
     batch.set(doc(db, 'payments', 'P' + (i+1)), p);
   });
-  batch.set(doc(db, 'settings', 'main'), {bankBalance: 0, nextId: 1000});
+  batch.set(doc(db, 'settings', 'main'), {bankBalance: 0, nextId: 1000, seeded: true});
   await batch.commit();
 }
 
@@ -544,7 +547,7 @@ async function deleteExpenseFS(id) {
 }
 async function saveBankBalance(amount) {
   setSyncDot('syncing');
-  await setDoc(doc(db, 'settings', 'main'), {bankBalance: amount, nextId}, {merge: true});
+  await setDoc(doc(db, 'settings', 'main'), {bankBalance: amount, nextId, seeded: true}, {merge: true});
   setSyncDot('online');
 }
 function newId(prefix) {
