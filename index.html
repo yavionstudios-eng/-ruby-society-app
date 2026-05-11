@@ -5,51 +5,60 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1D9E75">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<title>Ruby Social Society — Maintenance</title>
+<title>Ruby Social Society</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/[email protected]/dist/tabler-icons.min.css">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: #F4F3EE;
-    color: #1A1A19;
-    overflow-x: hidden;
-    overscroll-behavior: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #F4F3EE; color: #1A1A19;
+    overflow-x: hidden; overscroll-behavior: none;
   }
-  .shell {
-    max-width: 480px;
-    margin: 0 auto;
-    min-height: 100vh;
-    background: #F4F3EE;
-    position: relative;
-    padding-bottom: 80px;
+  .shell { max-width: 480px; margin: 0 auto; min-height: 100vh; background: #F4F3EE; padding-bottom: 80px; }
+
+  /* LOADING SCREEN */
+  .loading-screen {
+    position: fixed; inset: 0; background: #0F6E56;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 999; transition: opacity 0.4s ease;
   }
+  .loading-screen.hidden { opacity: 0; pointer-events: none; }
+  .loading-logo { font-size: 48px; margin-bottom: 16px; }
+  .loading-title { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .loading-sub { font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 40px; }
+  .loading-spinner {
+    width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .loading-status { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 14px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOPBAR */
   .topbar {
-    background: #fff;
-    border-bottom: 1px solid #E8E7E1;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 5;
+    background: #fff; border-bottom: 1px solid #E8E7E1;
+    padding: 14px 16px; display: flex; align-items: center;
+    justify-content: space-between; position: sticky; top: 0; z-index: 5;
   }
-  .topbar-left .title {
-    font-size: 16px; font-weight: 600; color: #1A1A19;
-    display: flex; align-items: center; gap: 6px;
-  }
+  .topbar-left .title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
   .topbar-left .sub { font-size: 11px; color: #6A6A65; margin-top: 2px; }
+  .sync-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #ccc;
+    display: inline-block; margin-left: 6px; vertical-align: middle;
+  }
+  .sync-dot.online { background: #1D9E75; }
+  .sync-dot.syncing { background: #FAC775; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
   .pay-btn {
     background: #1D9E75; color: #fff; border: none; border-radius: 50px;
     padding: 9px 18px; font-size: 14px; cursor: pointer;
     display: flex; align-items: center; gap: 6px; font-weight: 500;
-    box-shadow: 0 2px 6px rgba(29, 158, 117, 0.25);
   }
   .pay-btn:active { background: #0F6E56; transform: scale(0.97); }
   .content { padding: 14px 14px 24px; }
+
+  /* BOTTOM NAV */
   .bottom-nav {
     position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
     width: 100%; max-width: 480px; background: #fff;
@@ -61,24 +70,16 @@
     display: flex; flex-direction: column; align-items: center;
     padding: 8px 0; gap: 3px; border: none; background: none;
     cursor: pointer; color: #6A6A65; font-size: 10px; font-family: inherit;
-    transition: color 0.15s;
   }
   .nav-item i { font-size: 20px; }
   .nav-item.active { color: #1D9E75; }
-  .stats-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;
-  }
+
+  /* CARDS & STATS */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
   .stats-grid.three { grid-template-columns: repeat(3, 1fr); }
-  .stat-card {
-    background: #fff; border-radius: 14px; padding: 14px;
-    border: 1px solid #E8E7E1;
-  }
+  .stat-card { background: #fff; border-radius: 14px; padding: 14px; border: 1px solid #E8E7E1; }
   .stat-card.compact { padding: 10px 12px; }
-  .stat-label {
-    font-size: 11px; color: #6A6A65; margin-bottom: 6px;
-    display: flex; align-items: center; gap: 4px;
-  }
-  .stat-label i { font-size: 13px; }
+  .stat-label { font-size: 11px; color: #6A6A65; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
   .stat-val { font-size: 19px; font-weight: 600; }
   .stat-val.green { color: #0F6E56; }
   .stat-val.red { color: #A32D2D; }
@@ -86,6 +87,8 @@
   .stat-val.blue { color: #185FA5; }
   .stat-val.muted { color: #1A1A19; }
   .stat-val small { font-size: 13px; color: #6A6A65; font-weight: 400; }
+
+  /* BANK CARD */
   .bank-card {
     background: linear-gradient(135deg, #1D9E75 0%, #0F6E56 100%);
     border-radius: 16px; padding: 16px; margin-bottom: 14px;
@@ -96,30 +99,22 @@
     width: 120px; height: 120px; background: rgba(255,255,255,0.08);
     border-radius: 50%;
   }
-  .bank-label {
-    font-size: 11px; color: rgba(255,255,255,0.85);
-    margin-bottom: 4px; display: flex; align-items: center; gap: 5px;
-    text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;
-  }
+  .bank-label { font-size: 11px; color: rgba(255,255,255,0.85); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
   .bank-amount { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
-  .bank-actions { display: flex; gap: 8px; position: relative; z-index: 1; }
+  .bank-actions { display: flex; gap: 8px; }
   .bank-actions button {
     flex: 1; padding: 8px; background: rgba(255,255,255,0.18);
     color: #fff; border: 1px solid rgba(255,255,255,0.25);
     border-radius: 8px; font-size: 12px; font-family: inherit;
-    cursor: pointer; display: flex; align-items: center;
-    justify-content: center; gap: 4px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;
   }
   .bank-actions button:active { background: rgba(255,255,255,0.3); }
-  .card {
-    background: #fff; border: 1px solid #E8E7E1; border-radius: 14px;
-    margin-bottom: 12px; overflow: hidden;
-  }
-  .card-header {
-    padding: 12px 14px; border-bottom: 1px solid #E8E7E1;
-    display: flex; align-items: center; justify-content: space-between;
-  }
+
+  .card { background: #fff; border: 1px solid #E8E7E1; border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
+  .card-header { padding: 12px 14px; border-bottom: 1px solid #E8E7E1; display: flex; align-items: center; justify-content: space-between; }
   .card-title { font-size: 13px; font-weight: 600; }
+
+  /* MEMBER ROW */
   .member-row {
     padding: 13px 14px; border-bottom: 1px solid #F0EFE9;
     display: flex; align-items: center; gap: 12px; cursor: pointer;
@@ -127,97 +122,80 @@
   .member-row:last-child { border-bottom: none; }
   .member-row:active { background: #F4F3EE; }
   .avatar {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: #9FE1CB; display: flex; align-items: center;
-    justify-content: center; font-size: 12px; font-weight: 600;
-    color: #085041; flex-shrink: 0;
+    width: 38px; height: 38px; border-radius: 50%; background: #9FE1CB;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: #085041; flex-shrink: 0;
   }
   .avatar.rented { background: #FAC775; color: #633806; }
   .member-info { flex: 1; min-width: 0; }
-  .member-name {
-    font-size: 14px; font-weight: 500; color: #1A1A19;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    display: flex; align-items: center; gap: 6px;
-  }
+  .member-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
   .member-flat { font-size: 12px; color: #6A6A65; margin-top: 1px; }
-  .badge {
-    display: inline-block; padding: 3px 8px; border-radius: 20px;
-    font-size: 10px; font-weight: 500;
-  }
+
+  /* BADGES */
+  .badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 500; }
   .badge.paid { background: #EAF3DE; color: #3B6D11; }
   .badge.unpaid { background: #FCEBEB; color: #A32D2D; }
   .badge.overdue { background: #FFE4E1; color: #8B1A0E; border: 1px solid #F09595; }
   .badge.owner { background: #E1F5EE; color: #0F6E56; }
   .badge.rented { background: #FAEEDA; color: #854F0B; }
-  .btn {
-    padding: 9px 14px; border: 1px solid #D8D6CB; border-radius: 8px;
-    background: #fff; cursor: pointer; font-size: 13px;
-    font-family: inherit; color: #1A1A19;
-  }
+
+  /* BUTTONS */
+  .btn { padding: 9px 14px; border: 1px solid #D8D6CB; border-radius: 8px; background: #fff; cursor: pointer; font-size: 13px; font-family: inherit; color: #1A1A19; }
   .btn:active { background: #F4F3EE; }
-  .btn.primary {
-    background: #1D9E75; border-color: #1D9E75; color: #fff;
-  }
+  .btn.primary { background: #1D9E75; border-color: #1D9E75; color: #fff; }
   .btn.primary:active { background: #0F6E56; }
-  .btn.danger {
-    background: #fff; border-color: #F09595; color: #A32D2D;
-  }
+  .btn.danger { background: #fff; border-color: #F09595; color: #A32D2D; }
   .btn.danger:active { background: #FCEBEB; }
-  .btn.whatsapp {
-    background: #25D366; border-color: #25D366; color: #fff;
-  }
+  .btn.whatsapp { background: #25D366; border-color: #25D366; color: #fff; }
   .btn.whatsapp:active { background: #1da851; }
   .btn.sm { padding: 6px 12px; font-size: 12px; }
   .btn.icon-only { padding: 8px; min-width: 36px; display: inline-flex; align-items: center; justify-content: center; }
   .btn.icon-only i { font-size: 16px; }
+
   .search-wrap { padding: 10px 14px; border-bottom: 1px solid #E8E7E1; }
-  .search-wrap input {
-    width: 100%; padding: 10px 12px; border: 1px solid #D8D6CB;
-    border-radius: 10px; background: #F8F7F2; color: #1A1A19;
-    font-size: 14px; font-family: inherit; outline: none;
-  }
+  .search-wrap input { width: 100%; padding: 10px 12px; border: 1px solid #D8D6CB; border-radius: 10px; background: #F8F7F2; color: #1A1A19; font-size: 14px; font-family: inherit; outline: none; }
   .search-wrap input:focus { border-color: #1D9E75; background: #fff; }
-  .pay-row {
-    padding: 12px 14px; border-bottom: 1px solid #F0EFE9;
-    cursor: pointer;
-  }
+
+  /* PAYMENT ROWS */
+  .pay-row { padding: 12px 14px; border-bottom: 1px solid #F0EFE9; cursor: pointer; }
   .pay-row:last-child { border-bottom: none; }
   .pay-row:active { background: #F4F3EE; }
-  .pay-top {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
-  }
+  .pay-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .pay-name { font-size: 14px; font-weight: 500; }
   .pay-amt { font-size: 15px; font-weight: 600; color: #0F6E56; }
   .pay-sub { display: flex; justify-content: space-between; }
   .pay-info { font-size: 11px; color: #6A6A65; }
-  .pay-mode-tag {
-    display: inline-block; padding: 1px 6px; border-radius: 4px;
-    font-size: 9px; font-weight: 600; margin-left: 4px; vertical-align: middle;
-  }
+  .pay-mode-tag { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 600; margin-left: 4px; vertical-align: middle; }
   .pay-mode-tag.cash { background: #FAEEDA; color: #633806; }
   .pay-mode-tag.bank { background: #E6F1FB; color: #0C447C; }
-  .due-row {
-    padding: 13px 14px; border-bottom: 1px solid #F0EFE9;
-    display: flex; align-items: center; gap: 10px;
-  }
+
+  /* DUE ROWS */
+  .due-row { padding: 13px 14px; border-bottom: 1px solid #F0EFE9; display: flex; align-items: center; gap: 10px; }
   .due-row:last-child { border-bottom: none; }
   .due-info { flex: 1; min-width: 0; }
-  .due-name {
-    font-size: 14px; font-weight: 500;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
+  .due-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .due-sub { font-size: 11px; color: #6A6A65; margin-top: 1px; }
   .due-amt { font-size: 14px; font-weight: 600; color: #A32D2D; white-space: nowrap; }
-  .empty {
-    padding: 40px 20px; text-align: center; color: #6A6A65; font-size: 14px;
-  }
+
+  /* EXPENSE */
+  .expense-row { padding: 12px 14px; border-bottom: 1px solid #F0EFE9; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .expense-row:last-child { border-bottom: none; }
+  .expense-icon { width: 36px; height: 36px; border-radius: 50%; background: #FCEBEB; display: flex; align-items: center; justify-content: center; color: #A32D2D; flex-shrink: 0; }
+  .expense-info { flex: 1; min-width: 0; }
+  .expense-title { font-size: 13px; font-weight: 500; }
+  .expense-sub { font-size: 11px; color: #6A6A65; margin-top: 1px; }
+  .expense-amt { font-size: 14px; font-weight: 600; color: #A32D2D; }
+
+  .empty { padding: 40px 20px; text-align: center; color: #6A6A65; font-size: 14px; }
   .empty i { font-size: 36px; display: block; margin-bottom: 10px; color: #1D9E75; }
+
+  /* MODAL SHEETS */
   .modal-wrap {
-    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5);
-    z-index: 100; display: flex; align-items: flex-end;
-    justify-content: center; animation: fadeIn 0.18s ease;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 100; display: flex; align-items: flex-end; justify-content: center;
+    animation: fadeIn 0.18s ease;
   }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
   .modal-sheet {
     background: #fff; border-radius: 22px 22px 0 0;
     width: 100%; max-width: 480px;
@@ -225,22 +203,12 @@
     max-height: 92vh; overflow-y: auto;
     animation: slideUp 0.22s ease;
   }
-  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .sheet-handle {
-    width: 38px; height: 4px; background: #D8D6CB;
-    border-radius: 4px; margin: 10px auto 14px;
-  }
-  .sheet-title {
-    font-size: 16px; font-weight: 600; padding: 0 16px 12px;
-    border-bottom: 1px solid #E8E7E1;
-    display: flex; justify-content: space-between; align-items: center;
-  }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .sheet-handle { width: 38px; height: 4px; background: #D8D6CB; border-radius: 4px; margin: 10px auto 14px; }
+  .sheet-title { font-size: 16px; font-weight: 600; padding: 0 16px 12px; border-bottom: 1px solid #E8E7E1; display: flex; justify-content: space-between; align-items: center; }
   .sheet-body { padding: 16px; }
   .field { margin-bottom: 14px; }
-  .field label {
-    display: block; font-size: 12px; color: #6A6A65;
-    margin-bottom: 6px; font-weight: 500;
-  }
+  .field label { display: block; font-size: 12px; color: #6A6A65; margin-bottom: 6px; font-weight: 500; }
   .field input, .field select, .field textarea {
     width: 100%; padding: 12px; border: 1px solid #D8D6CB;
     border-radius: 10px; background: #F8F7F2; color: #1A1A19;
@@ -248,300 +216,142 @@
     -webkit-appearance: none; appearance: none;
   }
   .field textarea { min-height: 80px; resize: vertical; }
-  .field input:focus, .field select:focus, .field textarea:focus {
-    border-color: #1D9E75; background: #fff;
-  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #1D9E75; background: #fff; }
   .field select {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3e%3cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236A6A65' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3e%3cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236A6A65' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3e%3c/svg%3e");
     background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
   }
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-  .sheet-footer {
-    padding: 12px 16px 16px; display: flex; gap: 10px;
-    border-top: 1px solid #E8E7E1;
-  }
-  .sheet-footer .btn {
-    flex: 1; padding: 13px; font-size: 15px;
-    font-weight: 500; text-align: center;
-  }
-  .err {
-    color: #A32D2D; font-size: 12px; margin-top: 6px; display: none;
-    background: #FCEBEB; padding: 8px 10px; border-radius: 6px;
-  }
-  .heatmap-row {
-    display: grid; grid-template-columns: 70px 1fr;
-    gap: 6px; align-items: center; margin-bottom: 5px;
-  }
-  .hmap-name {
-    font-size: 11px; color: #6A6A65;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .hmap-dots { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
-  .hmap-dot { height: 14px; border-radius: 3px; }
-  .section-label {
-    font-size: 11px; font-weight: 600; color: #6A6A65;
-    text-transform: uppercase; letter-spacing: 0.05em;
-    margin: 16px 0 8px; padding: 0 4px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .legend {
-    display: flex; gap: 12px; margin-bottom: 12px;
-    font-size: 11px; color: #6A6A65;
-  }
-  .legend span { display: flex; align-items: center; gap: 5px; }
-  .legend .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-  .toast {
-    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-    background: #1A1A19; color: #fff; padding: 12px 20px;
-    border-radius: 50px; font-size: 13px; z-index: 200;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    animation: toastIn 0.3s ease; max-width: 90%; text-align: center;
-  }
-  .toast.success { background: #0F6E56; }
-  .toast.error { background: #A32D2D; }
-  @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
-  .pay-mode-toggle {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  }
-  .pay-mode-btn {
-    padding: 12px; border: 1px solid #D8D6CB; border-radius: 10px;
-    background: #F8F7F2; cursor: pointer; font-family: inherit;
-    font-size: 13px; display: flex; flex-direction: column;
-    align-items: center; gap: 4px; color: #6A6A65;
-  }
-  .pay-mode-btn.active {
-    background: #EAF3DE; border-color: #1D9E75; color: #0F6E56;
-  }
+  .three-col { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .sheet-footer { padding: 12px 16px 16px; display: flex; gap: 10px; border-top: 1px solid #E8E7E1; }
+  .sheet-footer .btn { flex: 1; padding: 13px; font-size: 15px; font-weight: 500; text-align: center; }
+  .err { color: #A32D2D; font-size: 12px; margin-top: 6px; display: none; background: #FCEBEB; padding: 8px 10px; border-radius: 6px; }
+
+  /* PAY MODE TOGGLE */
+  .pay-mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pay-mode-btn { padding: 12px; border: 1px solid #D8D6CB; border-radius: 10px; background: #F8F7F2; cursor: pointer; font-family: inherit; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6A6A65; }
+  .pay-mode-btn.active { background: #EAF3DE; border-color: #1D9E75; color: #0F6E56; }
   .pay-mode-btn i { font-size: 22px; }
-  .attachment-zone {
-    border: 2px dashed #D8D6CB; border-radius: 10px;
-    padding: 20px; text-align: center; cursor: pointer;
-    transition: all 0.15s; background: #F8F7F2;
-  }
+
+  /* ATTACHMENT */
+  .attachment-zone { border: 2px dashed #D8D6CB; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; background: #F8F7F2; }
   .attachment-zone:active { background: #EAF3DE; border-color: #1D9E75; }
   .attachment-zone i { font-size: 28px; color: #6A6A65; display: block; margin-bottom: 6px; }
   .attachment-zone.has-file { border-style: solid; border-color: #1D9E75; background: #EAF3DE; }
-  .attachment-zone.has-file i { color: #0F6E56; }
-  .attachment-preview {
-    margin-top: 8px; max-width: 100%; max-height: 120px;
-    border-radius: 6px; border: 1px solid #E8E7E1;
-  }
-  .alert-box {
-    background: #FFF7ED; border: 1px solid #F0997B;
-    border-radius: 10px; padding: 12px 14px;
-    margin-bottom: 14px; display: flex; gap: 10px;
-  }
+  .attachment-preview { margin-top: 8px; max-width: 100%; max-height: 120px; border-radius: 6px; }
+
+  /* HEATMAP */
+  .heatmap-row { display: grid; grid-template-columns: 70px 1fr; gap: 6px; align-items: center; margin-bottom: 5px; }
+  .hmap-name { font-size: 11px; color: #6A6A65; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hmap-dots { display: grid; grid-template-columns: repeat(12,1fr); gap: 3px; }
+  .hmap-dot { height: 14px; border-radius: 3px; }
+
+  .section-label { font-size: 11px; font-weight: 600; color: #6A6A65; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; padding: 0 4px; }
+  .legend { display: flex; gap: 12px; margin-bottom: 12px; font-size: 11px; color: #6A6A65; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .legend .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+  .alert-box { background: #FFF7ED; border: 1px solid #F0997B; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; display: flex; gap: 10px; }
   .alert-box i { color: #993C1D; font-size: 20px; flex-shrink: 0; }
-  .alert-box-content { flex: 1; }
-  .alert-box-title { font-size: 13px; font-weight: 600; color: #993C1D; margin-bottom: 2px; }
-  .alert-box-text { font-size: 12px; color: #712B13; }
-  .summary-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 8px 0; font-size: 13px;
-  }
-  .summary-row.total {
-    border-top: 1px solid #E8E7E1; padding-top: 12px;
-    margin-top: 8px; font-weight: 600; font-size: 15px;
-  }
-  .menu-popup {
-    position: absolute; right: 14px; top: 50px;
-    background: #fff; border: 1px solid #E8E7E1;
-    border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    z-index: 50; min-width: 160px; overflow: hidden;
-    animation: fadeIn 0.15s ease;
-  }
-  .menu-item {
-    padding: 12px 14px; display: flex; align-items: center; gap: 10px;
-    font-size: 13px; cursor: pointer; border-bottom: 1px solid #F0EFE9;
-    background: #fff;
-  }
-  .menu-item:last-child { border-bottom: none; }
-  .menu-item:active { background: #F4F3EE; }
-  .menu-item.danger { color: #A32D2D; }
-  .menu-item i { font-size: 16px; }
-  .expense-row {
-    padding: 12px 14px; border-bottom: 1px solid #F0EFE9;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .expense-row:last-child { border-bottom: none; }
-  .expense-icon {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: #FCEBEB; display: flex; align-items: center;
-    justify-content: center; color: #A32D2D; flex-shrink: 0;
-  }
-  .expense-icon.income { background: #EAF3DE; color: #3B6D11; }
-  .expense-info { flex: 1; min-width: 0; }
-  .expense-title { font-size: 13px; font-weight: 500; }
-  .expense-sub { font-size: 11px; color: #6A6A65; margin-top: 1px; }
-  .expense-amt { font-size: 14px; font-weight: 600; }
-  .expense-amt.out { color: #A32D2D; }
-  .expense-amt.in { color: #0F6E56; }
-  .receipt-preview {
-    background: #fff; border: 1px dashed #D8D6CB;
-    border-radius: 10px; padding: 14px; margin-bottom: 14px;
-    font-size: 12px; line-height: 1.6;
-  }
-  .receipt-preview .head {
-    text-align: center; font-weight: 600; font-size: 14px;
-    margin-bottom: 8px; color: #0F6E56;
-  }
-  .quick-action-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
-    padding: 12px;
-  }
-  .quick-action {
-    padding: 14px 10px; border: 1px solid #E8E7E1; border-radius: 10px;
-    background: #F8F7F2; text-align: center; cursor: pointer;
-    font-size: 12px; font-family: inherit; color: #1A1A19;
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-  }
+  .alert-title { font-size: 13px; font-weight: 600; color: #993C1D; margin-bottom: 2px; }
+  .alert-text { font-size: 12px; color: #712B13; }
+
+  .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px; }
+  .summary-row.total { border-top: 1px solid #E8E7E1; padding-top: 12px; margin-top: 8px; font-weight: 600; font-size: 15px; }
+
+  .receipt-preview { background: #fff; border: 1px dashed #D8D6CB; border-radius: 10px; padding: 14px; margin-bottom: 14px; font-size: 12px; line-height: 1.6; }
+  .receipt-preview .head { text-align: center; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #0F6E56; }
+
+  .quick-action-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; padding: 12px; }
+  .quick-action { padding: 14px 10px; border: 1px solid #E8E7E1; border-radius: 10px; background: #F8F7F2; text-align: center; cursor: pointer; font-size: 12px; font-family: inherit; color: #1A1A19; display: flex; flex-direction: column; align-items: center; gap: 6px; }
   .quick-action:active { background: #EAF3DE; border-color: #1D9E75; }
   .quick-action i { font-size: 22px; color: #1D9E75; }
+
+  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #1A1A19; color: #fff; padding: 12px 20px; border-radius: 50px; font-size: 13px; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,0.2); animation: toastIn 0.3s ease; max-width: 90%; text-align: center; }
+  .toast.success { background: #0F6E56; }
+  .toast.error { background: #A32D2D; }
+  @keyframes toastIn { from{opacity:0;transform:translate(-50%,20px)} to{opacity:1;transform:translate(-50%,0)} }
 </style>
 </head>
 <body>
 
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-logo">🏢</div>
+  <div class="loading-title">Ruby Social Society</div>
+  <div class="loading-sub">Third Floor · 2026</div>
+  <div class="loading-spinner"></div>
+  <div class="loading-status" id="loadingStatus">Connecting to Firebase...</div>
+</div>
+
 <div class="shell">
   <div class="topbar">
     <div class="topbar-left">
-      <div class="title"><i class="ti ti-building"></i>Ruby Social Society</div>
+      <div class="title">
+        <i class="ti ti-building"></i>Ruby Social Society
+        <span class="sync-dot" id="syncDot" title="Sync status"></span>
+      </div>
       <div class="sub">Third Floor &nbsp;·&nbsp; 2026</div>
     </div>
     <button class="pay-btn" onclick="openPaymentModal()"><i class="ti ti-plus"></i>Pay</button>
   </div>
-
   <div class="content" id="content"></div>
-
   <nav class="bottom-nav">
-    <button class="nav-item active" onclick="showTab('dashboard', this)"><i class="ti ti-layout-dashboard"></i>Home</button>
-    <button class="nav-item" onclick="showTab('members', this)"><i class="ti ti-users"></i>Members</button>
-    <button class="nav-item" onclick="showTab('payments', this)"><i class="ti ti-receipt"></i>Payments</button>
-    <button class="nav-item" onclick="showTab('expenses', this)"><i class="ti ti-cash"></i>Expenses</button>
-    <button class="nav-item" onclick="showTab('dues', this)"><i class="ti ti-alert-circle"></i>Dues</button>
+    <button class="nav-item active" onclick="showTab('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Home</button>
+    <button class="nav-item" onclick="showTab('members',this)"><i class="ti ti-users"></i>Members</button>
+    <button class="nav-item" onclick="showTab('payments',this)"><i class="ti ti-receipt"></i>Payments</button>
+    <button class="nav-item" onclick="showTab('expenses',this)"><i class="ti ti-cash"></i>Expenses</button>
+    <button class="nav-item" onclick="showTab('dues',this)"><i class="ti ti-alert-circle"></i>Dues</button>
   </nav>
-
   <div id="modal-root"></div>
   <div id="toast-root"></div>
 </div>
 
-<script>
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, doc, getDocs, setDoc, deleteDoc,
+  onSnapshot, writeBatch, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCs_izHLvuN4jEbo7JS9w_VOku4H0upRR4",
+  authDomain: "ruby-society-5656f.firebaseapp.com",
+  projectId: "ruby-society-5656f",
+  storageBucket: "ruby-society-5656f.firebasestorage.app",
+  messagingSenderId: "97702634272",
+  appId: "1:97702634272:web:ac82592bf7e79b20222d45"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ─── CONSTANTS ─────────────────────────────────────
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const CURRENT_MONTH = 5; // May (1-indexed). So months 0-4 (Jan-May) are billable.
+const CURRENT_MONTH = 5;
 const MONTHLY_AMT = 800;
-const SOCIETY_NAME = 'Ruby Social Society';
-const FLOOR = 'Third Floor';
-const YEAR = 2026;
 
-function loadData() {
-  try {
-    const saved = localStorage.getItem('ruby_society_v2');
-    if (saved) return JSON.parse(saved);
-  } catch(e) { console.error(e); }
-  return null;
-}
-function saveData() {
-  try {
-    localStorage.setItem('ruby_society_v2', JSON.stringify({
-      members, payments, expenses, bankBalance, nextId, nextReceipt
-    }));
-  } catch(e) { console.error('Save failed:', e); }
-}
+// ─── STATE ─────────────────────────────────────────
+let members = [];
+let payments = [];
+let expenses = [];
+let bankBalance = 0;
+let nextId = Date.now();
+let activeTab = 'dashboard';
+let currentAttachment = null;
+let unsubscribers = [];
 
-const saved = loadData();
-
-let members = saved?.members || [
-  {id:1, name:'Hiral Naresh Barot', flat:'301', phone:'', type:'owner'},
-  {id:2, name:'Thakkar Family', flat:'302', phone:'', type:'rented'},
-  {id:3, name:'Puja Nilesh Bhatt', flat:'303', phone:'', type:'owner'},
-  {id:4, name:'Maniben Wagh', flat:'304', phone:'', type:'owner'},
-  {id:5, name:'Ankodbhai Panchal', flat:'305', phone:'', type:'owner'},
-  {id:6, name:'Nakodiya Kapil', flat:'306', phone:'', type:'rented'},
-  {id:7, name:'Bhawani Patel', flat:'307', phone:'', type:'owner'},
-  {id:8, name:'Neha/Nikita Makwana', flat:'308', phone:'', type:'owner'},
-  {id:9, name:'Sanjay Patel', flat:'309', phone:'', type:'rented'},
-  {id:10, name:'Chandni Sharma', flat:'310', phone:'', type:'owner'},
-  {id:11, name:'Jignesh Kumar', flat:'311', phone:'', type:'owner'},
-  {id:12, name:'Raksha Ben', flat:'312', phone:'', type:'owner'},
-];
-
-let payments = saved?.payments || [
-  {id:1,memberId:1,month:0,amount:800,receipt:'118',date:'2026-01-05',mode:'cash',note:'',attachment:null},
-  {id:2,memberId:1,month:1,amount:800,receipt:'124',date:'2026-02-06',mode:'cash',note:'',attachment:null},
-  {id:3,memberId:1,month:2,amount:800,receipt:'200',date:'2026-03-04',mode:'cash',note:'',attachment:null},
-  {id:4,memberId:1,month:3,amount:800,receipt:'214',date:'2026-04-07',mode:'cash',note:'',attachment:null},
-  {id:5,memberId:2,month:0,amount:800,receipt:'119',date:'2026-01-08',mode:'cash',note:'',attachment:null},
-  {id:6,memberId:2,month:1,amount:700,receipt:'125',date:'2026-02-08',mode:'cash',note:'',attachment:null},
-  {id:7,memberId:2,month:2,amount:800,receipt:'201',date:'2026-03-09',mode:'cash',note:'',attachment:null},
-  {id:8,memberId:2,month:3,amount:900,receipt:'217',date:'2026-04-05',mode:'cash',note:'',attachment:null},
-  {id:9,memberId:3,month:0,amount:800,receipt:'120',date:'2026-01-10',mode:'cash',note:'',attachment:null},
-  {id:10,memberId:3,month:1,amount:800,receipt:'126',date:'2026-02-10',mode:'cash',note:'',attachment:null},
-  {id:11,memberId:3,month:2,amount:800,receipt:'202',date:'2026-03-11',mode:'cash',note:'',attachment:null},
-  {id:12,memberId:4,month:0,amount:800,receipt:'121',date:'2026-01-12',mode:'cash',note:'',attachment:null},
-  {id:13,memberId:4,month:1,amount:800,receipt:'130',date:'2026-02-12',mode:'cash',note:'',attachment:null},
-  {id:14,memberId:4,month:2,amount:800,receipt:'211',date:'2026-03-12',mode:'cash',note:'',attachment:null},
-  {id:15,memberId:4,month:3,amount:800,receipt:'221',date:'2026-04-14',mode:'cash',note:'',attachment:null},
-  {id:16,memberId:5,month:0,amount:800,receipt:'122',date:'2026-01-14',mode:'cash',note:'',attachment:null},
-  {id:17,memberId:5,month:1,amount:800,receipt:'162',date:'2026-02-14',mode:'cash',note:'',attachment:null},
-  {id:18,memberId:5,month:2,amount:800,receipt:'203',date:'2026-03-14',mode:'cash',note:'',attachment:null},
-  {id:19,memberId:5,month:3,amount:800,receipt:'222',date:'2026-04-20',mode:'cash',note:'',attachment:null},
-  {id:20,memberId:6,month:0,amount:800,receipt:'123',date:'2026-01-15',mode:'cash',note:'',attachment:null},
-  {id:21,memberId:6,month:1,amount:800,receipt:'163',date:'2026-02-15',mode:'cash',note:'',attachment:null},
-  {id:22,memberId:6,month:2,amount:800,receipt:'204',date:'2026-03-18',mode:'cash',note:'',attachment:null},
-  {id:23,memberId:6,month:3,amount:800,receipt:'228',date:'2026-04-22',mode:'cash',note:'',attachment:null},
-  {id:24,memberId:7,month:0,amount:800,receipt:'140',date:'2026-01-18',mode:'cash',note:'',attachment:null},
-  {id:25,memberId:7,month:1,amount:800,receipt:'148',date:'2026-02-18',mode:'cash',note:'',attachment:null},
-  {id:26,memberId:7,month:2,amount:800,receipt:'205',date:'2026-03-20',mode:'cash',note:'',attachment:null},
-  {id:27,memberId:8,month:0,amount:800,receipt:'141',date:'2026-01-19',mode:'cash',note:'',attachment:null},
-  {id:28,memberId:8,month:1,amount:800,receipt:'151',date:'2026-02-19',mode:'cash',note:'',attachment:null},
-  {id:29,memberId:8,month:2,amount:800,receipt:'206',date:'2026-03-22',mode:'cash',note:'',attachment:null},
-  {id:30,memberId:8,month:3,amount:800,receipt:'231',date:'2026-04-26',mode:'cash',note:'',attachment:null},
-  {id:31,memberId:9,month:0,amount:800,receipt:'142',date:'2026-01-20',mode:'cash',note:'',attachment:null},
-  {id:32,memberId:9,month:1,amount:800,receipt:'157',date:'2026-02-20',mode:'cash',note:'',attachment:null},
-  {id:33,memberId:9,month:2,amount:800,receipt:'207',date:'2026-03-24',mode:'cash',note:'',attachment:null},
-  {id:34,memberId:10,month:0,amount:800,receipt:'143',date:'2026-01-22',mode:'cash',note:'',attachment:null},
-  {id:35,memberId:10,month:1,amount:800,receipt:'194',date:'2026-02-22',mode:'cash',note:'',attachment:null},
-  {id:36,memberId:10,month:2,amount:800,receipt:'251',date:'2026-03-25',mode:'cash',note:'',attachment:null},
-  {id:37,memberId:10,month:3,amount:800,receipt:'256',date:'2026-04-28',mode:'cash',note:'',attachment:null},
-  {id:38,memberId:11,month:0,amount:800,receipt:'144',date:'2026-01-24',mode:'cash',note:'',attachment:null},
-  {id:39,memberId:11,month:1,amount:800,receipt:'137',date:'2026-02-24',mode:'cash',note:'',attachment:null},
-  {id:40,memberId:11,month:2,amount:800,receipt:'208',date:'2026-03-26',mode:'cash',note:'',attachment:null},
-  {id:41,memberId:11,month:3,amount:800,receipt:'234',date:'2026-04-29',mode:'cash',note:'',attachment:null},
-  {id:42,memberId:12,month:0,amount:800,receipt:'150',date:'2026-01-26',mode:'cash',note:'',attachment:null},
-  {id:43,memberId:12,month:1,amount:800,receipt:'127',date:'2026-02-26',mode:'cash',note:'',attachment:null},
-  {id:44,memberId:12,month:2,amount:800,receipt:'209',date:'2026-03-28',mode:'cash',note:'',attachment:null},
-];
-
-let expenses = saved?.expenses || [];
-let bankBalance = saved?.bankBalance || 0;
-let nextId = saved?.nextId || 200;
-let nextReceipt = saved?.nextReceipt || 270;
-
-// HELPERS ============================================
+// ─── HELPERS ───────────────────────────────────────
 function rupee(n) { return '\u20B9' + Number(n).toLocaleString('en-IN'); }
-function initials(name) {
-  return name.split(/[\s\/]/).filter(Boolean).slice(0,2).map(w => w[0]).join('').toUpperCase();
-}
+function initials(name) { return name.split(/[\s\/]/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
 function getMember(id) { return members.find(m => m.id === id); }
 function getPayment(id) { return payments.find(p => p.id === id); }
 function getMemberPay(mid) { return payments.filter(p => p.memberId === mid); }
-function isPaidThisMonth(mid) {
-  return payments.some(p => p.memberId === mid && p.month === CURRENT_MONTH - 1);
-}
-function totalCollected() { return payments.reduce((s, p) => s + p.amount, 0); }
-function thisMonthCollected() {
-  return payments.filter(p => p.month === CURRENT_MONTH - 1).reduce((s, p) => s + p.amount, 0);
-}
-function totalDue() {
-  let d = 0;
-  members.forEach(m => {
-    for (let i = 0; i < CURRENT_MONTH; i++) {
-      if (!payments.find(p => p.memberId === m.id && p.month === i)) d += MONTHLY_AMT;
-    }
-  });
-  return d;
-}
-function totalExpenses() { return expenses.reduce((s, e) => s + e.amount, 0); }
+function isPaidThisMonth(mid) { return payments.some(p => p.memberId === mid && p.month === CURRENT_MONTH - 1); }
+function totalCollected() { return payments.reduce((s,p) => s+p.amount, 0); }
+function thisMonthCollected() { return payments.filter(p=>p.month===CURRENT_MONTH-1).reduce((s,p)=>s+p.amount,0); }
+function totalExpenses() { return expenses.reduce((s,e) => s+e.amount, 0); }
 function getMemberDueMonths(mid) {
   const due = [];
   for (let i = 0; i < CURRENT_MONTH; i++) {
@@ -549,211 +359,310 @@ function getMemberDueMonths(mid) {
   }
   return due;
 }
-
-// WhatsApp message builders
-function buildReceiptMessage(payment) {
-  const m = getMember(payment.memberId);
-  const lines = [
-    '*\u2728 ' + SOCIETY_NAME + ' \u2728*',
-    FLOOR + ' \u2014 Year ' + YEAR,
-    '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500',
-    '*PAYMENT RECEIPT*',
-    '',
-    '*Receipt No:* #' + payment.receipt,
-    '*Date:* ' + formatDate(payment.date),
-    '*Member:* ' + m.name,
-    '*Flat No:* ' + m.flat + ' (' + (m.type === 'owner' ? 'Owner' : 'Tenant') + ')',
-    '',
-    '*Period:* ' + MONTHS[payment.month] + ' ' + YEAR,
-    '*Amount:* ' + rupee(payment.amount),
-    '*Mode:* ' + (payment.mode === 'cash' ? 'Cash' : 'Bank Transfer'),
-    payment.note ? '*Note:* ' + payment.note : null,
-    '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500',
-    '\u2705 Payment received successfully',
-    '',
-    'Thank you for your timely payment! \ud83d\ude4f',
-    '',
-    '_- Society Management_'
-  ].filter(Boolean);
-  return lines.join('\n');
+function totalDue() {
+  let d = 0;
+  members.forEach(m => { getMemberDueMonths(m.id).forEach(() => d += MONTHLY_AMT); });
+  return d;
 }
-
-function buildHistoryMessage(memberId) {
-  const m = getMember(memberId);
-  const mp = getMemberPay(memberId).sort((a,b) => a.month - b.month);
-  const totalPaid = mp.reduce((s,p) => s+p.amount, 0);
-  const dueMonths = getMemberDueMonths(memberId);
-  const totalDueAmt = dueMonths.length * MONTHLY_AMT;
-  
-  const lines = [
-    '*\u2728 ' + SOCIETY_NAME + ' \u2728*',
-    FLOOR + ' \u2014 Year ' + YEAR,
-    '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500',
-    '*PAYMENT HISTORY*',
-    '',
-    'Dear *' + m.name + '*,',
-    'Flat No: ' + m.flat + ' (' + (m.type === 'owner' ? 'Owner' : 'Tenant') + ')',
-    '',
-    'Here is your maintenance payment summary:',
-    '',
-    '*\ud83d\udcc5 Months Paid:*'
-  ];
-  
-  if (mp.length === 0) {
-    lines.push('_No payments recorded yet_');
-  } else {
-    mp.forEach(p => {
-      lines.push('\u2705 ' + MONTHS[p.month] + ' ' + YEAR + ' \u2014 ' + rupee(p.amount) + ' (#' + p.receipt + ')');
-    });
-  }
-  
-  lines.push('');
-  lines.push('*\u26a0\ufe0f Pending Months:*');
-  if (dueMonths.length === 0) {
-    lines.push('\ud83c\udf89 All clear! No pending dues.');
-  } else {
-    dueMonths.forEach(mo => {
-      lines.push('\u274c ' + MONTHS[mo] + ' ' + YEAR + ' \u2014 ' + rupee(MONTHLY_AMT));
-    });
-  }
-  
-  lines.push('');
-  lines.push('\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500');
-  lines.push('*\ud83d\udcb0 Total Paid:* ' + rupee(totalPaid));
-  if (totalDueAmt > 0) lines.push('*\ud83d\udd34 Total Due:* ' + rupee(totalDueAmt));
-  lines.push('');
-  
-  if (dueMonths.length > 0) {
-    lines.push('Kindly clear pending dues at the earliest. \ud83d\ude4f');
-  } else {
-    lines.push('Thank you for your timely payments! \ud83d\ude4f\u2728');
-  }
-  
-  lines.push('');
-  lines.push('_- Society Management_');
-  return lines.join('\n');
-}
-
-function buildOverdueWarning(memberId) {
-  const m = getMember(memberId);
-  const dueMonths = getMemberDueMonths(memberId);
-  const totalDueAmt = dueMonths.length * MONTHLY_AMT;
-  
-  const lines = [
-    '*\u26a0\ufe0f IMPORTANT NOTICE \u26a0\ufe0f*',
-    SOCIETY_NAME + ' \u2014 ' + FLOOR,
-    '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500',
-    '',
-    'Dear *' + m.name + '*,',
-    'Flat No: ' + m.flat,
-    '',
-    'This is to inform you that your maintenance dues have been *pending for ' + dueMonths.length + ' months*.',
-    '',
-    '*Outstanding Months:*'
-  ];
-  dueMonths.forEach(mo => {
-    lines.push('\u274c ' + MONTHS[mo] + ' ' + YEAR + ' \u2014 ' + rupee(MONTHLY_AMT));
-  });
-  
-  lines.push('');
-  lines.push('*Total Outstanding Amount: ' + rupee(totalDueAmt) + '*');
-  lines.push('');
-  lines.push('Despite multiple reminders, we have not received any payment from your end.');
-  lines.push('');
-  lines.push('Please be informed that if the pending dues are *not cleared within 7 days* from the receipt of this notice, the society reserves the right to disconnect the *water supply* to your flat as per society bye-laws.');
-  lines.push('');
-  lines.push('We request you to make the payment at the earliest to avoid any inconvenience. Kindly contact the society management for any clarification or to settle the dues.');
-  lines.push('');
-  lines.push('Thanking you for your cooperation.');
-  lines.push('');
-  lines.push('_- Society Management Committee_');
-  lines.push(SOCIETY_NAME);
-  return lines.join('\n');
-}
-
-function buildReminderMessage(memberId) {
-  const m = getMember(memberId);
-  const dueMonths = getMemberDueMonths(memberId);
-  const totalDueAmt = dueMonths.length * MONTHLY_AMT;
-  
-  const lines = [
-    '*\ud83d\udcec Friendly Reminder*',
-    SOCIETY_NAME + ' \u2014 ' + FLOOR,
-    '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500',
-    '',
-    'Dear *' + m.name + '*,',
-    'Flat No: ' + m.flat,
-    '',
-    'This is a gentle reminder that your maintenance payment is pending for the following months:',
-    ''
-  ];
-  dueMonths.forEach(mo => {
-    lines.push('\ud83d\udd38 ' + MONTHS[mo] + ' ' + YEAR + ' \u2014 ' + rupee(MONTHLY_AMT));
-  });
-  
-  lines.push('');
-  lines.push('*Total Pending: ' + rupee(totalDueAmt) + '*');
-  lines.push('');
-  lines.push('Kindly arrange the payment at your earliest convenience. If you have already paid, please ignore this message and share the receipt with us.');
-  lines.push('');
-  lines.push('Thank you for your cooperation. \ud83d\ude4f');
-  lines.push('');
-  lines.push('_- Society Management_');
-  return lines.join('\n');
-}
-
 function formatDate(iso) {
   if (!iso) return '';
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  return new Date(iso).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'});
+}
+function setSyncDot(state) {
+  const dot = document.getElementById('syncDot');
+  if (!dot) return;
+  dot.className = 'sync-dot ' + state;
+  dot.title = state === 'online' ? 'Synced' : state === 'syncing' ? 'Syncing...' : 'Offline';
 }
 
-function sendWhatsApp(phone, message) {
-  // If phone is empty, open generic WhatsApp; else open chat with that number
-  const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
-  let phoneWithCode = cleanPhone;
-  if (cleanPhone && cleanPhone.length === 10) phoneWithCode = '91' + cleanPhone;
-  const url = phoneWithCode 
-    ? `https://wa.me/${phoneWithCode}?text=${encodeURIComponent(message)}`
-    : `https://wa.me/?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
+// ─── FIREBASE REALTIME LISTENERS ──────────────────
+async function initFirebase() {
+  setLoadingStatus('Loading members...');
+  try {
+    // Members listener
+    const unsubMembers = onSnapshot(collection(db, 'members'), snap => {
+      members = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      setSyncDot('online');
+      if (activeTab) render();
+    });
+
+    // Payments listener
+    const unsubPayments = onSnapshot(collection(db, 'payments'), snap => {
+      payments = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      if (activeTab) render();
+    });
+
+    // Expenses listener
+    const unsubExpenses = onSnapshot(collection(db, 'expenses'), snap => {
+      expenses = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      if (activeTab) render();
+    });
+
+    // Settings (bank balance)
+    const unsubSettings = onSnapshot(doc(db, 'settings', 'main'), snap => {
+      if (snap.exists()) {
+        bankBalance = snap.data().bankBalance || 0;
+        nextId = snap.data().nextId || Date.now();
+      }
+      if (activeTab) render();
+    });
+
+    unsubscribers = [unsubMembers, unsubPayments, unsubExpenses, unsubSettings];
+
+    // Seed initial members if empty
+    setLoadingStatus('Checking data...');
+    const membersSnap = await getDocs(collection(db, 'members'));
+    if (membersSnap.empty) {
+      setLoadingStatus('Setting up initial data...');
+      await seedInitialData();
+    }
+
+    setLoadingStatus('Ready!');
+    setTimeout(() => {
+      document.getElementById('loadingScreen').classList.add('hidden');
+    }, 600);
+
+  } catch(e) {
+    console.error('Firebase error:', e);
+    setLoadingStatus('Error: ' + e.message);
+    setSyncDot('');
+  }
 }
 
-let activeTab = 'dashboard';
+function setLoadingStatus(msg) {
+  const el = document.getElementById('loadingStatus');
+  if (el) el.textContent = msg;
+}
 
-function showTab(tab, btn) {
+async function seedInitialData() {
+  const batch = writeBatch(db);
+  const initialMembers = [
+    {name:'Hiral Naresh Barot',flat:'301',phone:'',type:'owner'},
+    {name:'Thakkar Family',flat:'302',phone:'',type:'rented'},
+    {name:'Puja Nilesh Bhatt',flat:'303',phone:'',type:'owner'},
+    {name:'Maniben Wagh',flat:'304',phone:'',type:'owner'},
+    {name:'Ankodbhai Panchal',flat:'305',phone:'',type:'owner'},
+    {name:'Nakodiya Kapil',flat:'306',phone:'',type:'rented'},
+    {name:'Bhawani Patel',flat:'307',phone:'',type:'owner'},
+    {name:'Neha/Nikita Makwana',flat:'308',phone:'',type:'owner'},
+    {name:'Sanjay Patel',flat:'309',phone:'',type:'rented'},
+    {name:'Chandni Sharma',flat:'310',phone:'',type:'owner'},
+    {name:'Jignesh Kumar',flat:'311',phone:'',type:'owner'},
+    {name:'Raksha Ben',flat:'312',phone:'',type:'owner'},
+  ];
+  initialMembers.forEach((m, i) => {
+    batch.set(doc(db, 'members', 'M' + (i+1)), m);
+  });
+  const initialPayments = [
+    {memberId:'M1',month:0,amount:800,receipt:'118',date:'2026-01-05',mode:'cash',note:'',attachment:null},
+    {memberId:'M1',month:1,amount:800,receipt:'124',date:'2026-02-06',mode:'cash',note:'',attachment:null},
+    {memberId:'M1',month:2,amount:800,receipt:'200',date:'2026-03-04',mode:'cash',note:'',attachment:null},
+    {memberId:'M1',month:3,amount:800,receipt:'214',date:'2026-04-07',mode:'cash',note:'',attachment:null},
+    {memberId:'M2',month:0,amount:800,receipt:'119',date:'2026-01-08',mode:'cash',note:'',attachment:null},
+    {memberId:'M2',month:1,amount:700,receipt:'125',date:'2026-02-08',mode:'cash',note:'',attachment:null},
+    {memberId:'M2',month:2,amount:800,receipt:'201',date:'2026-03-09',mode:'cash',note:'',attachment:null},
+    {memberId:'M2',month:3,amount:900,receipt:'217',date:'2026-04-05',mode:'cash',note:'',attachment:null},
+    {memberId:'M3',month:0,amount:800,receipt:'120',date:'2026-01-10',mode:'cash',note:'',attachment:null},
+    {memberId:'M3',month:1,amount:800,receipt:'126',date:'2026-02-10',mode:'cash',note:'',attachment:null},
+    {memberId:'M3',month:2,amount:800,receipt:'202',date:'2026-03-11',mode:'cash',note:'',attachment:null},
+    {memberId:'M4',month:0,amount:800,receipt:'121',date:'2026-01-12',mode:'cash',note:'',attachment:null},
+    {memberId:'M4',month:1,amount:800,receipt:'130',date:'2026-02-12',mode:'cash',note:'',attachment:null},
+    {memberId:'M4',month:2,amount:800,receipt:'211',date:'2026-03-12',mode:'cash',note:'',attachment:null},
+    {memberId:'M4',month:3,amount:800,receipt:'221',date:'2026-04-14',mode:'cash',note:'',attachment:null},
+    {memberId:'M5',month:0,amount:800,receipt:'122',date:'2026-01-14',mode:'cash',note:'',attachment:null},
+    {memberId:'M5',month:1,amount:800,receipt:'162',date:'2026-02-14',mode:'cash',note:'',attachment:null},
+    {memberId:'M5',month:2,amount:800,receipt:'203',date:'2026-03-14',mode:'cash',note:'',attachment:null},
+    {memberId:'M5',month:3,amount:800,receipt:'222',date:'2026-04-20',mode:'cash',note:'',attachment:null},
+    {memberId:'M6',month:0,amount:800,receipt:'123',date:'2026-01-15',mode:'cash',note:'',attachment:null},
+    {memberId:'M6',month:1,amount:800,receipt:'163',date:'2026-02-15',mode:'cash',note:'',attachment:null},
+    {memberId:'M6',month:2,amount:800,receipt:'204',date:'2026-03-18',mode:'cash',note:'',attachment:null},
+    {memberId:'M6',month:3,amount:800,receipt:'228',date:'2026-04-22',mode:'cash',note:'',attachment:null},
+    {memberId:'M7',month:0,amount:800,receipt:'140',date:'2026-01-18',mode:'cash',note:'',attachment:null},
+    {memberId:'M7',month:1,amount:800,receipt:'148',date:'2026-02-18',mode:'cash',note:'',attachment:null},
+    {memberId:'M7',month:2,amount:800,receipt:'205',date:'2026-03-20',mode:'cash',note:'',attachment:null},
+    {memberId:'M8',month:0,amount:800,receipt:'141',date:'2026-01-19',mode:'cash',note:'',attachment:null},
+    {memberId:'M8',month:1,amount:800,receipt:'151',date:'2026-02-19',mode:'cash',note:'',attachment:null},
+    {memberId:'M8',month:2,amount:800,receipt:'206',date:'2026-03-22',mode:'cash',note:'',attachment:null},
+    {memberId:'M8',month:3,amount:800,receipt:'231',date:'2026-04-26',mode:'cash',note:'',attachment:null},
+    {memberId:'M9',month:0,amount:800,receipt:'142',date:'2026-01-20',mode:'cash',note:'',attachment:null},
+    {memberId:'M9',month:1,amount:800,receipt:'157',date:'2026-02-20',mode:'cash',note:'',attachment:null},
+    {memberId:'M9',month:2,amount:800,receipt:'207',date:'2026-03-24',mode:'cash',note:'',attachment:null},
+    {memberId:'M10',month:0,amount:800,receipt:'143',date:'2026-01-22',mode:'cash',note:'',attachment:null},
+    {memberId:'M10',month:1,amount:800,receipt:'194',date:'2026-02-22',mode:'cash',note:'',attachment:null},
+    {memberId:'M10',month:2,amount:800,receipt:'251',date:'2026-03-25',mode:'cash',note:'',attachment:null},
+    {memberId:'M10',month:3,amount:800,receipt:'256',date:'2026-04-28',mode:'cash',note:'',attachment:null},
+    {memberId:'M11',month:0,amount:800,receipt:'144',date:'2026-01-24',mode:'cash',note:'',attachment:null},
+    {memberId:'M11',month:1,amount:800,receipt:'137',date:'2026-02-24',mode:'cash',note:'',attachment:null},
+    {memberId:'M11',month:2,amount:800,receipt:'208',date:'2026-03-26',mode:'cash',note:'',attachment:null},
+    {memberId:'M11',month:3,amount:800,receipt:'234',date:'2026-04-29',mode:'cash',note:'',attachment:null},
+    {memberId:'M12',month:0,amount:800,receipt:'150',date:'2026-01-26',mode:'cash',note:'',attachment:null},
+    {memberId:'M12',month:1,amount:800,receipt:'127',date:'2026-02-26',mode:'cash',note:'',attachment:null},
+    {memberId:'M12',month:2,amount:800,receipt:'209',date:'2026-03-28',mode:'cash',note:'',attachment:null},
+  ];
+  initialPayments.forEach((p, i) => {
+    batch.set(doc(db, 'payments', 'P' + (i+1)), p);
+  });
+  batch.set(doc(db, 'settings', 'main'), {bankBalance: 0, nextId: 1000});
+  await batch.commit();
+}
+
+// ─── FIRESTORE CRUD ───────────────────────────────
+async function saveMemberFS(m) {
+  setSyncDot('syncing');
+  await setDoc(doc(db, 'members', m.id), {name:m.name,flat:m.flat,phone:m.phone,type:m.type});
+  setSyncDot('online');
+}
+async function deleteMemberFS(id) {
+  setSyncDot('syncing');
+  await deleteDoc(doc(db, 'members', id));
+  const payDocs = payments.filter(p => p.memberId === id);
+  const batch = writeBatch(db);
+  payDocs.forEach(p => batch.delete(doc(db, 'payments', p.id)));
+  await batch.commit();
+  setSyncDot('online');
+}
+async function savePaymentFS(p) {
+  setSyncDot('syncing');
+  const data = {memberId:p.memberId,month:p.month,amount:p.amount,receipt:p.receipt,date:p.date,mode:p.mode,note:p.note||'',attachment:p.attachment||null};
+  await setDoc(doc(db, 'payments', p.id), data);
+  setSyncDot('online');
+}
+async function deletePaymentFS(id) {
+  setSyncDot('syncing');
+  await deleteDoc(doc(db, 'payments', id));
+  setSyncDot('online');
+}
+async function saveExpenseFS(e) {
+  setSyncDot('syncing');
+  await setDoc(doc(db, 'expenses', e.id), {title:e.title,category:e.category,amount:e.amount,date:e.date,source:e.source,note:e.note||'',icon:e.icon,attachment:e.attachment||null});
+  setSyncDot('online');
+}
+async function deleteExpenseFS(id) {
+  setSyncDot('syncing');
+  await deleteDoc(doc(db, 'expenses', id));
+  setSyncDot('online');
+}
+async function saveBankBalance(amount) {
+  setSyncDot('syncing');
+  await setDoc(doc(db, 'settings', 'main'), {bankBalance: amount, nextId}, {merge: true});
+  setSyncDot('online');
+}
+function newId(prefix) {
+  return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+}
+
+// ─── WHATSAPP MESSAGES ────────────────────────────
+function buildReceiptMsg(p) {
+  const m = getMember(p.memberId);
+  return [
+    '*\u2728 Ruby Social Society \u2728*',
+    'Third Floor \u2014 2026',
+    '\u2500'.repeat(20),
+    '*PAYMENT RECEIPT*','',
+    '*Receipt No:* #' + p.receipt,
+    '*Date:* ' + formatDate(p.date),
+    '*Member:* ' + m.name,
+    '*Flat:* ' + m.flat + ' (' + (m.type==='owner'?'Owner':'Tenant') + ')','',
+    '*Period:* ' + MONTHS[p.month] + ' 2026',
+    '*Amount:* ' + rupee(p.amount),
+    '*Mode:* ' + (p.mode==='cash'?'Cash':'Bank Transfer'),
+    p.note?'*Note:* '+p.note:null,
+    '\u2500'.repeat(20),
+    '\u2705 Payment received successfully','',
+    'Thank you for your timely payment! \ud83d\ude4f','',
+    '_- Society Management_'
+  ].filter(Boolean).join('\n');
+}
+function buildHistoryMsg(mid) {
+  const m = getMember(mid);
+  const mp = getMemberPay(mid).sort((a,b)=>a.month-b.month);
+  const due = getMemberDueMonths(mid);
+  const totalPaid = mp.reduce((s,p)=>s+p.amount,0);
+  return [
+    '*\u2728 Ruby Social Society \u2728*',
+    'Third Floor \u2014 2026',
+    '\u2500'.repeat(20),
+    '*PAYMENT HISTORY*','',
+    'Dear *'+m.name+'*,',
+    'Flat: ' + m.flat + ' (' + (m.type==='owner'?'Owner':'Tenant') + ')','',
+    '*\ud83d\udcc5 Months Paid:*',
+    ...( mp.length ? mp.map(p=>'\u2705 '+MONTHS[p.month]+' 2026 \u2014 '+rupee(p.amount)+' (#'+p.receipt+')') : ['_No payments yet_']),
+    '','*\u26a0\ufe0f Pending:*',
+    ...( due.length ? due.map(mo=>'\u274c '+MONTHS[mo]+' 2026 \u2014 '+rupee(MONTHLY_AMT)) : ['\ud83c\udf89 All clear!']),
+    '','\u2500'.repeat(20),
+    '*\ud83d\udcb0 Total Paid:* '+rupee(totalPaid),
+    due.length?'*\ud83d\udd34 Total Due:* '+rupee(due.length*MONTHLY_AMT):'',
+    '','',
+    due.length?'Kindly clear pending dues at the earliest. \ud83d\ude4f':'Thank you for your timely payments! \ud83c\udf89',
+    '','_- Society Management_'
+  ].filter(s=>s!==null&&s!==undefined).join('\n');
+}
+function buildOverdueMsg(mid) {
+  const m = getMember(mid);
+  const due = getMemberDueMonths(mid);
+  return [
+    '*\u26a0\ufe0f IMPORTANT NOTICE \u26a0\ufe0f*',
+    'Ruby Social Society \u2014 Third Floor',
+    '\u2500'.repeat(20),'',
+    'Dear *'+m.name+'*,','Flat: '+m.flat,'',
+    'Your maintenance dues are pending for *'+due.length+' months*:','',
+    ...due.map(mo=>'\u274c '+MONTHS[mo]+' 2026 \u2014 '+rupee(MONTHLY_AMT)),
+    '','*Total Outstanding: '+rupee(due.length*MONTHLY_AMT)+'*','',
+    'Please be informed that if dues are not cleared within *7 days*, the society reserves the right to *disconnect water supply* to your flat as per society bye-laws.','',
+    'Kindly contact the society management to settle your dues immediately.','',
+    'Thanking you for your cooperation.','',
+    '_- Society Management Committee_',
+    'Ruby Social Society'
+  ].join('\n');
+}
+function buildReminderMsg(mid) {
+  const m = getMember(mid);
+  const due = getMemberDueMonths(mid);
+  return [
+    '*\ud83d\udcec Friendly Reminder*',
+    'Ruby Social Society \u2014 Third Floor',
+    '\u2500'.repeat(20),'',
+    'Dear *'+m.name+'*,','Flat: '+m.flat,'',
+    'Your maintenance is pending for:','',
+    ...due.map(mo=>'\ud83d\udd38 '+MONTHS[mo]+' 2026 \u2014 '+rupee(MONTHLY_AMT)),
+    '','*Total Pending: '+rupee(due.length*MONTHLY_AMT)+'*','',
+    'Kindly arrange payment at your earliest. If already paid, share the receipt with us.','',
+    'Thank you \ud83d\ude4f','','_- Society Management_'
+  ].join('\n');
+}
+function sendWA(phone, msg) {
+  const clean = (phone||'').replace(/\D/g,'');
+  const num = clean.length===10?'91'+clean:clean;
+  window.open(num?`https://wa.me/${num}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+// ─── TABS ─────────────────────────────────────────
+window.showTab = function(tab, btn) {
   activeTab = tab;
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  window.scrollTo(0, 0);
+  window.scrollTo(0,0);
   render();
-}
-
-function showToast(msg, type) {
-  const root = document.getElementById('toast-root');
-  const cls = type ? ' ' + type : '';
-  root.innerHTML = `<div class="toast${cls}">${msg}</div>`;
-  setTimeout(() => root.innerHTML = '', 2200);
-}
+};
 
 function render() {
   const el = document.getElementById('content');
-  if (activeTab === 'dashboard') el.innerHTML = renderDash();
-  else if (activeTab === 'members') el.innerHTML = renderMembers();
-  else if (activeTab === 'payments') el.innerHTML = renderPayments();
-  else if (activeTab === 'expenses') el.innerHTML = renderExpenses();
+  if (!el) return;
+  if (activeTab==='dashboard') el.innerHTML = renderDash();
+  else if (activeTab==='members') el.innerHTML = renderMembers();
+  else if (activeTab==='payments') el.innerHTML = renderPayments();
+  else if (activeTab==='expenses') el.innerHTML = renderExpenses();
   else el.innerHTML = renderDues();
 }
 
-// DASHBOARD =========================================
+// ─── DASHBOARD ────────────────────────────────────
 function renderDash() {
-  const paidNow = members.filter(m => isPaidThisMonth(m.id)).length;
+  const paidNow = members.filter(m=>isPaidThisMonth(m.id)).length;
   const unpaid = members.length - paidNow;
-  const overdueMembers = members.filter(m => getMemberDueMonths(m.id).length >= 3);
-  
+  const overdue3 = members.filter(m=>getMemberDueMonths(m.id).length>=3);
   return `
   <div class="bank-card">
-    <div class="bank-label"><i class="ti ti-wallet"></i>Society Bank Balance</div>
+    <div class="bank-label"><i class="ti ti-wallet"></i> Society Bank Balance</div>
     <div class="bank-amount">${rupee(bankBalance)}</div>
     <div class="bank-actions">
       <button onclick="openBankModal('add')"><i class="ti ti-plus"></i>Add</button>
@@ -761,65 +670,35 @@ function renderDash() {
       <button onclick="openBankModal('set')"><i class="ti ti-edit"></i>Set</button>
     </div>
   </div>
-
-  ${overdueMembers.length > 0 ? `
-  <div class="alert-box">
-    <i class="ti ti-alert-triangle"></i>
-    <div class="alert-box-content">
-      <div class="alert-box-title">${overdueMembers.length} member${overdueMembers.length > 1 ? 's' : ''} overdue 3+ months</div>
-      <div class="alert-box-text">Send a final notice via WhatsApp from the Dues tab.</div>
-    </div>
-  </div>
-  ` : ''}
-
+  ${overdue3.length?`<div class="alert-box"><i class="ti ti-alert-triangle"></i><div><div class="alert-title">${overdue3.length} member(s) overdue 3+ months</div><div class="alert-text">Send final notice from Dues tab.</div></div></div>`:''}
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label"><i class="ti ti-coins"></i>Total collected</div>
-      <div class="stat-val green">${rupee(totalCollected())}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label"><i class="ti ti-calendar-month"></i>${MONTHS[CURRENT_MONTH-1]} collected</div>
-      <div class="stat-val blue">${rupee(thisMonthCollected())}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label"><i class="ti ti-alert-triangle"></i>Pending dues</div>
-      <div class="stat-val red">${rupee(totalDue())}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label"><i class="ti ti-circle-check"></i>Paid this month</div>
-      <div class="stat-val muted">${paidNow}<small>/${members.length}</small></div>
-    </div>
+    <div class="stat-card"><div class="stat-label"><i class="ti ti-coins"></i>Total collected</div><div class="stat-val green">${rupee(totalCollected())}</div></div>
+    <div class="stat-card"><div class="stat-label"><i class="ti ti-calendar-month"></i>${MONTHS[CURRENT_MONTH-1]} collected</div><div class="stat-val blue">${rupee(thisMonthCollected())}</div></div>
+    <div class="stat-card"><div class="stat-label"><i class="ti ti-alert-triangle"></i>Pending dues</div><div class="stat-val red">${rupee(totalDue())}</div></div>
+    <div class="stat-card"><div class="stat-label"><i class="ti ti-circle-check"></i>Paid this month</div><div class="stat-val muted">${paidNow}<small>/${members.length}</small></div></div>
   </div>
-
+  <div class="card"><div class="card-header"><span class="card-title">Quick actions</span></div>
+  <div class="quick-action-grid">
+    <button class="quick-action" onclick="openPaymentModal()"><i class="ti ti-receipt-rupee"></i>Record payment</button>
+    <button class="quick-action" onclick="openAddMember()"><i class="ti ti-user-plus"></i>Add member</button>
+    <button class="quick-action" onclick="openExpenseModal()"><i class="ti ti-cash-banknote"></i>Add expense</button>
+    <button class="quick-action" onclick="exportBackup()"><i class="ti ti-download"></i>Backup data</button>
+  </div></div>
+  <div class="section-label">${MONTHS[CURRENT_MONTH-1]} 2026 — status</div>
   <div class="card">
-    <div class="card-header"><span class="card-title">Quick actions</span></div>
-    <div class="quick-action-grid">
-      <button class="quick-action" onclick="openPaymentModal()"><i class="ti ti-receipt-rupee"></i>Record payment</button>
-      <button class="quick-action" onclick="openAddMember()"><i class="ti ti-user-plus"></i>Add member</button>
-      <button class="quick-action" onclick="openExpenseModal()"><i class="ti ti-cash-banknote"></i>Add expense</button>
-      <button class="quick-action" onclick="exportData()"><i class="ti ti-download"></i>Backup data</button>
-    </div>
-  </div>
-
-  <div class="section-label">${MONTHS[CURRENT_MONTH-1]} 2026 — quick status</div>
-  <div class="card">
-    ${members.map(m => {
-      const dueMonths = getMemberDueMonths(m.id);
-      const isOverdue = dueMonths.length >= 3;
-      return `
-      <div class="member-row" onclick="openMemberDetail(${m.id})">
-        <div class="avatar ${m.type === 'rented' ? 'rented' : ''}">${initials(m.name)}</div>
+    ${members.map(m=>{
+      const due=getMemberDueMonths(m.id);
+      return `<div class="member-row" onclick="openMemberDetail('${m.id}')">
+        <div class="avatar ${m.type==='rented'?'rented':''}">${initials(m.name)}</div>
         <div class="member-info">
           <div class="member-name">${m.name}</div>
-          <div class="member-flat">Flat ${m.flat} · <span class="badge ${m.type}">${m.type === 'owner' ? 'Owner' : 'Tenant'}</span></div>
+          <div class="member-flat">Flat ${m.flat} · <span class="badge ${m.type}">${m.type==='owner'?'Owner':'Tenant'}</span></div>
         </div>
-        ${isOverdue ? `<span class="badge overdue">${dueMonths.length}m due</span>` :
-          `<span class="badge ${isPaidThisMonth(m.id) ? 'paid' : 'unpaid'}">${isPaidThisMonth(m.id) ? 'Paid' : 'Pending'}</span>`}
+        ${due.length>=3?`<span class="badge overdue">${due.length}m due</span>`:`<span class="badge ${isPaidThisMonth(m.id)?'paid':'unpaid'}">${isPaidThisMonth(m.id)?'Paid':'Pending'}</span>`}
         <i class="ti ti-chevron-right" style="font-size:18px;color:#ABABA3;margin-left:4px"></i>
       </div>`;
     }).join('')}
   </div>
-
   <div class="section-label">Payment heatmap</div>
   <div class="card" style="padding:14px">
     <div class="legend">
@@ -827,106 +706,76 @@ function renderDash() {
       <span><span class="dot" style="background:#F09595"></span>Pending</span>
       <span><span class="dot" style="background:#E8E7E1"></span>Future</span>
     </div>
-    ${members.map(m => `
+    ${members.map(m=>`
       <div class="heatmap-row">
         <div class="hmap-name">${m.name.split(/[\s\/]/)[0]}</div>
-        <div class="hmap-dots">
-          ${MONTHS.map((_, i) => {
-            const future = i >= CURRENT_MONTH;
-            const paid = payments.find(p => p.memberId === m.id && p.month === i);
-            const bg = future ? '#E8E7E1' : (paid ? '#5DCAA5' : '#F09595');
-            return `<div class="hmap-dot" style="background:${bg}" title="${MONTHS[i]}"></div>`;
-          }).join('')}
-        </div>
-      </div>
-    `).join('')}
+        <div class="hmap-dots">${MONTHS.map((_,i)=>{
+          const future=i>=CURRENT_MONTH;
+          const paid=payments.find(p=>p.memberId===m.id&&p.month===i);
+          return `<div class="hmap-dot" style="background:${future?'#E8E7E1':paid?'#5DCAA5':'#F09595'}"></div>`;
+        }).join('')}</div>
+      </div>`).join('')}
     <div class="heatmap-row" style="margin-top:6px">
       <div></div>
-      <div class="hmap-dots">${MONTHS.map(m => `<div style="font-size:9px;color:#6A6A65;text-align:center">${m[0]}</div>`).join('')}</div>
+      <div class="hmap-dots">${MONTHS.map(m=>`<div style="font-size:9px;color:#6A6A65;text-align:center">${m[0]}</div>`).join('')}</div>
     </div>
   </div>`;
 }
 
-// MEMBERS ============================================
+// ─── MEMBERS ──────────────────────────────────────
 function renderMembers() {
-  const owners = members.filter(m => m.type === 'owner').length;
-  const tenants = members.filter(m => m.type === 'rented').length;
+  const owners = members.filter(m=>m.type==='owner').length;
+  const tenants = members.length-owners;
   return `
   <div class="stats-grid three">
-    <div class="stat-card compact">
-      <div class="stat-label"><i class="ti ti-users"></i>Total</div>
-      <div class="stat-val muted">${members.length}</div>
-    </div>
-    <div class="stat-card compact">
-      <div class="stat-label"><i class="ti ti-home"></i>Owners</div>
-      <div class="stat-val green">${owners}</div>
-    </div>
-    <div class="stat-card compact">
-      <div class="stat-label"><i class="ti ti-key"></i>Tenants</div>
-      <div class="stat-val amber">${tenants}</div>
-    </div>
+    <div class="stat-card compact"><div class="stat-label">Total</div><div class="stat-val muted">${members.length}</div></div>
+    <div class="stat-card compact"><div class="stat-label">Owners</div><div class="stat-val green">${owners}</div></div>
+    <div class="stat-card compact"><div class="stat-label">Tenants</div><div class="stat-val amber">${tenants}</div></div>
   </div>
-  
   <div class="card">
-    <div class="card-header">
-      <span class="card-title">All members</span>
-      <button class="btn sm primary" onclick="openAddMember()"><i class="ti ti-plus"></i> Add</button>
-    </div>
-    <div class="search-wrap">
-      <input type="search" placeholder="Search name or flat..." oninput="filterList(this.value)" id="msearch">
-    </div>
-    <div id="mlist">
-      ${members.map(m => `
-        <div class="member-row" id="mr${m.id}" onclick="openMemberDetail(${m.id})">
-          <div class="avatar ${m.type === 'rented' ? 'rented' : ''}">${initials(m.name)}</div>
-          <div class="member-info">
-            <div class="member-name">${m.name} <span class="badge ${m.type}">${m.type === 'owner' ? 'Owner' : 'Tenant'}</span></div>
-            <div class="member-flat">Flat ${m.flat}${m.phone ? ' &nbsp;·&nbsp; ' + m.phone : ''}</div>
-          </div>
-          <span class="badge ${isPaidThisMonth(m.id) ? 'paid' : 'unpaid'}">${isPaidThisMonth(m.id) ? 'Current' : 'Pending'}</span>
+    <div class="card-header"><span class="card-title">All members</span><button class="btn sm primary" onclick="openAddMember()"><i class="ti ti-plus"></i> Add</button></div>
+    <div class="search-wrap"><input type="search" placeholder="Search name or flat..." oninput="filterList(this.value)" id="msearch"></div>
+    <div id="mlist">${members.map(m=>`
+      <div class="member-row" id="mr${m.id}" onclick="openMemberDetail('${m.id}')">
+        <div class="avatar ${m.type==='rented'?'rented':''}">${initials(m.name)}</div>
+        <div class="member-info">
+          <div class="member-name">${m.name} <span class="badge ${m.type}">${m.type==='owner'?'Owner':'Tenant'}</span></div>
+          <div class="member-flat">Flat ${m.flat}${m.phone?' · '+m.phone:''}</div>
         </div>
-      `).join('')}
+        <span class="badge ${isPaidThisMonth(m.id)?'paid':'unpaid'}">${isPaidThisMonth(m.id)?'Current':'Pending'}</span>
+        <i class="ti ti-chevron-right" style="font-size:18px;color:#ABABA3;margin-left:4px"></i>
+      </div>`).join('')}
     </div>
   </div>`;
 }
 
-function filterList(q) {
-  members.forEach(m => {
-    const row = document.getElementById('mr' + m.id);
-    if (!row) return;
-    const match = m.name.toLowerCase().includes(q.toLowerCase()) || m.flat.includes(q);
-    row.style.display = match ? '' : 'none';
+window.filterList = function(q) {
+  members.forEach(m=>{
+    const row=document.getElementById('mr'+m.id);
+    if(!row) return;
+    row.style.display=(m.name.toLowerCase().includes(q.toLowerCase())||m.flat.includes(q))?'':'none';
   });
-}
+};
 
-// PAYMENTS ===========================================
+// ─── PAYMENTS ─────────────────────────────────────
 function renderPayments() {
-  const sorted = [...payments].sort((a, b) => b.id - a.id);
-  const cashTotal = payments.filter(p => p.mode === 'cash').reduce((s,p) => s+p.amount, 0);
-  const bankTotal = payments.filter(p => p.mode === 'bank').reduce((s,p) => s+p.amount, 0);
+  const sorted=[...payments].sort((a,b)=>b.id.localeCompare(a.id));
+  const cashTotal=payments.filter(p=>p.mode==='cash').reduce((s,p)=>s+p.amount,0);
+  const bankTotal=payments.filter(p=>p.mode==='bank').reduce((s,p)=>s+p.amount,0);
   return `
   <div class="stats-grid">
-    <div class="stat-card compact">
-      <div class="stat-label"><i class="ti ti-cash"></i>Cash collected</div>
-      <div class="stat-val amber">${rupee(cashTotal)}</div>
-    </div>
-    <div class="stat-card compact">
-      <div class="stat-label"><i class="ti ti-building-bank"></i>Bank transfers</div>
-      <div class="stat-val blue">${rupee(bankTotal)}</div>
-    </div>
+    <div class="stat-card compact"><div class="stat-label"><i class="ti ti-cash"></i>Cash</div><div class="stat-val amber">${rupee(cashTotal)}</div></div>
+    <div class="stat-card compact"><div class="stat-label"><i class="ti ti-building-bank"></i>Bank</div><div class="stat-val blue">${rupee(bankTotal)}</div></div>
   </div>
-  <div class="section-label">${payments.length} payment records</div>
+  <div class="section-label">${payments.length} records</div>
   <div class="card">
-    ${sorted.length === 0 ? `<div class="empty"><i class="ti ti-receipt"></i>No payments recorded yet</div>` :
-    sorted.map(p => {
-      const m = getMember(p.memberId);
-      return `<div class="pay-row" onclick="openPaymentDetail(${p.id})">
-        <div class="pay-top">
-          <span class="pay-name">${m ? m.name : 'Unknown'}</span>
-          <span class="pay-amt">${rupee(p.amount)}</span>
-        </div>
+    ${sorted.length===0?`<div class="empty"><i class="ti ti-receipt"></i>No payments yet</div>`:
+    sorted.map(p=>{
+      const m=getMember(p.memberId);
+      return `<div class="pay-row" onclick="openPaymentDetail('${p.id}')">
+        <div class="pay-top"><span class="pay-name">${m?m.name:'Unknown'}</span><span class="pay-amt">${rupee(p.amount)}</span></div>
         <div class="pay-sub">
-          <span class="pay-info">Flat ${m ? m.flat : '\u2014'} · ${MONTHS[p.month]} · #${p.receipt}<span class="pay-mode-tag ${p.mode || 'cash'}">${(p.mode || 'cash').toUpperCase()}</span>${p.attachment ? ' <i class="ti ti-paperclip" style="font-size:11px;color:#1D9E75"></i>' : ''}</span>
+          <span class="pay-info">Flat ${m?m.flat:'—'} · ${MONTHS[p.month]} · #${p.receipt}<span class="pay-mode-tag ${p.mode||'cash'}">${(p.mode||'cash').toUpperCase()}</span></span>
           <span class="pay-info">${formatDate(p.date)}</span>
         </div>
       </div>`;
@@ -934,387 +783,246 @@ function renderPayments() {
   </div>`;
 }
 
-// DUES ===============================================
+// ─── DUES ─────────────────────────────────────────
 function renderDues() {
-  const overdue3plus = [];
-  const overdueAll = [];
-  
-  members.forEach(m => {
-    const due = getMemberDueMonths(m.id);
-    if (due.length > 0) {
-      overdueAll.push({ m, months: due });
-      if (due.length >= 3) overdue3plus.push({ m, months: due });
-    }
-  });
-  
-  const totalDueAmt = overdueAll.reduce((s, d) => s + d.months.length * MONTHLY_AMT, 0);
-  
+  const dueList=[];
+  members.forEach(m=>{const d=getMemberDueMonths(m.id);if(d.length>0)dueList.push({m,months:d});});
+  const overdue3=dueList.filter(d=>d.months.length>=3);
+  const totalDueAmt=dueList.reduce((s,d)=>s+d.months.length*MONTHLY_AMT,0);
   return `
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label"><i class="ti ti-alert-triangle"></i>Total outstanding</div>
-      <div class="stat-val red">${rupee(totalDueAmt)}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label"><i class="ti ti-users"></i>Members with dues</div>
-      <div class="stat-val amber">${overdueAll.length}</div>
-    </div>
+    <div class="stat-card"><div class="stat-label">Total outstanding</div><div class="stat-val red">${rupee(totalDueAmt)}</div></div>
+    <div class="stat-card"><div class="stat-label">Members with dues</div><div class="stat-val amber">${dueList.length}</div></div>
   </div>
-  
-  ${overdue3plus.length > 0 ? `
-  <div class="section-label" style="color:#A32D2D">
-    <span><i class="ti ti-alert-octagon" style="font-size:13px"></i> Critical: 3+ months overdue</span>
-  </div>
+  ${overdue3.length?`
+  <div class="section-label" style="color:#A32D2D">⚠️ Critical: 3+ months overdue</div>
   <div class="card" style="border-color:#F09595">
-    ${overdue3plus.map(d => `
-      <div class="due-row" style="background:#FFF7F5">
-        <div class="avatar" style="background:#FCEBEB;color:#A32D2D">${initials(d.m.name)}</div>
-        <div class="due-info">
-          <div class="due-name">${d.m.name}</div>
-          <div class="due-sub">Flat ${d.m.flat} · ${d.months.length} months · ${rupee(d.months.length * MONTHLY_AMT)}</div>
-        </div>
-        <button class="btn sm" style="background:#A32D2D;color:#fff;border-color:#A32D2D" onclick="event.stopPropagation();sendOverdueWarning(${d.m.id})">
-          <i class="ti ti-brand-whatsapp"></i> Warn
-        </button>
-      </div>
-    `).join('')}
-  </div>
-  ` : ''}
-  
-  <div class="section-label">All outstanding dues</div>
+    ${overdue3.map(d=>`<div class="due-row" style="background:#FFF7F5">
+      <div class="avatar" style="background:#FCEBEB;color:#A32D2D">${initials(d.m.name)}</div>
+      <div class="due-info"><div class="due-name">${d.m.name}</div><div class="due-sub">Flat ${d.m.flat} · ${d.months.length} months · ${rupee(d.months.length*MONTHLY_AMT)}</div></div>
+      <button class="btn sm" style="background:#A32D2D;color:#fff;border-color:#A32D2D" onclick="sendOverdueWarn('${d.m.id}')"><i class="ti ti-brand-whatsapp"></i> Warn</button>
+    </div>`).join('')}
+  </div>`:''}
+  <div class="section-label">All dues</div>
   <div class="card">
-    ${overdueAll.length === 0 ?
-      `<div class="empty"><i class="ti ti-circle-check"></i>All dues cleared!</div>` :
-      overdueAll.map(d => `
-        <div class="due-row">
-          <div class="avatar ${d.m.type === 'rented' ? 'rented' : ''}">${initials(d.m.name)}</div>
-          <div class="due-info">
-            <div class="due-name">${d.m.name}</div>
-            <div class="due-sub">Flat ${d.m.flat} · ${d.months.length} month${d.months.length > 1 ? 's' : ''} · ${d.months.map(mo => MONTHS[mo]).join(', ')}</div>
-          </div>
-          <button class="btn sm icon-only whatsapp" onclick="event.stopPropagation();sendReminder(${d.m.id})" title="Send reminder">
-            <i class="ti ti-brand-whatsapp"></i>
-          </button>
-          <button class="btn sm primary" onclick="event.stopPropagation();openPaymentModalFor(${d.m.id}, ${d.months[0]})">Collect</button>
-        </div>
-      `).join('')
-    }
+    ${dueList.length===0?`<div class="empty"><i class="ti ti-circle-check"></i>All dues cleared! 🎉</div>`:
+    dueList.map(d=>`<div class="due-row">
+      <div class="avatar ${d.m.type==='rented'?'rented':''}">${initials(d.m.name)}</div>
+      <div class="due-info"><div class="due-name">${d.m.name}</div><div class="due-sub">Flat ${d.m.flat} · ${d.months.length} month(s) · ${d.months.map(mo=>MONTHS[mo]).join(', ')}</div></div>
+      <button class="btn sm icon-only whatsapp" onclick="sendReminder('${d.m.id}')"><i class="ti ti-brand-whatsapp"></i></button>
+      <button class="btn sm primary" onclick="openPaymentModalFor('${d.m.id}',${d.months[0]})">Collect</button>
+    </div>`).join('')}
   </div>`;
 }
 
-// EXPENSES ===========================================
+// ─── EXPENSES ─────────────────────────────────────
 function renderExpenses() {
-  const sorted = [...expenses].sort((a, b) => b.id - a.id);
-  const total = totalExpenses();
-  const collected = totalCollected();
-  const netFunds = collected - total;
-  
+  const sorted=[...expenses].sort((a,b)=>b.id.localeCompare(a.id));
+  const total=totalExpenses();
+  const collected=totalCollected();
   return `
   <div class="stats-grid three">
-    <div class="stat-card compact">
-      <div class="stat-label"><i class="ti ti-arrow-up-right"></i>Collected</div>
-      <div class="stat-val green">${rupee(collected)}</div>
-    </div>
-    <div class="stat-card compact">
-      <div class="stat-label"><i class="ti ti-arrow-down-left"></i>Spent</div>
-      <div class="stat-val red">${rupee(total)}</div>
-    </div>
-    <div class="stat-card compact">
-      <div class="stat-label"><i class="ti ti-equal"></i>Balance</div>
-      <div class="stat-val ${netFunds >= 0 ? 'green' : 'red'}">${rupee(netFunds)}</div>
-    </div>
+    <div class="stat-card compact"><div class="stat-label">Collected</div><div class="stat-val green">${rupee(collected)}</div></div>
+    <div class="stat-card compact"><div class="stat-label">Spent</div><div class="stat-val red">${rupee(total)}</div></div>
+    <div class="stat-card compact"><div class="stat-label">Net</div><div class="stat-val ${collected-total>=0?'green':'red'}">${rupee(collected-total)}</div></div>
   </div>
-  
   <div class="card">
-    <div class="card-header">
-      <span class="card-title">Society expenses</span>
-      <button class="btn sm primary" onclick="openExpenseModal()"><i class="ti ti-plus"></i> Add</button>
-    </div>
-    ${sorted.length === 0 ?
-      `<div class="empty"><i class="ti ti-cash"></i>No expenses recorded.<br><small>Track watchman, cleaning, electricity etc.</small></div>` :
-      sorted.map(e => `
-        <div class="expense-row" onclick="openExpenseDetail(${e.id})">
-          <div class="expense-icon"><i class="ti ti-${e.icon || 'cash'}"></i></div>
-          <div class="expense-info">
-            <div class="expense-title">${e.title}</div>
-            <div class="expense-sub">${e.category} · ${formatDate(e.date)}${e.note ? ' · ' + e.note.substring(0, 30) : ''}</div>
-          </div>
-          <div class="expense-amt out">-${rupee(e.amount)}</div>
-        </div>
-      `).join('')
-    }
+    <div class="card-header"><span class="card-title">Expenses</span><button class="btn sm primary" onclick="openExpenseModal()"><i class="ti ti-plus"></i> Add</button></div>
+    ${sorted.length===0?`<div class="empty"><i class="ti ti-cash"></i>No expenses yet.<br><small>Track watchman, cleaning, electricity etc.</small></div>`:
+    sorted.map(e=>`<div class="expense-row" onclick="openExpenseDetail('${e.id}')">
+      <div class="expense-icon"><i class="ti ti-${e.icon||'cash'}"></i></div>
+      <div class="expense-info"><div class="expense-title">${e.title}</div><div class="expense-sub">${e.category} · ${formatDate(e.date)}</div></div>
+      <div class="expense-amt">-${rupee(e.amount)}</div>
+    </div>`).join('')}
   </div>`;
 }
 
-// MODALS =============================================
-let currentAttachment = null;
-
-function openPaymentModal() { openPaymentModalFor(null, null); }
-
-function openPaymentModalFor(memberId, month) {
+// ─── PAYMENT MODAL ────────────────────────────────
+window.openPaymentModal = function() { openPaymentModalFor(null,null); };
+window.openPaymentModalFor = function(memberId, month) {
   const today = new Date().toISOString().split('T')[0];
   currentAttachment = null;
-  const root = document.getElementById('modal-root');
-  root.innerHTML = `
+  const nxt = 270 + payments.length;
+  document.getElementById('modal-root').innerHTML = `
   <div class="modal-wrap" onclick="closeSheet(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
-      <div class="sheet-title">
-        Record payment
-        <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-      </div>
+      <div class="sheet-title">Record payment <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
       <div class="sheet-body">
-        <div class="field">
-          <label>Member</label>
-          <select id="pm-m">
-            <option value="">Select member...</option>
-            ${members.map(m => `<option value="${m.id}"${memberId === m.id ? ' selected' : ''}>${m.name} - Flat ${m.flat} (${m.type === 'owner' ? 'Owner' : 'Tenant'})</option>`).join('')}
+        <div class="field"><label>Member</label>
+          <select id="pm-m"><option value="">Select member...</option>
+            ${members.map(m=>`<option value="${m.id}"${memberId===m.id?' selected':''}>${m.name} - Flat ${m.flat}</option>`).join('')}
           </select>
         </div>
-        
-        <div class="field">
-          <label>Payment mode</label>
+        <div class="field"><label>Payment mode</label>
           <div class="pay-mode-toggle">
-            <div class="pay-mode-btn active" id="pm-mode-cash" onclick="selectPayMode('cash')">
-              <i class="ti ti-cash"></i>Cash
-            </div>
-            <div class="pay-mode-btn" id="pm-mode-bank" onclick="selectPayMode('bank')">
-              <i class="ti ti-building-bank"></i>Bank Transfer
-            </div>
+            <div class="pay-mode-btn active" id="pm-mode-cash" onclick="selMode('cash')"><i class="ti ti-cash"></i>Cash</div>
+            <div class="pay-mode-btn" id="pm-mode-bank" onclick="selMode('bank')"><i class="ti ti-building-bank"></i>Bank Transfer</div>
           </div>
           <input type="hidden" id="pm-mode" value="cash">
         </div>
-        
         <div class="two-col">
-          <div class="field">
-            <label>Month</label>
+          <div class="field"><label>Month</label>
             <select id="pm-mo">
-              ${MONTHS.slice(0, CURRENT_MONTH).map((mo, i) =>
-                `<option value="${i}"${(month === i || (month === null && i === CURRENT_MONTH - 1)) ? ' selected' : ''}>${mo} 2026</option>`
-              ).join('')}
+              ${MONTHS.slice(0,CURRENT_MONTH).map((mo,i)=>`<option value="${i}"${(month===i||(month===null&&i===CURRENT_MONTH-1))?' selected':''}>${mo} 2026</option>`).join('')}
             </select>
           </div>
-          <div class="field">
-            <label>Amount (\u20B9)</label>
-            <input type="number" id="pm-amt" value="${MONTHLY_AMT}" inputmode="numeric">
-          </div>
+          <div class="field"><label>Amount (\u20B9)</label><input type="number" id="pm-amt" value="${MONTHLY_AMT}" inputmode="numeric"></div>
         </div>
-        
         <div class="two-col">
-          <div class="field">
-            <label>Receipt no.</label>
-            <input type="text" id="pm-rec" value="${nextReceipt}">
-          </div>
-          <div class="field">
-            <label>Date</label>
-            <input type="date" id="pm-dt" value="${today}">
-          </div>
+          <div class="field"><label>Receipt no.</label><input type="text" id="pm-rec" value="${nxt}"></div>
+          <div class="field"><label>Date</label><input type="date" id="pm-dt" value="${today}"></div>
         </div>
-        
-        <div class="field">
-          <label>Note (optional)</label>
-          <input type="text" id="pm-note" placeholder="e.g. Late payment, Partial">
-        </div>
-        
-        <div class="field">
-          <label>Attachment (optional)</label>
-          <div class="attachment-zone" id="pm-att-zone" onclick="document.getElementById('pm-attachment').click()">
+        <div class="field"><label>Note (optional)</label><input type="text" id="pm-note" placeholder="e.g. Late payment"></div>
+        <div class="field"><label>Attachment (optional)</label>
+          <div class="attachment-zone" id="pm-att-zone" onclick="document.getElementById('pm-file').click()">
             <i class="ti ti-camera-plus"></i>
             <div style="font-size:13px;font-weight:500">Attach screenshot or photo</div>
-            <div style="font-size:11px;color:#6A6A65;margin-top:2px">Bank transfer screenshot, cash receipt photo</div>
           </div>
-          <input type="file" id="pm-attachment" accept="image/*" style="display:none" onchange="handleAttachment(event)">
+          <input type="file" id="pm-file" accept="image/*" style="display:none" onchange="handleAtt(event,'pm-att-zone')">
         </div>
-        
         <div class="err" id="pm-err"></div>
       </div>
       <div class="sheet-footer">
         <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-        <button class="btn primary" onclick="savePayment()">Save</button>
+        <button class="btn primary" onclick="doSavePayment()">Save</button>
       </div>
     </div>
   </div>`;
-}
+};
 
-function selectPayMode(mode) {
-  document.getElementById('pm-mode').value = mode;
-  document.getElementById('pm-mode-cash').classList.toggle('active', mode === 'cash');
-  document.getElementById('pm-mode-bank').classList.toggle('active', mode === 'bank');
-}
+window.selMode = function(mode) {
+  document.getElementById('pm-mode').value=mode;
+  document.getElementById('pm-mode-cash').classList.toggle('active',mode==='cash');
+  document.getElementById('pm-mode-bank').classList.toggle('active',mode==='bank');
+};
 
-function handleAttachment(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    currentAttachment = ev.target.result;
-    const zone = document.getElementById('pm-att-zone') || document.getElementById('ex-att-zone');
-    if (zone) {
-      zone.classList.add('has-file');
-      zone.innerHTML = `
-        <i class="ti ti-photo-check"></i>
-        <div style="font-size:13px;font-weight:500">Attached</div>
-        <img src="${ev.target.result}" class="attachment-preview">
-        <div style="margin-top:6px"><button class="btn sm" onclick="event.stopPropagation();removeAttachment()"><i class="ti ti-x"></i> Remove</button></div>
-      `;
-    }
+window.handleAtt = function(e, zoneId) {
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    currentAttachment=ev.target.result;
+    const zone=document.getElementById(zoneId);
+    zone.classList.add('has-file');
+    zone.innerHTML=`<i class="ti ti-photo-check"></i><div style="font-size:13px;font-weight:500">Attached ✓</div><img src="${ev.target.result}" class="attachment-preview">`;
   };
   reader.readAsDataURL(file);
-}
+};
 
-function removeAttachment() {
-  currentAttachment = null;
-  const fileInput = document.getElementById('pm-attachment') || document.getElementById('ex-attachment');
-  if (fileInput) fileInput.value = '';
-  const zone = document.getElementById('pm-att-zone') || document.getElementById('ex-att-zone');
-  if (zone) {
-    zone.classList.remove('has-file');
-    zone.innerHTML = `
-      <i class="ti ti-camera-plus"></i>
-      <div style="font-size:13px;font-weight:500">Attach screenshot or photo</div>
-      <div style="font-size:11px;color:#6A6A65;margin-top:2px">Bank transfer screenshot, cash receipt photo</div>
-    `;
-  }
-}
-
-function savePayment() {
-  const mid = parseInt(document.getElementById('pm-m').value);
-  const mo = parseInt(document.getElementById('pm-mo').value);
-  const amt = parseInt(document.getElementById('pm-amt').value);
-  const rec = document.getElementById('pm-rec').value.trim();
-  const dt = document.getElementById('pm-dt').value;
-  const mode = document.getElementById('pm-mode').value;
-  const note = document.getElementById('pm-note').value.trim();
-  const err = document.getElementById('pm-err');
-
-  if (!mid) { err.textContent = 'Please select a member'; err.style.display = 'block'; return; }
-  if (!amt || amt <= 0) { err.textContent = 'Enter a valid amount'; err.style.display = 'block'; return; }
-  if (payments.find(p => p.memberId === mid && p.month === mo)) {
-    err.textContent = 'Already recorded for this month'; err.style.display = 'block'; return;
-  }
-
-  const newPayment = {
-    id: nextId++, memberId: mid, month: mo, amount: amt,
-    receipt: rec || String(nextReceipt), date: dt, mode, note,
-    attachment: currentAttachment
-  };
-  payments.push(newPayment);
-  nextReceipt++;
-  
-  // Auto-add to bank if bank transfer
-  if (mode === 'bank') bankBalance += amt;
-  
-  saveData();
+window.doSavePayment = async function() {
+  const mid=document.getElementById('pm-m').value;
+  const mo=parseInt(document.getElementById('pm-mo').value);
+  const amt=parseInt(document.getElementById('pm-amt').value);
+  const rec=document.getElementById('pm-rec').value.trim();
+  const dt=document.getElementById('pm-dt').value;
+  const mode=document.getElementById('pm-mode').value;
+  const note=document.getElementById('pm-note').value.trim();
+  const err=document.getElementById('pm-err');
+  if(!mid){err.textContent='Please select a member';err.style.display='block';return;}
+  if(!amt||amt<=0){err.textContent='Enter valid amount';err.style.display='block';return;}
+  if(payments.find(p=>p.memberId===mid&&p.month===mo)){err.textContent='Already recorded for this month';err.style.display='block';return;}
+  const pid=newId('P');
+  const newPay={id:pid,memberId:mid,month:mo,amount:amt,receipt:rec,date:dt,mode,note,attachment:currentAttachment};
+  if(mode==='bank'){bankBalance+=amt;await saveBankBalance(bankBalance);}
+  await savePaymentFS(newPay);
   closeSheetDirect();
-  render();
-  showToast('Payment saved \u2713', 'success');
-  
-  // Ask about WhatsApp receipt
-  setTimeout(() => offerWhatsAppReceipt(newPayment), 300);
-}
+  showToast('Payment saved \u2713','success');
+  setTimeout(()=>offerReceipt(pid),300);
+};
 
-function offerWhatsAppReceipt(payment) {
-  const m = getMember(payment.memberId);
-  const root = document.getElementById('modal-root');
-  root.innerHTML = `
+function offerReceipt(pid) {
+  const p=payments.find(x=>x.id===pid)||{id:pid};
+  if(!p.memberId) return;
+  const m=getMember(p.memberId);
+  document.getElementById('modal-root').innerHTML=`
   <div class="modal-wrap" onclick="closeSheet(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
-      <div class="sheet-title">
-        Send receipt?
-        <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-      </div>
+      <div class="sheet-title">Send receipt? <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
       <div class="sheet-body">
         <div style="text-align:center;padding:10px 0 16px">
-          <div style="display:inline-flex;width:60px;height:60px;border-radius:50%;background:#EAF3DE;align-items:center;justify-content:center;margin-bottom:10px">
-            <i class="ti ti-circle-check" style="font-size:32px;color:#0F6E56"></i>
-          </div>
+          <div style="display:inline-flex;width:60px;height:60px;border-radius:50%;background:#EAF3DE;align-items:center;justify-content:center;margin-bottom:10px"><i class="ti ti-circle-check" style="font-size:32px;color:#0F6E56"></i></div>
           <div style="font-size:15px;font-weight:600;margin-bottom:4px">Payment recorded!</div>
-          <div style="font-size:13px;color:#6A6A65">${rupee(payment.amount)} from ${m.name}</div>
+          <div style="font-size:13px;color:#6A6A65">${rupee(p.amount||MONTHLY_AMT)} from ${m?m.name:'Member'}</div>
         </div>
-        <div class="receipt-preview">
-          <div class="head">📄 Receipt Preview</div>
-          <div>Receipt #${payment.receipt} · ${MONTHS[payment.month]} ${YEAR}</div>
-          <div>${m.name} · Flat ${m.flat}</div>
-          <div>${rupee(payment.amount)} · ${payment.mode === 'cash' ? 'Cash' : 'Bank Transfer'}</div>
-        </div>
-        ${!m.phone ? `<div class="err" style="display:block">⚠️ No phone number saved for this member. Add it to send directly.</div>` : ''}
+        ${!m?.phone?`<div class="err" style="display:block">⚠️ No phone saved for this member.</div>`:''}
       </div>
       <div class="sheet-footer">
         <button class="btn" onclick="closeSheetDirect()">Skip</button>
-        <button class="btn whatsapp" onclick="sendReceipt(${payment.id})"><i class="ti ti-brand-whatsapp"></i> Send Receipt</button>
+        <button class="btn whatsapp" onclick="sendReceipt('${pid}')"><i class="ti ti-brand-whatsapp"></i> Send Receipt</button>
       </div>
     </div>
   </div>`;
 }
 
-function sendReceipt(paymentId) {
-  const p = getPayment(paymentId);
-  const m = getMember(p.memberId);
-  const msg = buildReceiptMessage(p);
-  sendWhatsApp(m.phone, msg);
+window.sendReceipt = function(pid) {
+  const p=payments.find(x=>x.id===pid); if(!p) return;
+  const m=getMember(p.memberId);
+  sendWA(m?.phone, buildReceiptMsg(p));
   closeSheetDirect();
-  showToast('Opening WhatsApp...', 'success');
-}
+};
+window.sendHistory = function(mid) { const m=getMember(mid); sendWA(m?.phone,buildHistoryMsg(mid)); };
+window.sendReminder = function(mid) { const m=getMember(mid); sendWA(m?.phone,buildReminderMsg(mid)); };
+window.sendOverdueWarn = function(mid) {
+  const m=getMember(mid);
+  if(!confirm(`Send water-cut warning to ${m.name}?`)) return;
+  sendWA(m?.phone,buildOverdueMsg(mid));
+};
 
-function sendHistory(memberId) {
-  const m = getMember(memberId);
-  const msg = buildHistoryMessage(memberId);
-  sendWhatsApp(m.phone, msg);
-  showToast('Opening WhatsApp...', 'success');
-}
-
-function sendReminder(memberId) {
-  const m = getMember(memberId);
-  const msg = buildReminderMessage(memberId);
-  sendWhatsApp(m.phone, msg);
-  showToast('Opening WhatsApp...', 'success');
-}
-
-function sendOverdueWarning(memberId) {
-  const m = getMember(memberId);
-  if (!confirm(`Send formal water-cut warning to ${m.name}?\n\nThis is a serious notice. Continue?`)) return;
-  const msg = buildOverdueWarning(memberId);
-  sendWhatsApp(m.phone, msg);
-  showToast('Opening WhatsApp...', 'success');
-}
-
-// MEMBER MODAL =======================================
-function openAddMember() {
-  currentAttachment = null;
-  const root = document.getElementById('modal-root');
-  root.innerHTML = `
+// ─── PAYMENT DETAIL ───────────────────────────────
+window.openPaymentDetail = function(pid) {
+  const p=getPayment(pid); const m=getMember(p.memberId);
+  document.getElementById('modal-root').innerHTML=`
   <div class="modal-wrap" onclick="closeSheet(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
-      <div class="sheet-title">
-        Add new member
-        <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-      </div>
+      <div class="sheet-title">Payment details <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
       <div class="sheet-body">
-        <div class="field">
-          <label>Full name *</label>
-          <input type="text" id="nm-name" placeholder="Member name">
+        <div class="receipt-preview">
+          <div class="head">Receipt #${p.receipt}</div>
+          <div class="summary-row"><span style="color:#6A6A65">Member</span><span style="font-weight:500">${m?.name}</span></div>
+          <div class="summary-row"><span style="color:#6A6A65">Flat</span><span>${m?.flat}</span></div>
+          <div class="summary-row"><span style="color:#6A6A65">Period</span><span>${MONTHS[p.month]} 2026</span></div>
+          <div class="summary-row"><span style="color:#6A6A65">Date</span><span>${formatDate(p.date)}</span></div>
+          <div class="summary-row"><span style="color:#6A6A65">Mode</span><span class="pay-mode-tag ${p.mode||'cash'}">${(p.mode||'cash').toUpperCase()}</span></div>
+          ${p.note?`<div class="summary-row"><span style="color:#6A6A65">Note</span><span>${p.note}</span></div>`:''}
+          <div class="summary-row total"><span>Amount</span><span style="color:#0F6E56">${rupee(p.amount)}</span></div>
         </div>
+        ${p.attachment?`<img src="${p.attachment}" style="width:100%;border-radius:10px;border:1px solid #E8E7E1">`:''} 
+      </div>
+      <div class="sheet-footer">
+        <button class="btn danger" onclick="doDeletePayment('${pid}')"><i class="ti ti-trash"></i></button>
+        <button class="btn whatsapp" onclick="sendReceipt('${pid}')"><i class="ti ti-brand-whatsapp"></i> Send</button>
+        <button class="btn primary" onclick="closeSheetDirect()">Close</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+window.doDeletePayment = async function(pid) {
+  const p=getPayment(pid); const m=getMember(p.memberId);
+  if(!confirm(`Delete payment of ${rupee(p.amount)} from ${m?.name}?`)) return;
+  await deletePaymentFS(pid);
+  closeSheetDirect(); render(); showToast('Payment deleted','error');
+};
+
+// ─── MEMBER MODALS ────────────────────────────────
+window.openAddMember = function() {
+  document.getElementById('modal-root').innerHTML=`
+  <div class="modal-wrap" onclick="closeSheet(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Add member <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
+      <div class="sheet-body">
+        <div class="field"><label>Full name *</label><input type="text" id="nm-name" placeholder="Member name"></div>
         <div class="two-col">
-          <div class="field">
-            <label>Flat no. *</label>
-            <input type="text" id="nm-flat" placeholder="e.g. 313" inputmode="numeric">
-          </div>
-          <div class="field">
-            <label>Phone</label>
-            <input type="tel" id="nm-ph" placeholder="WhatsApp number" inputmode="tel">
-          </div>
+          <div class="field"><label>Flat no. *</label><input type="text" id="nm-flat" inputmode="numeric" placeholder="e.g. 313"></div>
+          <div class="field"><label>Phone (WhatsApp)</label><input type="tel" id="nm-ph" inputmode="tel" placeholder="10 digit"></div>
         </div>
-        <div class="field">
-          <label>Type *</label>
+        <div class="field"><label>Type *</label>
           <div class="pay-mode-toggle">
-            <div class="pay-mode-btn active" id="nm-type-owner" onclick="selectMemberType('owner')">
-              <i class="ti ti-home"></i>Owner
-            </div>
-            <div class="pay-mode-btn" id="nm-type-rented" onclick="selectMemberType('rented')">
-              <i class="ti ti-key"></i>Tenant
-            </div>
+            <div class="pay-mode-btn active" id="nm-t-owner" onclick="selNMType('owner')"><i class="ti ti-home"></i>Owner</div>
+            <div class="pay-mode-btn" id="nm-t-rented" onclick="selNMType('rented')"><i class="ti ti-key"></i>Tenant</div>
           </div>
           <input type="hidden" id="nm-type" value="owner">
         </div>
@@ -1322,563 +1030,300 @@ function openAddMember() {
       </div>
       <div class="sheet-footer">
         <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-        <button class="btn primary" onclick="saveMember()">Add</button>
+        <button class="btn primary" onclick="doSaveMember()">Add</button>
       </div>
     </div>
   </div>`;
-  setTimeout(() => document.getElementById('nm-name')?.focus(), 250);
-}
+  setTimeout(()=>document.getElementById('nm-name')?.focus(),250);
+};
 
-function selectMemberType(type) {
-  document.getElementById('nm-type').value = type;
-  document.getElementById('nm-type-owner').classList.toggle('active', type === 'owner');
-  document.getElementById('nm-type-rented').classList.toggle('active', type === 'rented');
-}
+window.selNMType = function(t) {
+  document.getElementById('nm-type').value=t;
+  document.getElementById('nm-t-owner').classList.toggle('active',t==='owner');
+  document.getElementById('nm-t-rented').classList.toggle('active',t==='rented');
+};
 
-function saveMember() {
-  const name = document.getElementById('nm-name').value.trim();
-  const flat = document.getElementById('nm-flat').value.trim();
-  const ph = document.getElementById('nm-ph').value.trim();
-  const type = document.getElementById('nm-type').value;
-  const err = document.getElementById('nm-err');
-  
-  if (!name) { err.textContent = 'Name is required'; err.style.display = 'block'; return; }
-  if (!flat) { err.textContent = 'Flat number is required'; err.style.display = 'block'; return; }
-  if (members.some(m => m.flat === flat)) {
-    err.textContent = 'Flat ' + flat + ' is already registered'; err.style.display = 'block'; return;
-  }
-  
-  members.push({ id: nextId++, name, flat, phone: ph, type });
-  saveData();
-  closeSheetDirect();
-  render();
-  showToast('Member added \u2713', 'success');
-}
+window.doSaveMember = async function() {
+  const name=document.getElementById('nm-name').value.trim();
+  const flat=document.getElementById('nm-flat').value.trim();
+  const ph=document.getElementById('nm-ph').value.trim();
+  const type=document.getElementById('nm-type').value;
+  const err=document.getElementById('nm-err');
+  if(!name){err.textContent='Name required';err.style.display='block';return;}
+  if(!flat){err.textContent='Flat number required';err.style.display='block';return;}
+  if(members.some(m=>m.flat===flat)){err.textContent='Flat '+flat+' already registered';err.style.display='block';return;}
+  const mid=newId('M');
+  await saveMemberFS({id:mid,name,flat,phone:ph,type});
+  closeSheetDirect(); showToast('Member added \u2713','success');
+};
 
-function openEditMember(mid) {
-  const m = getMember(mid);
-  closeSheetDirect();
-  setTimeout(() => {
-    const root = document.getElementById('modal-root');
-    root.innerHTML = `
-    <div class="modal-wrap" onclick="closeSheet(event)">
-      <div class="modal-sheet" onclick="event.stopPropagation()">
-        <div class="sheet-handle"></div>
-        <div class="sheet-title">
-          Edit member
-          <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-        </div>
-        <div class="sheet-body">
-          <div class="field">
-            <label>Full name *</label>
-            <input type="text" id="em-name" value="${m.name.replace(/"/g, '&quot;')}">
-          </div>
-          <div class="two-col">
-            <div class="field">
-              <label>Flat no. *</label>
-              <input type="text" id="em-flat" value="${m.flat}" inputmode="numeric">
-            </div>
-            <div class="field">
-              <label>Phone</label>
-              <input type="tel" id="em-ph" value="${m.phone || ''}" inputmode="tel" placeholder="WhatsApp number">
-            </div>
-          </div>
-          <div class="field">
-            <label>Type *</label>
-            <div class="pay-mode-toggle">
-              <div class="pay-mode-btn ${m.type === 'owner' ? 'active' : ''}" id="em-type-owner" onclick="selectEditMemberType('owner')">
-                <i class="ti ti-home"></i>Owner
-              </div>
-              <div class="pay-mode-btn ${m.type === 'rented' ? 'active' : ''}" id="em-type-rented" onclick="selectEditMemberType('rented')">
-                <i class="ti ti-key"></i>Tenant
-              </div>
-            </div>
-            <input type="hidden" id="em-type" value="${m.type}">
-          </div>
-          <div class="err" id="em-err"></div>
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #E8E7E1">
-            <button class="btn danger" style="width:100%" onclick="deleteMember(${mid})"><i class="ti ti-trash"></i> Delete this member</button>
-            <div style="font-size:11px;color:#6A6A65;margin-top:6px;text-align:center">All payment history will also be deleted</div>
-          </div>
-        </div>
-        <div class="sheet-footer">
-          <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-          <button class="btn primary" onclick="updateMember(${mid})">Save changes</button>
-        </div>
-      </div>
-    </div>`;
-  }, 100);
-}
-
-function selectEditMemberType(type) {
-  document.getElementById('em-type').value = type;
-  document.getElementById('em-type-owner').classList.toggle('active', type === 'owner');
-  document.getElementById('em-type-rented').classList.toggle('active', type === 'rented');
-}
-
-function updateMember(mid) {
-  const m = getMember(mid);
-  const name = document.getElementById('em-name').value.trim();
-  const flat = document.getElementById('em-flat').value.trim();
-  const ph = document.getElementById('em-ph').value.trim();
-  const type = document.getElementById('em-type').value;
-  const err = document.getElementById('em-err');
-  
-  if (!name) { err.textContent = 'Name is required'; err.style.display = 'block'; return; }
-  if (!flat) { err.textContent = 'Flat number is required'; err.style.display = 'block'; return; }
-  if (members.some(x => x.flat === flat && x.id !== mid)) {
-    err.textContent = 'Flat ' + flat + ' is already registered'; err.style.display = 'block'; return;
-  }
-  
-  m.name = name; m.flat = flat; m.phone = ph; m.type = type;
-  saveData();
-  closeSheetDirect();
-  render();
-  showToast('Member updated \u2713', 'success');
-}
-
-function deleteMember(mid) {
-  const m = getMember(mid);
-  if (!confirm(`Delete ${m.name}?\n\nThis will also delete all their payment records. This cannot be undone.`)) return;
-  members = members.filter(x => x.id !== mid);
-  payments = payments.filter(p => p.memberId !== mid);
-  saveData();
-  closeSheetDirect();
-  render();
-  showToast('Member deleted', 'error');
-}
-
-// MEMBER DETAIL ======================================
-function openMemberDetail(mid) {
-  const m = getMember(mid);
-  const mp = getMemberPay(mid);
-  const totalPaid = mp.reduce((s, p) => s + p.amount, 0);
-  const dueMonths = getMemberDueMonths(mid);
-  const root = document.getElementById('modal-root');
-  root.innerHTML = `
+window.openMemberDetail = function(mid) {
+  const m=getMember(mid); const mp=getMemberPay(mid);
+  const totalPaid=mp.reduce((s,p)=>s+p.amount,0);
+  const due=getMemberDueMonths(mid);
+  document.getElementById('modal-root').innerHTML=`
   <div class="modal-wrap" onclick="closeSheet(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
       <div class="sheet-title" style="padding-bottom:16px">
         <div style="display:flex;align-items:center;gap:12px">
-          <div class="avatar ${m.type === 'rented' ? 'rented' : ''}" style="width:42px;height:42px;font-size:14px">${initials(m.name)}</div>
-          <div>
-            <div style="font-size:15px;font-weight:600">${m.name}</div>
-            <div style="font-size:12px;color:#6A6A65;font-weight:400">Flat ${m.flat} · <span class="badge ${m.type}" style="font-size:9px">${m.type === 'owner' ? 'Owner' : 'Tenant'}</span>${m.phone ? ' · ' + m.phone : ''}</div>
-          </div>
+          <div class="avatar ${m.type==='rented'?'rented':''}" style="width:42px;height:42px;font-size:14px">${initials(m.name)}</div>
+          <div><div style="font-size:15px;font-weight:600">${m.name}</div><div style="font-size:12px;color:#6A6A65">Flat ${m.flat} · <span class="badge ${m.type}">${m.type==='owner'?'Owner':'Tenant'}</span></div></div>
         </div>
         <div style="display:flex;gap:6px">
-          <button class="btn icon-only sm" onclick="openEditMember(${mid})" title="Edit"><i class="ti ti-edit"></i></button>
+          <button class="btn icon-only sm" onclick="openEditMember('${mid}')"><i class="ti ti-edit"></i></button>
           <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
         </div>
       </div>
       <div class="sheet-body">
         <div class="stats-grid" style="margin-bottom:14px">
-          <div class="stat-card compact">
-            <div class="stat-label">Total paid</div>
-            <div class="stat-val green">${rupee(totalPaid)}</div>
-          </div>
-          <div class="stat-card compact">
-            <div class="stat-label">Pending</div>
-            <div class="stat-val ${dueMonths.length > 0 ? 'red' : 'green'}">${rupee(dueMonths.length * MONTHLY_AMT)}</div>
-          </div>
+          <div class="stat-card compact"><div class="stat-label">Total paid</div><div class="stat-val green">${rupee(totalPaid)}</div></div>
+          <div class="stat-card compact"><div class="stat-label">Pending</div><div class="stat-val ${due.length>0?'red':'green'}">${rupee(due.length*MONTHLY_AMT)}</div></div>
         </div>
-        
         <div class="hmap-dots" style="margin-bottom:18px">
-          ${MONTHS.map((_, i) => {
-            const future = i >= CURRENT_MONTH;
-            const paid = mp.find(p => p.month === i);
-            const bg = future ? '#E8E7E1' : (paid ? '#5DCAA5' : '#F09595');
-            return `<div style="text-align:center">
-              <div style="font-size:10px;color:#6A6A65;margin-bottom:3px">${MONTHS[i][0]}</div>
-              <div style="height:20px;border-radius:3px;background:${bg}" title="${MONTHS[i]}"></div>
-            </div>`;
+          ${MONTHS.map((_,i)=>{
+            const future=i>=CURRENT_MONTH; const paid=mp.find(p=>p.month===i);
+            return `<div style="text-align:center"><div style="font-size:10px;color:#6A6A65;margin-bottom:3px">${MONTHS[i][0]}</div><div style="height:20px;border-radius:3px;background:${future?'#E8E7E1':paid?'#5DCAA5':'#F09595'}"></div></div>`;
           }).join('')}
         </div>
-        
-        ${MONTHS.slice(0, CURRENT_MONTH).map((mo, i) => {
-          const p = mp.find(x => x.month === i);
+        ${MONTHS.slice(0,CURRENT_MONTH).map((mo,i)=>{
+          const p=mp.find(x=>x.month===i);
           return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #F0EFE9">
-            <div style="flex:1;min-width:0">
-              <div style="font-size:14px;font-weight:500">${mo} 2026</div>
-              ${p ? `<div style="font-size:11px;color:#6A6A65;margin-top:2px">#${p.receipt} · ${formatDate(p.date)}<span class="pay-mode-tag ${p.mode || 'cash'}" style="margin-left:6px">${(p.mode || 'cash').toUpperCase()}</span></div>` : '<div style="font-size:11px;color:#A32D2D;margin-top:2px">Pending</div>'}
-            </div>
-            ${p ? `<span style="font-size:15px;font-weight:600;color:#0F6E56">${rupee(p.amount)}</span>
-              <button class="btn sm icon-only" style="margin-left:6px" onclick="openPaymentDetail(${p.id})"><i class="ti ti-eye"></i></button>` :
-              `<button class="btn sm primary" onclick="closeSheetDirect();openPaymentModalFor(${mid}, ${i})">Collect</button>`}
+            <div><div style="font-size:14px;font-weight:500">${mo} 2026</div>
+            ${p?`<div style="font-size:11px;color:#6A6A65">#${p.receipt} · ${formatDate(p.date)} <span class="pay-mode-tag ${p.mode||'cash'}">${(p.mode||'cash').toUpperCase()}</span></div>`:'<div style="font-size:11px;color:#A32D2D">Pending</div>'}</div>
+            ${p?`<span style="font-size:15px;font-weight:600;color:#0F6E56">${rupee(p.amount)}</span>`:`<button class="btn sm primary" onclick="closeSheetDirect();openPaymentModalFor('${mid}',${i})">Collect</button>`}
           </div>`;
         }).join('')}
-      </div>
-      <div class="sheet-footer">
-        <button class="btn whatsapp" onclick="sendHistory(${mid})"><i class="ti ti-brand-whatsapp"></i> Send Summary</button>
-        <button class="btn primary" onclick="closeSheetDirect();openPaymentModalFor(${mid})"><i class="ti ti-plus"></i> Record Payment</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-// PAYMENT DETAIL =====================================
-function openPaymentDetail(pid) {
-  const p = getPayment(pid);
-  const m = getMember(p.memberId);
-  const root = document.getElementById('modal-root');
-  root.innerHTML = `
-  <div class="modal-wrap" onclick="closeSheet(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">
-        Payment details
-        <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-      </div>
-      <div class="sheet-body">
-        <div class="receipt-preview">
-          <div class="head">📄 Receipt #${p.receipt}</div>
-          <div class="summary-row"><span style="color:#6A6A65">Member</span><span style="font-weight:500">${m.name}</span></div>
-          <div class="summary-row"><span style="color:#6A6A65">Flat</span><span>${m.flat} (${m.type === 'owner' ? 'Owner' : 'Tenant'})</span></div>
-          <div class="summary-row"><span style="color:#6A6A65">Period</span><span>${MONTHS[p.month]} ${YEAR}</span></div>
-          <div class="summary-row"><span style="color:#6A6A65">Date</span><span>${formatDate(p.date)}</span></div>
-          <div class="summary-row"><span style="color:#6A6A65">Mode</span><span class="pay-mode-tag ${p.mode || 'cash'}">${(p.mode || 'cash').toUpperCase()}</span></div>
-          ${p.note ? `<div class="summary-row"><span style="color:#6A6A65">Note</span><span>${p.note}</span></div>` : ''}
-          <div class="summary-row total"><span>Amount paid</span><span style="color:#0F6E56">${rupee(p.amount)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:14px 0 6px;font-size:14px">
+          <span style="color:#6A6A65">Total paid</span><span style="font-weight:600;color:#0F6E56;font-size:16px">${rupee(totalPaid)}</span>
         </div>
-        ${p.attachment ? `
-          <div class="field">
-            <label>Attachment</label>
-            <img src="${p.attachment}" style="width:100%;border-radius:10px;border:1px solid #E8E7E1">
-          </div>
-        ` : ''}
       </div>
       <div class="sheet-footer">
-        <button class="btn danger" onclick="deletePayment(${pid})"><i class="ti ti-trash"></i></button>
-        <button class="btn whatsapp" onclick="sendReceipt(${pid})"><i class="ti ti-brand-whatsapp"></i> Send</button>
-        <button class="btn primary" onclick="openEditPayment(${pid})"><i class="ti ti-edit"></i> Edit</button>
+        <button class="btn whatsapp" onclick="sendHistory('${mid}')"><i class="ti ti-brand-whatsapp"></i> Summary</button>
+        <button class="btn primary" onclick="closeSheetDirect();openPaymentModalFor('${mid}')"><i class="ti ti-plus"></i> Record</button>
       </div>
     </div>
   </div>`;
-}
+};
 
-function openEditPayment(pid) {
-  const p = getPayment(pid);
-  closeSheetDirect();
-  currentAttachment = p.attachment;
-  setTimeout(() => {
-    const root = document.getElementById('modal-root');
-    root.innerHTML = `
+window.openEditMember = function(mid) {
+  const m=getMember(mid); closeSheetDirect();
+  setTimeout(()=>{
+    document.getElementById('modal-root').innerHTML=`
     <div class="modal-wrap" onclick="closeSheet(event)">
       <div class="modal-sheet" onclick="event.stopPropagation()">
         <div class="sheet-handle"></div>
-        <div class="sheet-title">
-          Edit payment
-          <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-        </div>
+        <div class="sheet-title">Edit member <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
         <div class="sheet-body">
-          <div class="field">
-            <label>Member</label>
-            <select id="ep-m">
-              ${members.map(m => `<option value="${m.id}"${p.memberId === m.id ? ' selected' : ''}>${m.name} - Flat ${m.flat}</option>`).join('')}
-            </select>
+          <div class="field"><label>Full name *</label><input type="text" id="em-name" value="${m.name.replace(/"/g,'&quot;')}"></div>
+          <div class="two-col">
+            <div class="field"><label>Flat no. *</label><input type="text" id="em-flat" value="${m.flat}" inputmode="numeric"></div>
+            <div class="field"><label>Phone</label><input type="tel" id="em-ph" value="${m.phone||''}" placeholder="WhatsApp number"></div>
           </div>
-          <div class="field">
-            <label>Payment mode</label>
+          <div class="field"><label>Type *</label>
             <div class="pay-mode-toggle">
-              <div class="pay-mode-btn ${(p.mode || 'cash') === 'cash' ? 'active' : ''}" id="ep-mode-cash" onclick="selectEditPayMode('cash')">
-                <i class="ti ti-cash"></i>Cash
-              </div>
-              <div class="pay-mode-btn ${p.mode === 'bank' ? 'active' : ''}" id="ep-mode-bank" onclick="selectEditPayMode('bank')">
-                <i class="ti ti-building-bank"></i>Bank
-              </div>
+              <div class="pay-mode-btn ${m.type==='owner'?'active':''}" id="em-t-owner" onclick="selEMType('owner')"><i class="ti ti-home"></i>Owner</div>
+              <div class="pay-mode-btn ${m.type==='rented'?'active':''}" id="em-t-rented" onclick="selEMType('rented')"><i class="ti ti-key"></i>Tenant</div>
             </div>
-            <input type="hidden" id="ep-mode" value="${p.mode || 'cash'}">
+            <input type="hidden" id="em-type" value="${m.type}">
           </div>
-          <div class="two-col">
-            <div class="field">
-              <label>Month</label>
-              <select id="ep-mo">
-                ${MONTHS.slice(0, CURRENT_MONTH).map((mo, i) => `<option value="${i}"${p.month === i ? ' selected' : ''}>${mo} 2026</option>`).join('')}
-              </select>
-            </div>
-            <div class="field">
-              <label>Amount</label>
-              <input type="number" id="ep-amt" value="${p.amount}" inputmode="numeric">
-            </div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #E8E7E1">
+            <button class="btn danger" style="width:100%" onclick="doDeleteMember('${mid}')"><i class="ti ti-trash"></i> Delete this member</button>
+            <div style="font-size:11px;color:#6A6A65;text-align:center;margin-top:6px">All payment history will be deleted</div>
           </div>
-          <div class="two-col">
-            <div class="field">
-              <label>Receipt no.</label>
-              <input type="text" id="ep-rec" value="${p.receipt}">
-            </div>
-            <div class="field">
-              <label>Date</label>
-              <input type="date" id="ep-dt" value="${p.date}">
-            </div>
-          </div>
-          <div class="field">
-            <label>Note</label>
-            <input type="text" id="ep-note" value="${(p.note || '').replace(/"/g, '&quot;')}">
-          </div>
-          <div class="err" id="ep-err"></div>
+          <div class="err" id="em-err"></div>
         </div>
         <div class="sheet-footer">
           <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-          <button class="btn primary" onclick="updatePayment(${pid})">Save</button>
+          <button class="btn primary" onclick="doUpdateMember('${mid}')">Save changes</button>
         </div>
       </div>
     </div>`;
-  }, 100);
-}
+  },100);
+};
 
-function selectEditPayMode(mode) {
-  document.getElementById('ep-mode').value = mode;
-  document.getElementById('ep-mode-cash').classList.toggle('active', mode === 'cash');
-  document.getElementById('ep-mode-bank').classList.toggle('active', mode === 'bank');
-}
+window.selEMType = function(t) {
+  document.getElementById('em-type').value=t;
+  document.getElementById('em-t-owner').classList.toggle('active',t==='owner');
+  document.getElementById('em-t-rented').classList.toggle('active',t==='rented');
+};
 
-function updatePayment(pid) {
-  const p = getPayment(pid);
-  const mid = parseInt(document.getElementById('ep-m').value);
-  const mo = parseInt(document.getElementById('ep-mo').value);
-  const amt = parseInt(document.getElementById('ep-amt').value);
-  const rec = document.getElementById('ep-rec').value.trim();
-  const dt = document.getElementById('ep-dt').value;
-  const mode = document.getElementById('ep-mode').value;
-  const note = document.getElementById('ep-note').value.trim();
-  const err = document.getElementById('ep-err');
-  
-  if (!amt || amt <= 0) { err.textContent = 'Enter a valid amount'; err.style.display = 'block'; return; }
-  if (payments.find(x => x.id !== pid && x.memberId === mid && x.month === mo)) {
-    err.textContent = 'Already recorded for this month'; err.style.display = 'block'; return;
-  }
-  
-  p.memberId = mid; p.month = mo; p.amount = amt; p.receipt = rec;
-  p.date = dt; p.mode = mode; p.note = note;
-  saveData();
-  closeSheetDirect();
-  render();
-  showToast('Payment updated \u2713', 'success');
-}
+window.doUpdateMember = async function(mid) {
+  const name=document.getElementById('em-name').value.trim();
+  const flat=document.getElementById('em-flat').value.trim();
+  const ph=document.getElementById('em-ph').value.trim();
+  const type=document.getElementById('em-type').value;
+  const err=document.getElementById('em-err');
+  if(!name){err.textContent='Name required';err.style.display='block';return;}
+  if(!flat){err.textContent='Flat required';err.style.display='block';return;}
+  if(members.some(x=>x.flat===flat&&x.id!==mid)){err.textContent='Flat '+flat+' already taken';err.style.display='block';return;}
+  await saveMemberFS({id:mid,name,flat,phone:ph,type});
+  closeSheetDirect(); showToast('Member updated \u2713','success');
+};
 
-function deletePayment(pid) {
-  const p = getPayment(pid);
-  const m = getMember(p.memberId);
-  if (!confirm(`Delete payment of ${rupee(p.amount)} from ${m.name} for ${MONTHS[p.month]}?\n\nThis cannot be undone.`)) return;
-  payments = payments.filter(x => x.id !== pid);
-  saveData();
-  closeSheetDirect();
-  render();
-  showToast('Payment deleted', 'error');
-}
+window.doDeleteMember = async function(mid) {
+  const m=getMember(mid);
+  if(!confirm(`Delete ${m.name}?\n\nAll payment history will also be deleted.`)) return;
+  await deleteMemberFS(mid);
+  closeSheetDirect(); showToast('Member deleted','error');
+};
 
-// EXPENSES ===========================================
-function openExpenseModal() {
-  currentAttachment = null;
-  const today = new Date().toISOString().split('T')[0];
-  const root = document.getElementById('modal-root');
-  root.innerHTML = `
+// ─── EXPENSE MODALS ───────────────────────────────
+window.openExpenseModal = function() {
+  currentAttachment=null;
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('modal-root').innerHTML=`
   <div class="modal-wrap" onclick="closeSheet(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
-      <div class="sheet-title">
-        Add expense
-        <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-      </div>
+      <div class="sheet-title">Add expense <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
       <div class="sheet-body">
-        <div class="field">
-          <label>Title *</label>
-          <input type="text" id="ex-title" placeholder="e.g. Watchman salary - May">
-        </div>
+        <div class="field"><label>Title *</label><input type="text" id="ex-title" placeholder="e.g. Watchman salary - May"></div>
         <div class="two-col">
-          <div class="field">
-            <label>Category</label>
+          <div class="field"><label>Category</label>
             <select id="ex-cat">
-              <option value="Salary">Salary</option>
-              <option value="Cleaning">Cleaning</option>
-              <option value="Electricity">Electricity</option>
-              <option value="Water">Water</option>
-              <option value="Repairs">Repairs</option>
-              <option value="Security">Security</option>
-              <option value="Other">Other</option>
+              <option>Salary</option><option>Cleaning</option><option>Electricity</option>
+              <option>Water</option><option>Repairs</option><option>Security</option><option>Other</option>
             </select>
           </div>
-          <div class="field">
-            <label>Amount (\u20B9) *</label>
-            <input type="number" id="ex-amt" inputmode="numeric">
-          </div>
+          <div class="field"><label>Amount (\u20B9) *</label><input type="number" id="ex-amt" inputmode="numeric"></div>
         </div>
         <div class="two-col">
-          <div class="field">
-            <label>Date</label>
-            <input type="date" id="ex-dt" value="${today}">
-          </div>
-          <div class="field">
-            <label>Paid from</label>
-            <select id="ex-source">
-              <option value="cash">Cash</option>
-              <option value="bank">Bank</option>
-            </select>
+          <div class="field"><label>Date</label><input type="date" id="ex-dt" value="${today}"></div>
+          <div class="field"><label>Paid from</label>
+            <select id="ex-src"><option value="cash">Cash</option><option value="bank">Bank</option></select>
           </div>
         </div>
-        <div class="field">
-          <label>Note (optional)</label>
-          <textarea id="ex-note" placeholder="Additional details"></textarea>
-        </div>
-        <div class="field">
-          <label>Receipt photo (optional)</label>
-          <div class="attachment-zone" id="ex-att-zone" onclick="document.getElementById('ex-attachment').click()">
-            <i class="ti ti-camera-plus"></i>
-            <div style="font-size:13px;font-weight:500">Attach receipt</div>
+        <div class="field"><label>Note</label><textarea id="ex-note" placeholder="Additional details"></textarea></div>
+        <div class="field"><label>Receipt photo</label>
+          <div class="attachment-zone" id="ex-att-zone" onclick="document.getElementById('ex-file').click()">
+            <i class="ti ti-camera-plus"></i><div style="font-size:13px;font-weight:500">Attach receipt</div>
           </div>
-          <input type="file" id="ex-attachment" accept="image/*" style="display:none" onchange="handleAttachment(event)">
+          <input type="file" id="ex-file" accept="image/*" style="display:none" onchange="handleAtt(event,'ex-att-zone')">
         </div>
         <div class="err" id="ex-err"></div>
       </div>
       <div class="sheet-footer">
         <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-        <button class="btn primary" onclick="saveExpense()">Save</button>
+        <button class="btn primary" onclick="doSaveExpense()">Save</button>
       </div>
     </div>
   </div>`;
-}
+};
 
-function saveExpense() {
-  const title = document.getElementById('ex-title').value.trim();
-  const cat = document.getElementById('ex-cat').value;
-  const amt = parseInt(document.getElementById('ex-amt').value);
-  const dt = document.getElementById('ex-dt').value;
-  const source = document.getElementById('ex-source').value;
-  const note = document.getElementById('ex-note').value.trim();
-  const err = document.getElementById('ex-err');
-  
-  if (!title) { err.textContent = 'Title required'; err.style.display = 'block'; return; }
-  if (!amt || amt <= 0) { err.textContent = 'Enter valid amount'; err.style.display = 'block'; return; }
-  
-  const iconMap = {
-    'Salary': 'wallet', 'Cleaning': 'spray', 'Electricity': 'bolt',
-    'Water': 'droplet', 'Repairs': 'tools', 'Security': 'shield', 'Other': 'cash'
-  };
-  
-  expenses.push({
-    id: nextId++, title, category: cat, amount: amt, date: dt,
-    source, note, attachment: currentAttachment,
-    icon: iconMap[cat] || 'cash'
-  });
-  
-  if (source === 'bank') bankBalance -= amt;
-  
-  saveData();
-  closeSheetDirect();
-  render();
-  showToast('Expense recorded \u2713', 'success');
-}
+window.doSaveExpense = async function() {
+  const title=document.getElementById('ex-title').value.trim();
+  const cat=document.getElementById('ex-cat').value;
+  const amt=parseInt(document.getElementById('ex-amt').value);
+  const dt=document.getElementById('ex-dt').value;
+  const src=document.getElementById('ex-src').value;
+  const note=document.getElementById('ex-note').value.trim();
+  const err=document.getElementById('ex-err');
+  if(!title){err.textContent='Title required';err.style.display='block';return;}
+  if(!amt||amt<=0){err.textContent='Valid amount required';err.style.display='block';return;}
+  const iconMap={Salary:'wallet',Cleaning:'spray',Electricity:'bolt',Water:'droplet',Repairs:'tools',Security:'shield',Other:'cash'};
+  const eid=newId('E');
+  const exp={id:eid,title,category:cat,amount:amt,date:dt,source:src,note,attachment:currentAttachment,icon:iconMap[cat]||'cash'};
+  if(src==='bank'){bankBalance-=amt;await saveBankBalance(bankBalance);}
+  await saveExpenseFS(exp);
+  closeSheetDirect(); showToast('Expense saved \u2713','success');
+};
 
-function openExpenseDetail(eid) {
-  const e = expenses.find(x => x.id === eid);
-  const root = document.getElementById('modal-root');
-  root.innerHTML = `
+window.openExpenseDetail = function(eid) {
+  const e=expenses.find(x=>x.id===eid);
+  document.getElementById('modal-root').innerHTML=`
   <div class="modal-wrap" onclick="closeSheet(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
-      <div class="sheet-title">
-        Expense details
-        <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-      </div>
+      <div class="sheet-title">Expense <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
       <div class="sheet-body">
         <div class="receipt-preview">
           <div class="head">${e.title}</div>
           <div class="summary-row"><span style="color:#6A6A65">Category</span><span>${e.category}</span></div>
           <div class="summary-row"><span style="color:#6A6A65">Date</span><span>${formatDate(e.date)}</span></div>
-          <div class="summary-row"><span style="color:#6A6A65">Paid from</span><span>${e.source === 'cash' ? 'Cash' : 'Bank'}</span></div>
-          ${e.note ? `<div class="summary-row"><span style="color:#6A6A65">Note</span><span style="text-align:right;max-width:200px">${e.note}</span></div>` : ''}
+          <div class="summary-row"><span style="color:#6A6A65">Paid from</span><span>${e.source==='cash'?'Cash':'Bank'}</span></div>
+          ${e.note?`<div class="summary-row"><span style="color:#6A6A65">Note</span><span>${e.note}</span></div>`:''}
           <div class="summary-row total"><span>Amount</span><span style="color:#A32D2D">-${rupee(e.amount)}</span></div>
         </div>
-        ${e.attachment ? `<img src="${e.attachment}" style="width:100%;border-radius:10px;border:1px solid #E8E7E1">` : ''}
+        ${e.attachment?`<img src="${e.attachment}" style="width:100%;border-radius:10px;border:1px solid #E8E7E1">`:''} 
       </div>
       <div class="sheet-footer">
-        <button class="btn danger" style="flex:1" onclick="deleteExpense(${eid})"><i class="ti ti-trash"></i> Delete</button>
+        <button class="btn danger" style="flex:1" onclick="doDeleteExpense('${eid}')"><i class="ti ti-trash"></i> Delete</button>
         <button class="btn primary" style="flex:1" onclick="closeSheetDirect()">Close</button>
       </div>
     </div>
   </div>`;
-}
+};
 
-function deleteExpense(eid) {
-  const e = expenses.find(x => x.id === eid);
-  if (!confirm(`Delete expense "${e.title}"?`)) return;
-  if (e.source === 'bank') bankBalance += e.amount;
-  expenses = expenses.filter(x => x.id !== eid);
-  saveData();
-  closeSheetDirect();
-  render();
-  showToast('Expense deleted', 'error');
-}
+window.doDeleteExpense = async function(eid) {
+  const e=expenses.find(x=>x.id===eid);
+  if(!confirm(`Delete "${e.title}"?`)) return;
+  if(e.source==='bank'){bankBalance+=e.amount;await saveBankBalance(bankBalance);}
+  await deleteExpenseFS(eid);
+  closeSheetDirect(); showToast('Expense deleted','error');
+};
 
-// BANK ===============================================
-function openBankModal(action) {
-  const titleMap = {add: 'Add to bank', subtract: 'Withdraw from bank', set: 'Set bank balance'};
-  const root = document.getElementById('modal-root');
-  root.innerHTML = `
+// ─── BANK MODAL ───────────────────────────────────
+window.openBankModal = function(action) {
+  const titles={add:'Add to bank',subtract:'Withdraw from bank',set:'Set bank balance'};
+  document.getElementById('modal-root').innerHTML=`
   <div class="modal-wrap" onclick="closeSheet(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
-      <div class="sheet-title">
-        ${titleMap[action]}
-        <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-      </div>
+      <div class="sheet-title">${titles[action]} <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
       <div class="sheet-body">
         <div style="text-align:center;padding:8px 0 16px">
           <div style="font-size:11px;color:#6A6A65;margin-bottom:4px">Current balance</div>
           <div style="font-size:24px;font-weight:600;color:#0F6E56">${rupee(bankBalance)}</div>
         </div>
-        <div class="field">
-          <label>Amount (\u20B9) *</label>
-          <input type="number" id="bk-amt" inputmode="numeric" placeholder="0" autofocus>
-        </div>
-        <div class="field">
-          <label>Note (optional)</label>
-          <input type="text" id="bk-note" placeholder="${action === 'add' ? 'e.g. Cash deposit' : action === 'subtract' ? 'e.g. ATM withdrawal' : 'e.g. Opening balance'}">
-        </div>
+        <div class="field"><label>Amount (\u20B9) *</label><input type="number" id="bk-amt" inputmode="numeric" placeholder="0"></div>
+        <div class="field"><label>Note</label><input type="text" id="bk-note" placeholder="${action==='add'?'e.g. Cash deposit':action==='subtract'?'e.g. Withdrawal':'e.g. Opening balance'}"></div>
         <div class="err" id="bk-err"></div>
       </div>
       <div class="sheet-footer">
         <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-        <button class="btn primary" onclick="updateBank('${action}')">${action === 'set' ? 'Set' : action === 'add' ? 'Add' : 'Withdraw'}</button>
+        <button class="btn primary" onclick="doUpdateBank('${action}')">${action==='set'?'Set':action==='add'?'Add':'Withdraw'}</button>
       </div>
     </div>
   </div>`;
-  setTimeout(() => document.getElementById('bk-amt')?.focus(), 250);
+  setTimeout(()=>document.getElementById('bk-amt')?.focus(),250);
+};
+
+window.doUpdateBank = async function(action) {
+  const amt=parseInt(document.getElementById('bk-amt').value);
+  const err=document.getElementById('bk-err');
+  if(!amt||amt<0){err.textContent='Enter valid amount';err.style.display='block';return;}
+  if(action==='add') bankBalance+=amt;
+  else if(action==='subtract') bankBalance-=amt;
+  else if(action==='set') bankBalance=amt;
+  await saveBankBalance(bankBalance);
+  closeSheetDirect(); showToast('Balance updated \u2713','success');
+};
+
+// ─── BACKUP ───────────────────────────────────────
+window.exportBackup = function() {
+  const data={members,payments,expenses,bankBalance,exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`ruby-society-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast('Backup downloaded \u2713','success');
+};
+
+// ─── UTILS ────────────────────────────────────────
+window.closeSheet = function(e) { if(e.target===e.currentTarget) closeSheetDirect(); };
+window.closeSheetDirect = function() { document.getElementById('modal-root').innerHTML=''; };
+
+function showToast(msg, type) {
+  const root=document.getElementById('toast-root');
+  root.innerHTML=`<div class="toast ${type||''}">${msg}</div>`;
+  setTimeout(()=>root.innerHTML='',2200);
 }
+window.showToast = showToast;
 
-function updateBank(action) {
-  const amt = parseInt(document.getElementById('bk-amt').value);
-  const err = document.getElementById('bk-err');
-  if (!amt || amt < 0) { err.textContent = 'Enter a valid amount'; err.style.display = 'block'; return; }
-  
-  if (action === 'add') bankBalance += amt;
-  else if (action === 'subtract') bankBalance -= amt;
-  else if (action === 'set') bankBalance = amt;
-  
-  saveData();
-  closeSheetDirect();
-  render();
-  showToast('Bank balance updated \u2713', 'success');
-}
-
-// BACKUP =============================================
-function exportData() {
-  const data = { members, payments, expenses, bankBalance, exportedAt: new Date().toISOString() };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `ruby-society-backup-${new Date().toISOString().split('T')[0]}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('Backup downloaded \u2713', 'success');
-}
-
-function closeSheet(e) { if (e.target === e.currentTarget) closeSheetDirect(); }
-function closeSheetDirect() { document.getElementById('modal-root').innerHTML = ''; }
-
-render();
+// ─── START ────────────────────────────────────────
+initFirebase();
 </script>
 </body>
 </html>
