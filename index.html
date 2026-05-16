@@ -390,6 +390,9 @@ let nextId = Date.now();
 let activeTab = 'dashboard';
 let currentAttachment = null;
 let unsubscribers = [];
+let cashInHand = 0;
+let setupStep = 0;
+let setupOpeningData = {};
 
 // ─── HELPERS ───────────────────────────────────────
 function rupee(n) { return '\u20B9' + Number(n).toLocaleString('en-IN'); }
@@ -709,14 +712,14 @@ function sendWA(phone, msg) {
 
 
 // ─── SETUP WIZARD ─────────────────────────────────
-function showSetupWizard() {
+window.showSetupWizard = function showSetupWizard() {
   setupStep = 0;
   setupOpeningData = {};
   document.getElementById('setupScreen').classList.add('visible');
   renderSetupStep();
 }
 
-function renderSetupStep() {
+window.renderSetupStep = function renderSetupStep() {
   const titles = [
     { h:'Step 1: Cash in Hand', p:'Count your physical cash right now and enter the exact amount below.' },
     { h:'Step 2: Bank Balance', p:'Check your bank account and enter the current balance.' },
@@ -858,7 +861,7 @@ window.setupBack = function() {
   if (setupStep > 0) { setupStep--; renderSetupStep(); }
 };
 
-async function saveOpeningBalances() {
+window.saveOpeningBalances = async function saveOpeningBalances() {
   const btn = document.getElementById('setupNextBtn');
   btn.textContent = 'Saving...'; btn.disabled = true;
   try {
@@ -1103,6 +1106,7 @@ function renderExpenses() {
 }
 
 // ─── PAYMENT MODAL ────────────────────────────────
+window.openBankModal = window.openBankModal || function(){};
 window.openPaymentModal = function() { openPaymentModalFor(null,null); };
 window.openPaymentModalFor = function(memberId, month) {
   const today = new Date().toISOString().split('T')[0];
@@ -1529,7 +1533,7 @@ window.doDeleteExpense = async function(eid) {
 };
 
 // ─── BANK MODAL ───────────────────────────────────
-window.openBankModal = function(action) {
+window.openBankModal = function openBankModal(action) {
   const titles={add:'Add to bank',subtract:'Withdraw from bank',set:'Set bank balance'};
   document.getElementById('modal-root').innerHTML=`
   <div class="modal-wrap" onclick="closeSheet(event)">
