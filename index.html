@@ -428,23 +428,34 @@ function setSyncDot(state) {
 async function initFirebase() {
   setLoadingStatus('Loading members...');
   try {
+    // Track which collections have loaded
+    let loaded = {members: false, payments: false, expenses: false, settings: false};
+    function checkAndRender() {
+      if (loaded.members && loaded.payments && loaded.expenses && loaded.settings) {
+        setSyncDot('online');
+        render();
+      }
+    }
+
     // Members listener
     const unsubMembers = onSnapshot(collection(db, 'members'), snap => {
       members = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      setSyncDot('online');
-      if (activeTab) render();
+      loaded.members = true;
+      checkAndRender();
     });
 
     // Payments listener
     const unsubPayments = onSnapshot(collection(db, 'payments'), snap => {
       payments = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      if (activeTab) render();
+      loaded.payments = true;
+      checkAndRender();
     });
 
     // Expenses listener
     const unsubExpenses = onSnapshot(collection(db, 'expenses'), snap => {
       expenses = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      if (activeTab) render();
+      loaded.expenses = true;
+      checkAndRender();
     });
 
     // Settings (bank balance + opening)
@@ -454,7 +465,8 @@ async function initFirebase() {
         nextId = snap.data().nextId || Date.now();
         cashInHand = snap.data().cashInHand || 0;
       }
-      if (activeTab) render();
+      loaded.settings = true;
+      checkAndRender();
     });
 
     unsubscribers = [unsubMembers, unsubPayments, unsubExpenses, unsubSettings];
@@ -900,6 +912,14 @@ function render() {
 
 // ─── DASHBOARD ────────────────────────────────────
 function renderDash() {
+  if (members.length === 0) {
+    return `<div style="padding:40px 20px;text-align:center;color:#6A6A65">
+      <div style="font-size:48px;margin-bottom:16px">🏢</div>
+      <div style="font-size:16px;font-weight:600;margin-bottom:8px;color:#1A1A19">No members yet</div>
+      <div style="font-size:13px;margin-bottom:24px">Go to Members tab and add your first member</div>
+      <button onclick="document.querySelectorAll('.nav-item')[1].click()" style="background:#1D9E75;color:#fff;border:none;border-radius:50px;padding:12px 24px;font-size:14px;font-family:inherit;cursor:pointer">+ Add Members</button>
+    </div>`;
+  }
   const paidNow = members.filter(m=>isPaidThisMonth(m.id)).length;
   const unpaid = members.length - paidNow;
   const overdue3 = members.filter(m=>getMemberDueMonths(m.id).length>=3);
