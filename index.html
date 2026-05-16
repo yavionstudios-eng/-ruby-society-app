@@ -471,11 +471,12 @@ async function initFirebase() {
     setLoadingStatus('Ready!');
     // Mark as seeded immediately so auto-seed never runs again
     await setDoc(doc(db, 'settings', 'main'), {seeded: true}, {merge: true});
+    // Check if opening balance setup is done
+    const finalSettings = await getDoc(doc(db, 'settings', 'main'));
+    const openingDone = finalSettings.exists() && finalSettings.data().openingDone === true;
     setTimeout(() => {
       document.getElementById('loadingScreen').classList.add('hidden');
-      // Check if opening balance setup is done
-      const settingsData = (await getDoc(doc(db, 'settings', 'main'))).data();
-      if (!settingsData?.openingDone) {
+      if (!openingDone) {
         showSetupWizard();
       }
     }, 600);
