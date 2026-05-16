@@ -271,9 +271,58 @@
   .toast.success { background: #0F6E56; }
   .toast.error { background: #A32D2D; }
   @keyframes toastIn { from{opacity:0;transform:translate(-50%,20px)} to{opacity:1;transform:translate(-50%,0)} }
+
+  /* SETUP WIZARD */
+  .setup-screen { position:fixed; inset:0; background:#F4F3EE; z-index:90; overflow-y:auto; display:none; flex-direction:column; }
+  .setup-screen.visible { display:flex; }
+  .setup-hero { background:linear-gradient(135deg,#1D9E75,#0F6E56); padding:40px 24px 28px; color:#fff; }
+  .setup-hero h1 { font-size:22px; font-weight:700; margin-bottom:6px; }
+  .setup-hero p { font-size:13px; color:rgba(255,255,255,0.85); line-height:1.5; }
+  .setup-steps { display:flex; gap:6px; margin-top:16px; }
+  .setup-step-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.4); transition:all 0.3s; }
+  .setup-step-dot.active { background:#fff; width:24px; border-radius:4px; }
+  .setup-body { padding:20px 16px 120px; flex:1; }
+  .setup-section-title { font-size:16px; font-weight:600; margin-bottom:4px; color:#1A1A19; }
+  .setup-section-sub { font-size:13px; color:#6A6A65; margin-bottom:16px; line-height:1.5; }
+  .setup-footer { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:#fff; border-top:1px solid #E8E7E1; padding:14px 16px; display:flex; gap:10px; z-index:91; }
+  .setup-footer .btn { flex:1; padding:14px; font-size:15px; font-weight:600; }
+  .member-balance-row { background:#fff; border:1px solid #E8E7E1; border-radius:12px; padding:12px 14px; margin-bottom:10px; }
+  .member-balance-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .mbr-avatar { width:34px; height:34px; border-radius:50%; background:#9FE1CB; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#085041; flex-shrink:0; }
+  .mbr-avatar.rented { background:#FAC775; color:#633806; }
+  .balance-type-toggle { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:10px; }
+  .btb { padding:8px 4px; border:1.5px solid #D8D6CB; border-radius:8px; background:#F8F7F2; cursor:pointer; font-family:inherit; font-size:11px; text-align:center; color:#6A6A65; font-weight:500; }
+  .btb.ac { background:#EAF3DE; border-color:#1D9E75; color:#0F6E56; }
+  .btb.ad { background:#FCEBEB; border-color:#E09090; color:#A32D2D; }
+  .btb.aa { background:#E6F1FB; border-color:#90B8E0; color:#185FA5; }
+  .amt-row { display:flex; align-items:center; gap:8px; }
+  .amt-row input { flex:1; padding:10px 12px; border:1px solid #D8D6CB; border-radius:8px; background:#F8F7F2; font-size:15px; font-family:inherit; outline:none; }
+  .amt-row input:focus { border-color:#1D9E75; background:#fff; }
+  .info-box { background:#EAF3DE; border:1px solid #B8DFA0; border-radius:10px; padding:12px 14px; margin-bottom:16px; font-size:12px; color:#2D5A11; line-height:1.6; }
+  .setup-summary-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #F0EFE9; font-size:13px; }
+  .setup-summary-row:last-child { border-bottom:none; }
 </style>
 </head>
 <body>
+
+<!-- SETUP WIZARD -->
+<div class="setup-screen" id="setupScreen">
+  <div class="setup-hero">
+    <h1 id="setupHeroTitle">Welcome!</h1>
+    <p id="setupHeroSub">Let's set up your society books correctly. This takes 2 minutes and only happens once.</p>
+    <div class="setup-steps">
+      <div class="setup-step-dot active" id="dot0"></div>
+      <div class="setup-step-dot" id="dot1"></div>
+      <div class="setup-step-dot" id="dot2"></div>
+      <div class="setup-step-dot" id="dot3"></div>
+    </div>
+  </div>
+  <div class="setup-body" id="setupBody"></div>
+  <div class="setup-footer">
+    <button class="btn" id="setupBackBtn" onclick="setupBack()" style="display:none">Back</button>
+    <button class="btn primary" id="setupNextBtn" onclick="setupNext()">Get Started</button>
+  </div>
+</div>
 
 <!-- LOADING SCREEN -->
 <div class="loading-screen" id="loadingScreen">
@@ -398,11 +447,12 @@ async function initFirebase() {
       if (activeTab) render();
     });
 
-    // Settings (bank balance)
+    // Settings (bank balance + opening)
     const unsubSettings = onSnapshot(doc(db, 'settings', 'main'), snap => {
       if (snap.exists()) {
         bankBalance = snap.data().bankBalance || 0;
         nextId = snap.data().nextId || Date.now();
+        cashInHand = snap.data().cashInHand || 0;
       }
       if (activeTab) render();
     });
@@ -423,6 +473,11 @@ async function initFirebase() {
     await setDoc(doc(db, 'settings', 'main'), {seeded: true}, {merge: true});
     setTimeout(() => {
       document.getElementById('loadingScreen').classList.add('hidden');
+      // Check if opening balance setup is done
+      const settingsData = (await getDoc(doc(db, 'settings', 'main'))).data();
+      if (!settingsData?.openingDone) {
+        showSetupWizard();
+      }
     }, 600);
 
   } catch(e) {
@@ -639,6 +694,190 @@ function sendWA(phone, msg) {
   window.open(num?`https://wa.me/${num}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
 }
 
+
+// ─── SETUP WIZARD ─────────────────────────────────
+function showSetupWizard() {
+  setupStep = 0;
+  setupOpeningData = {};
+  document.getElementById('setupScreen').classList.add('visible');
+  renderSetupStep();
+}
+
+function renderSetupStep() {
+  const titles = [
+    { h:'Step 1: Cash in Hand', p:'Count your physical cash right now and enter the exact amount below.' },
+    { h:'Step 2: Bank Balance', p:'Check your bank account and enter the current balance.' },
+    { h:'Step 3: Member Balances', p:'For each member, mark if they have outstanding dues or have paid in advance.' },
+    { h:'Review & Confirm', p:'Check everything below before saving your opening balances.' },
+  ];
+  document.getElementById('setupHeroTitle').textContent = titles[setupStep].h;
+  document.getElementById('setupHeroSub').textContent = titles[setupStep].p;
+  [0,1,2,3].forEach(i => {
+    const dot = document.getElementById('dot'+i);
+    dot.className = 'setup-step-dot' + (i === setupStep ? ' active' : '');
+  });
+  document.getElementById('setupBackBtn').style.display = setupStep > 0 ? 'block' : 'none';
+  document.getElementById('setupNextBtn').textContent = setupStep === 3 ? 'Save & Start App' : 'Next';
+  const body = document.getElementById('setupBody');
+  if (setupStep === 0) {
+    body.innerHTML = `
+      <div class="info-box"><strong>Tip:</strong> Count all cash notes physically. Include any cash kept at home or with you for society purposes.</div>
+      <div class="setup-section-title">Opening Cash in Hand</div>
+      <div class="setup-section-sub">How much cash do you physically have right now?</div>
+      <div style="background:#fff;border:1px solid #E8E7E1;border-radius:12px;padding:16px">
+        <div style="font-size:12px;color:#6A6A65;margin-bottom:8px;font-weight:500">Cash in Hand (&#8377;)</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:22px;font-weight:600;color:#854F0B">&#8377;</span>
+          <input type="number" id="setup-cash" inputmode="numeric" placeholder="0"
+            value="${setupOpeningData.cash||''}"
+            style="flex:1;padding:12px;border:1.5px solid #D8D6CB;border-radius:10px;background:#F8F7F2;font-size:20px;font-family:inherit;outline:none;font-weight:600"
+            onfocus="this.style.borderColor='#1D9E75'" onblur="this.style.borderColor='#D8D6CB'">
+        </div>
+      </div>`;
+    setTimeout(()=>document.getElementById('setup-cash')?.focus(), 200);
+  } else if (setupStep === 1) {
+    body.innerHTML = `
+      <div class="info-box"><strong>Tip:</strong> Open your bank app or passbook and enter the exact current balance of the society account.</div>
+      <div class="setup-section-title">Opening Bank Balance</div>
+      <div class="setup-section-sub">What is the current balance in the society bank account?</div>
+      <div style="background:#fff;border:1px solid #E8E7E1;border-radius:12px;padding:16px">
+        <div style="font-size:12px;color:#6A6A65;margin-bottom:8px;font-weight:500">Bank Balance (&#8377;)</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:22px;font-weight:600;color:#0F6E56">&#8377;</span>
+          <input type="number" id="setup-bank" inputmode="numeric" placeholder="0"
+            value="${setupOpeningData.bank||''}"
+            style="flex:1;padding:12px;border:1.5px solid #D8D6CB;border-radius:10px;background:#F8F7F2;font-size:20px;font-family:inherit;outline:none;font-weight:600"
+            onfocus="this.style.borderColor='#1D9E75'" onblur="this.style.borderColor='#D8D6CB'">
+        </div>
+      </div>`;
+    setTimeout(()=>document.getElementById('setup-bank')?.focus(), 200);
+  } else if (setupStep === 2) {
+    if (!setupOpeningData.members) {
+      setupOpeningData.members = {};
+      members.forEach(m => { setupOpeningData.members[m.id] = { type:'clear', amount:0 }; });
+    }
+    body.innerHTML = `
+      <div class="info-box"><strong>Check your old register/notebook</strong> and mark each member's status. Most will be Clear. Only mark due/advance if you know for sure.</div>
+      ${members.map(m => {
+        const mb = setupOpeningData.members[m.id] || {type:'clear',amount:0};
+        return `<div class="member-balance-row">
+          <div class="member-balance-top">
+            <div class="mbr-avatar ${m.type==='rented'?'rented':''}">${initials(m.name)}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.name}</div>
+              <div style="font-size:11px;color:#6A6A65">Flat ${m.flat}</div>
+            </div>
+          </div>
+          <div class="balance-type-toggle">
+            <div class="btb ${mb.type==='clear'?'ac':''}" onclick="setMemberOpeningType('${m.id}','clear')">&#10003; Clear</div>
+            <div class="btb ${mb.type==='due'?'ad':''}" onclick="setMemberOpeningType('${m.id}','due')">&#8377; Due</div>
+            <div class="btb ${mb.type==='advance'?'aa':''}" onclick="setMemberOpeningType('${m.id}','advance')">&#8593; Advance</div>
+          </div>
+          ${mb.type !== 'clear' ? `
+          <div class="amt-row">
+            <span style="font-size:13px;color:#6A6A65">${mb.type==='due'?'Amount due:':'Advance paid:'}</span>
+            <input type="number" inputmode="numeric" placeholder="0" value="${mb.amount||''}"
+              onchange="setMemberOpeningAmount('${m.id}', this.value)"
+              style="width:130px;padding:9px 12px;border:1px solid #D8D6CB;border-radius:8px;background:#F8F7F2;font-size:14px;font-family:inherit;outline:none">
+          </div>` : ''}
+        </div>`;
+      }).join('')}`;
+  } else if (setupStep === 3) {
+    const dueList = members.filter(m => setupOpeningData.members?.[m.id]?.type === 'due');
+    const advList = members.filter(m => setupOpeningData.members?.[m.id]?.type === 'advance');
+    const clearList = members.filter(m => !setupOpeningData.members?.[m.id] || setupOpeningData.members[m.id].type === 'clear');
+    const totalDueAmt = dueList.reduce((s,m) => s+(setupOpeningData.members[m.id].amount||0), 0);
+    const totalAdvAmt = advList.reduce((s,m) => s+(setupOpeningData.members[m.id].amount||0), 0);
+    body.innerHTML = `
+      <div style="background:#fff;border:1px solid #E8E7E1;border-radius:12px;padding:16px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#1A1A19">Opening Balances</div>
+        <div class="setup-summary-row"><span style="color:#6A6A65">Cash in Hand</span><span style="font-weight:600;color:#854F0B">&#8377;${Number(setupOpeningData.cash||0).toLocaleString('en-IN')}</span></div>
+        <div class="setup-summary-row"><span style="color:#6A6A65">Bank Balance</span><span style="font-weight:600;color:#0F6E56">&#8377;${Number(setupOpeningData.bank||0).toLocaleString('en-IN')}</span></div>
+        <div class="setup-summary-row" style="border-top:1px solid #E8E7E1;margin-top:4px;padding-top:10px"><span style="font-weight:600">Total Funds</span><span style="font-weight:700;color:#0F6E56">&#8377;${Number((setupOpeningData.cash||0)+(setupOpeningData.bank||0)).toLocaleString('en-IN')}</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid #E8E7E1;border-radius:12px;padding:16px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">Member Status</div>
+        <div class="setup-summary-row"><span style="color:#6A6A65">Clear (no balance)</span><span style="font-weight:600">${clearList.length} members</span></div>
+        ${dueList.length > 0 ? `<div class="setup-summary-row"><span style="color:#A32D2D">Outstanding due</span><span style="font-weight:600;color:#A32D2D">${dueList.length} members — &#8377;${totalDueAmt.toLocaleString('en-IN')}</span></div>` : ''}
+        ${advList.length > 0 ? `<div class="setup-summary-row"><span style="color:#185FA5">Paid in advance</span><span style="font-weight:600;color:#185FA5">${advList.length} members — &#8377;${totalAdvAmt.toLocaleString('en-IN')}</span></div>` : ''}
+      </div>
+      ${dueList.length > 0 ? `
+      <div style="background:#FCEBEB;border:1px solid #F09595;border-radius:12px;padding:14px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:600;color:#A32D2D;margin-bottom:8px">Members with outstanding dues:</div>
+        ${dueList.map(m=>`<div style="font-size:12px;display:flex;justify-content:space-between;padding:4px 0"><span>${m.name} (Flat ${m.flat})</span><span style="font-weight:600">&#8377;${setupOpeningData.members[m.id].amount}</span></div>`).join('')}
+      </div>` : ''}
+      <div class="info-box">Once you save, the app will start fresh from these opening balances. All future payments and expenses will be tracked from here.</div>`;
+  }
+}
+
+window.setMemberOpeningType = function(mid, type) {
+  if (!setupOpeningData.members) setupOpeningData.members = {};
+  if (!setupOpeningData.members[mid]) setupOpeningData.members[mid] = {};
+  setupOpeningData.members[mid].type = type;
+  if (type === 'clear') setupOpeningData.members[mid].amount = 0;
+  renderSetupStep();
+};
+window.setMemberOpeningAmount = function(mid, val) {
+  if (!setupOpeningData.members) setupOpeningData.members = {};
+  if (!setupOpeningData.members[mid]) setupOpeningData.members[mid] = {};
+  setupOpeningData.members[mid].amount = parseInt(val) || 0;
+};
+
+window.setupNext = async function() {
+  if (setupStep === 0) {
+    const cash = parseInt(document.getElementById('setup-cash')?.value) || 0;
+    setupOpeningData.cash = cash;
+    setupStep = 1;
+  } else if (setupStep === 1) {
+    const bank = parseInt(document.getElementById('setup-bank')?.value) || 0;
+    setupOpeningData.bank = bank;
+    setupStep = 2;
+  } else if (setupStep === 2) {
+    setupStep = 3;
+  } else if (setupStep === 3) {
+    await saveOpeningBalances();
+    return;
+  }
+  renderSetupStep();
+};
+
+window.setupBack = function() {
+  if (setupStep > 0) { setupStep--; renderSetupStep(); }
+};
+
+async function saveOpeningBalances() {
+  const btn = document.getElementById('setupNextBtn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  try {
+    const batch = writeBatch(db);
+    // Save settings
+    bankBalance = setupOpeningData.bank || 0;
+    cashInHand = setupOpeningData.cash || 0;
+    batch.set(doc(db, 'settings', 'main'), {
+      bankBalance, cashInHand, seeded: true, openingDone: true,
+      openingDate: new Date().toISOString().split('T')[0]
+    }, {merge: true});
+    // Save member opening balances as special payments
+    const mData = setupOpeningData.members || {};
+    Object.entries(mData).forEach(([mid, mb]) => {
+      if (mb.type !== 'clear' && mb.amount > 0) {
+        const oid = newId('OB');
+        batch.set(doc(db, 'openingBalances', oid), {
+          memberId: mid, type: mb.type, amount: mb.amount,
+          date: new Date().toISOString().split('T')[0]
+        });
+      }
+    });
+    await batch.commit();
+    document.getElementById('setupScreen').classList.remove('visible');
+    showToast('Opening balances saved!', 'success');
+    render();
+  } catch(e) {
+    btn.textContent = 'Save & Start App'; btn.disabled = false;
+    showToast('Error saving: ' + e.message, 'error');
+  }
+}
+
 // ─── TABS ─────────────────────────────────────────
 window.showTab = function(tab, btn) {
   activeTab = tab;
@@ -665,8 +904,10 @@ function renderDash() {
   const overdue3 = members.filter(m=>getMemberDueMonths(m.id).length>=3);
   return `
   <div class="bank-card">
-    <div class="bank-label"><i class="ti ti-wallet"></i> Society Bank Balance</div>
-    <div class="bank-amount">${rupee(bankBalance)}</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div><div class="bank-label"><i class="ti ti-building-bank"></i> Bank Balance</div><div class="bank-amount">${rupee(bankBalance)}</div></div>
+      <div style="text-align:right"><div class="bank-label"><i class="ti ti-cash"></i> Cash in Hand</div><div style="font-size:18px;font-weight:600;color:rgba(255,255,255,0.9)">${rupee(cashInHand)}</div></div>
+    </div>
     <div class="bank-actions">
       <button onclick="openBankModal('add')"><i class="ti ti-plus"></i>Add</button>
       <button onclick="openBankModal('subtract')"><i class="ti ti-minus"></i>Withdraw</button>
