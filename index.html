@@ -301,6 +301,84 @@
   .info-box { background:#EAF3DE; border:1px solid #B8DFA0; border-radius:10px; padding:12px 14px; margin-bottom:16px; font-size:12px; color:#2D5A11; line-height:1.6; }
   .setup-summary-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #F0EFE9; font-size:13px; }
   .setup-summary-row:last-child { border-bottom:none; }
+
+  /* BALANCE SHEET */
+  .bs-container { padding: 0 0 24px; }
+  .bs-month-header {
+    background: linear-gradient(135deg, #2C3E7A, #1A2456);
+    color: #fff; padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .bs-month-title { font-size: 16px; font-weight: 700; }
+  .bs-cash-badge {
+    background: #27AE60; color: #fff;
+    padding: 6px 12px; border-radius: 8px;
+    font-size: 12px; font-weight: 700;
+  }
+  .bs-cash-label { font-size: 9px; opacity: 0.85; display: block; }
+  .bs-cash-amount { font-size: 14px; font-weight: 800; }
+  .bs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .bs-col { flex: 1; }
+  .bs-col-header {
+    padding: 10px 12px; font-size: 12px; font-weight: 700;
+    text-align: center; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .bs-col-header.income { background: #EAF3DE; color: #2D6A11; border-bottom: 2px solid #5CAD2F; }
+  .bs-col-header.expense { background: #FCEBEB; color: #A32D2D; border-bottom: 2px solid #E07070; }
+  .bs-sub-header {
+    display: grid; grid-template-columns: 1fr 2fr 1fr;
+    padding: 6px 8px; background: #F0EFE9;
+    font-size: 10px; font-weight: 600; color: #6A6A65;
+    text-transform: uppercase; border-bottom: 1px solid #E0DED8;
+  }
+  .bs-row {
+    display: grid; grid-template-columns: 1fr 2fr 1fr;
+    padding: 8px 8px; border-bottom: 1px solid #F4F3EE;
+    align-items: center; cursor: pointer;
+  }
+  .bs-row:active { background: #F0EFE9; }
+  .bs-row.income-row:hover { background: #F5FAF0; }
+  .bs-row.expense-row:hover { background: #FFF5F5; }
+  .bs-cell-date { font-size: 10px; color: #6A6A65; }
+  .bs-cell-name { font-size: 12px; color: #1A1A19; padding: 0 4px; line-height: 1.3; }
+  .bs-cell-amt { font-size: 12px; font-weight: 600; text-align: right; }
+  .bs-cell-amt.income { color: #27AE60; }
+  .bs-cell-amt.expense { color: #E74C3C; }
+  .bs-total-row {
+    display: grid; grid-template-columns: 1fr 2fr 1fr;
+    padding: 10px 8px; font-weight: 700; font-size: 12px;
+    border-top: 2px solid currentColor;
+  }
+  .bs-total-row.income { background: #D4EDDA; color: #155724; border-color: #5CAD2F; }
+  .bs-total-row.expense { background: #F8D7DA; color: #721C24; border-color: #E07070; }
+  .bs-summary-card {
+    margin: 12px 14px; background: #fff; border: 1px solid #E8E7E1;
+    border-radius: 14px; overflow: hidden;
+  }
+  .bs-summary-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 11px 14px; border-bottom: 1px solid #F0EFE9; font-size: 13px;
+  }
+  .bs-summary-row:last-child { border-bottom: none; }
+  .bs-summary-row.final {
+    background: linear-gradient(135deg, #1D9E75, #0F6E56);
+    color: #fff; font-size: 14px; font-weight: 700;
+  }
+  .bs-add-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; padding: 10px; color: #1D9E75; font-size: 12px;
+    font-weight: 500; cursor: pointer; border-top: 1px dashed #C8E6C9;
+    background: #F5FAF0;
+  }
+  .bs-add-row:active { background: #EAF3DE; }
+  .month-selector { display: flex; align-items: center; gap: 8px; }
+  .month-selector button {
+    background: rgba(255,255,255,0.2); border: none; color: #fff;
+    width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+  }
+  .month-selector button:active { background: rgba(255,255,255,0.35); }
+  .bs-empty { padding: 20px; text-align: center; color: #6A6A65; font-size: 12px; background: #fff; }
 </style>
 </head>
 <body>
@@ -345,12 +423,13 @@
     <button class="pay-btn" onclick="openPaymentModal()"><i class="ti ti-plus"></i>Pay</button>
   </div>
   <div class="content" id="content"></div>
-  <nav class="bottom-nav">
+  <nav class="bottom-nav" style="grid-template-columns:repeat(6,1fr)">
     <button class="nav-item active" onclick="showTab('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Home</button>
     <button class="nav-item" onclick="showTab('members',this)"><i class="ti ti-users"></i>Members</button>
     <button class="nav-item" onclick="showTab('payments',this)"><i class="ti ti-receipt"></i>Payments</button>
     <button class="nav-item" onclick="showTab('expenses',this)"><i class="ti ti-cash"></i>Expenses</button>
     <button class="nav-item" onclick="showTab('dues',this)"><i class="ti ti-alert-circle"></i>Dues</button>
+    <button class="nav-item" onclick="showTab('balancesheet',this)"><i class="ti ti-report-money"></i>Sheet</button>
   </nav>
   <div id="modal-root"></div>
   <div id="toast-root"></div>
@@ -393,6 +472,9 @@ let unsubscribers = [];
 let cashInHand = 0;
 let setupStep = 0;
 let setupOpeningData = {};
+let bsMonth = new Date().getMonth(); // 0=Jan
+let bsYear = new Date().getFullYear();
+let balanceSheetEntries = []; // loaded from Firebase
 
 // ─── HELPERS ───────────────────────────────────────
 function rupee(n) { return '\u20B9' + Number(n).toLocaleString('en-IN'); }
@@ -432,9 +514,9 @@ async function initFirebase() {
   setLoadingStatus('Loading members...');
   try {
     // Track which collections have loaded
-    let loaded = {members: false, payments: false, expenses: false, settings: false};
+    let loaded = {members: false, payments: false, expenses: false, settings: false, balanceEntries: false};
     function checkAndRender() {
-      if (loaded.members && loaded.payments && loaded.expenses && loaded.settings) {
+      if (loaded.members && loaded.payments && loaded.expenses && loaded.settings && loaded.balanceEntries) {
         setSyncDot('online');
         render();
       }
@@ -472,7 +554,14 @@ async function initFirebase() {
       checkAndRender();
     });
 
-    unsubscribers = [unsubMembers, unsubPayments, unsubExpenses, unsubSettings];
+    // Balance Sheet entries listener
+    const unsubBS = onSnapshot(collection(db, 'balanceEntries'), snap => {
+      balanceSheetEntries = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      loaded.balanceEntries = true;
+      checkAndRender();
+    });
+
+    unsubscribers = [unsubMembers, unsubPayments, unsubExpenses, unsubSettings, unsubBS];
 
     // Only seed once — check a permanent flag in Firebase
     setLoadingStatus('Checking data...');
@@ -910,7 +999,8 @@ function render() {
   else if (activeTab==='members') el.innerHTML = renderMembers();
   else if (activeTab==='payments') el.innerHTML = renderPayments();
   else if (activeTab==='expenses') el.innerHTML = renderExpenses();
-  else el.innerHTML = renderDues();
+  else if (activeTab==='dues') el.innerHTML = renderDues();
+  else if (activeTab==='balancesheet') el.innerHTML = renderBalanceSheet();
 }
 
 // ─── DASHBOARD ────────────────────────────────────
@@ -1104,6 +1194,273 @@ function renderExpenses() {
     </div>`).join('')}
   </div>`;
 }
+
+// ─── BALANCE SHEET ────────────────────────────────
+function renderBalanceSheet() {
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthKey = `${bsYear}-${String(bsMonth+1).padStart(2,'0')}`;
+
+  // Get entries for this month
+  const monthEntries = balanceSheetEntries.filter(e => e.monthKey === monthKey);
+  const incomeEntries = monthEntries.filter(e => e.side === 'income').sort((a,b) => (a.sortOrder||0)-(b.sortOrder||0));
+  const expenseEntries = monthEntries.filter(e => e.side === 'expense').sort((a,b) => (a.date||'').localeCompare(b.date||''));
+
+  // Auto-include maintenance collections as income from payments
+  const monthPayments = payments.filter(p => p.month === bsMonth);
+  const cashMaint = monthPayments.filter(p => (p.mode||'cash')==='cash').reduce((s,p)=>s+p.amount,0);
+  const bankMaint = monthPayments.filter(p => p.mode==='bank').reduce((s,p)=>s+p.amount,0);
+
+  const totalIncome = incomeEntries.reduce((s,e)=>s+e.amount,0) + cashMaint + bankMaint;
+  const totalExpense = expenseEntries.reduce((s,e)=>s+e.amount,0);
+  const cashOnHand = totalIncome - totalExpense;
+
+  const prevMonthLabel = bsMonth === 0 ? `Dec ${bsYear-1}` : `${MONTHS[bsMonth-1]} ${bsYear}`;
+
+  return `
+  <div class="bs-container">
+    <div class="bs-month-header">
+      <div class="month-selector">
+        <button onclick="bsChangeMonth(-1)">&#8249;</button>
+        <div class="bs-month-title">${MONTHS[bsMonth]} - ${bsYear}</div>
+        <button onclick="bsChangeMonth(1)">&#8250;</button>
+      </div>
+      <div class="bs-cash-badge">
+        <span class="bs-cash-label">Cash on Hand</span>
+        <span class="bs-cash-amount">${rupee(cashOnHand)}</span>
+      </div>
+    </div>
+
+    <div style="background:#1A2456;color:rgba(255,255,255,0.9);text-align:center;padding:8px;font-size:13px;font-weight:700;letter-spacing:0.08em">
+      RUBY BALANCE & EXPENSE SHEET
+    </div>
+
+    <!-- SUMMARY TOTALS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:2px solid #E8E7E1">
+      <div style="background:#EAF3DE;padding:10px 12px;text-align:center;border-right:1px solid #C8E6C9">
+        <div style="font-size:10px;color:#3B6D11;font-weight:600;text-transform:uppercase">Total Income</div>
+        <div style="font-size:17px;font-weight:700;color:#27AE60">${rupee(totalIncome)}</div>
+      </div>
+      <div style="background:#FCEBEB;padding:10px 12px;text-align:center">
+        <div style="font-size:10px;color:#A32D2D;font-weight:600;text-transform:uppercase">Total Expense</div>
+        <div style="font-size:17px;font-weight:700;color:#E74C3C">${rupee(totalExpense)}</div>
+      </div>
+    </div>
+
+    <!-- MAIN SHEET - side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;background:#fff;border-bottom:1px solid #E8E7E1">
+
+      <!-- INCOME COLUMN -->
+      <div style="border-right:1px solid #E8E7E1">
+        <div class="bs-col-header income">Income</div>
+        <div class="bs-sub-header">
+          <span>Month</span><span style="padding:0 4px">Particulars</span><span style="text-align:right">Amount</span>
+        </div>
+
+        <!-- Previous month carryover rows from custom entries -->
+        ${incomeEntries.map(e => `
+          <div class="bs-row income-row" onclick="openBSEntryDetail('${e.id}')">
+            <div class="bs-cell-date">${e.dateLabel||e.date||''}</div>
+            <div class="bs-cell-name">${e.name}</div>
+            <div class="bs-cell-amt income">${rupee(e.amount)}</div>
+          </div>
+        `).join('')}
+
+        <!-- Auto: Maintenance collections this month -->
+        ${bankMaint > 0 ? `
+          <div class="bs-row income-row" style="background:#F5FAF0">
+            <div class="bs-cell-date">${MONTHS[bsMonth]}</div>
+            <div class="bs-cell-name" style="color:#0F6E56;font-weight:500">Maint. (Bank)</div>
+            <div class="bs-cell-amt income">${rupee(bankMaint)}</div>
+          </div>` : ''}
+        ${cashMaint > 0 ? `
+          <div class="bs-row income-row" style="background:#F5FAF0">
+            <div class="bs-cell-date">${MONTHS[bsMonth]}</div>
+            <div class="bs-cell-name" style="color:#0F6E56;font-weight:500">Maint. (Cash)</div>
+            <div class="bs-cell-amt income">${rupee(cashMaint)}</div>
+          </div>` : ''}
+
+        ${incomeEntries.length === 0 && cashMaint === 0 && bankMaint === 0 ? '<div class="bs-empty">No income entries</div>' : ''}
+
+        <!-- Add income row -->
+        <div class="bs-add-row" onclick="openAddBSEntry('income','${monthKey}')">
+          <i class="ti ti-plus" style="font-size:14px"></i> Add Income
+        </div>
+
+        <!-- Total -->
+        <div class="bs-total-row income">
+          <span></span><span>Total Income</span><span style="text-align:right">${rupee(totalIncome)}</span>
+        </div>
+      </div>
+
+      <!-- EXPENSE COLUMN -->
+      <div>
+        <div class="bs-col-header expense">Expenses (Out)</div>
+        <div class="bs-sub-header">
+          <span>Date</span><span style="padding:0 4px">Particulars</span><span style="text-align:right">Amount</span>
+        </div>
+
+        ${expenseEntries.map(e => `
+          <div class="bs-row expense-row" onclick="openBSEntryDetail('${e.id}')">
+            <div class="bs-cell-date">${e.date||''}</div>
+            <div class="bs-cell-name">${e.name}</div>
+            <div class="bs-cell-amt expense">${rupee(e.amount)}</div>
+          </div>
+        `).join('')}
+
+        ${expenseEntries.length === 0 ? '<div class="bs-empty">No expenses yet</div>' : ''}
+
+        <!-- Add expense row -->
+        <div class="bs-add-row" onclick="openAddBSEntry('expense','${monthKey}')" style="border-color:#F9C0C0;background:#FFF5F5;color:#E74C3C">
+          <i class="ti ti-plus" style="font-size:14px"></i> Add Expense
+        </div>
+
+        <!-- Total -->
+        <div class="bs-total-row expense">
+          <span></span><span>Total Expanse</span><span style="text-align:right">${rupee(totalExpense)}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM SUMMARY -->
+    <div class="bs-summary-card">
+      <div class="bs-summary-row">
+        <span style="color:#6A6A65">Total Income</span>
+        <span style="font-weight:600;color:#27AE60">${rupee(totalIncome)}</span>
+      </div>
+      <div class="bs-summary-row">
+        <span style="color:#6A6A65">Total Expense</span>
+        <span style="font-weight:600;color:#E74C3C">- ${rupee(totalExpense)}</span>
+      </div>
+      <div class="bs-summary-row final">
+        <span>Cash on Hand</span>
+        <span>${rupee(cashOnHand)}</span>
+      </div>
+    </div>
+
+    <div style="padding:0 14px 14px;display:flex;gap:8px">
+      <button onclick="openAddBSEntry('income','${monthKey}')" class="btn primary" style="flex:1;padding:11px;font-size:13px"><i class="ti ti-plus"></i> Add Income</button>
+      <button onclick="openAddBSEntry('expense','${monthKey}')" class="btn danger" style="flex:1;padding:11px;font-size:13px"><i class="ti ti-plus"></i> Add Expense</button>
+    </div>
+  </div>`;
+}
+
+window.bsChangeMonth = function(dir) {
+  bsMonth += dir;
+  if (bsMonth < 0) { bsMonth = 11; bsYear--; }
+  if (bsMonth > 11) { bsMonth = 0; bsYear++; }
+  render();
+};
+
+window.openAddBSEntry = function(side, monthKey) {
+  const isExpense = side === 'expense';
+  const today = new Date().toLocaleDateString('en-IN', {day:'numeric',month:'numeric',year:'2-digit'});
+  document.getElementById('modal-root').innerHTML = `
+  <div class="modal-wrap" onclick="closeSheet(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">
+        Add ${isExpense ? 'Expense' : 'Income'} Entry
+        <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
+      </div>
+      <div class="sheet-body">
+        <div class="field"><label>Particulars / Description *</label>
+          <input type="text" id="bse-name" placeholder="${isExpense ? 'e.g. Watchman Salary, Water Tanker' : 'e.g. Last Month Cash, Bank Balance'}">
+        </div>
+        <div class="two-col">
+          <div class="field"><label>Date</label>
+            <input type="text" id="bse-date" placeholder="${isExpense ? 'e.g. 5-7-26' : 'e.g. April'}" value="${isExpense ? today : ''}">
+          </div>
+          <div class="field"><label>Amount (&#8377;) *</label>
+            <input type="number" id="bse-amt" inputmode="numeric" placeholder="0">
+          </div>
+        </div>
+        ${!isExpense ? `
+        <div class="field"><label>Category</label>
+          <select id="bse-cat">
+            <option value="carryover">Last Month Carryover</option>
+            <option value="maintenance">Maintenance Collection</option>
+            <option value="other">Other Income</option>
+          </select>
+        </div>` : `
+        <div class="field"><label>Category</label>
+          <select id="bse-cat">
+            <option>Water Tanker</option>
+            <option>Watchman Salary</option>
+            <option>Cleaning</option>
+            <option>Motor/Plumbing</option>
+            <option>Electricity</option>
+            <option>Repairs</option>
+            <option>Xerox/Stationery</option>
+            <option>Other</option>
+          </select>
+        </div>`}
+        <div class="err" id="bse-err"></div>
+      </div>
+      <div class="sheet-footer">
+        <button class="btn" onclick="closeSheetDirect()">Cancel</button>
+        <button class="btn ${isExpense ? 'danger' : 'primary'}" onclick="saveBSEntry('${side}','${monthKey}')">Save</button>
+      </div>
+    </div>
+  </div>`;
+  setTimeout(() => document.getElementById('bse-name')?.focus(), 200);
+};
+
+window.saveBSEntry = async function(side, monthKey) {
+  const name = document.getElementById('bse-name').value.trim();
+  const dateVal = document.getElementById('bse-date').value.trim();
+  const amt = parseInt(document.getElementById('bse-amt').value);
+  const cat = document.getElementById('bse-cat')?.value || 'Other';
+  const err = document.getElementById('bse-err');
+  if (!name) { err.textContent = 'Description required'; err.style.display = 'block'; return; }
+  if (!amt || amt <= 0) { err.textContent = 'Enter valid amount'; err.style.display = 'block'; return; }
+  const eid = newId('BS');
+  setSyncDot('syncing');
+  await setDoc(doc(db, 'balanceEntries', eid), {
+    side, monthKey, name, date: dateVal, dateLabel: dateVal,
+    amount: amt, category: cat,
+    sortOrder: side === 'income' ? balanceSheetEntries.filter(e=>e.side==='income'&&e.monthKey===monthKey).length : 0,
+    createdAt: new Date().toISOString()
+  });
+  setSyncDot('online');
+  closeSheetDirect();
+  showToast('Entry saved ✓', 'success');
+};
+
+window.openBSEntryDetail = function(eid) {
+  const e = balanceSheetEntries.find(x => x.id === eid);
+  if (!e) return;
+  document.getElementById('modal-root').innerHTML = `
+  <div class="modal-wrap" onclick="closeSheet(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">
+        Entry Details
+        <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
+      </div>
+      <div class="sheet-body">
+        <div style="background:#F8F7F2;border-radius:10px;padding:14px;margin-bottom:14px">
+          <div style="font-size:15px;font-weight:600;margin-bottom:6px">${e.name}</div>
+          <div style="font-size:12px;color:#6A6A65">Date: ${e.date||'—'} &nbsp;·&nbsp; Category: ${e.category||'—'}</div>
+          <div style="font-size:18px;font-weight:700;margin-top:10px;color:${e.side==='income'?'#27AE60':'#E74C3C'}">${e.side==='expense'?'-':''}${rupee(e.amount)}</div>
+        </div>
+      </div>
+      <div class="sheet-footer">
+        <button class="btn danger" onclick="deleteBSEntry('${eid}')"><i class="ti ti-trash"></i> Delete</button>
+        <button class="btn primary" onclick="closeSheetDirect()">Close</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+window.deleteBSEntry = async function(eid) {
+  const e = balanceSheetEntries.find(x => x.id === eid);
+  if (!confirm('Delete "' + e.name + '"?')) return;
+  setSyncDot('syncing');
+  await deleteDoc(doc(db, 'balanceEntries', eid));
+  setSyncDot('online');
+  closeSheetDirect();
+  showToast('Entry deleted', 'error');
+};
 
 // ─── PAYMENT MODAL ────────────────────────────────
 window.openBankModal = window.openBankModal || function(){};
