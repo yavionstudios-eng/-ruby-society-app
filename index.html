@@ -302,102 +302,128 @@
   .setup-summary-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #F0EFE9; font-size:13px; }
   .setup-summary-row:last-child { border-bottom:none; }
 
-  /* BALANCE SHEET v2 */
-  .ledger-wrap { background: #F4F3EE; padding: 0 0 24px; min-height: 100%; }
+  /* BALANCE SHEET v3 - Proper Ledger */
+  .ledger-wrap { background: #F4F3EE; padding-bottom: 30px; }
+
   .ledger-topbar {
     background: #fff; border-bottom: 1px solid #E8E7E1;
-    padding: 12px 14px; position: sticky; top: 57px; z-index: 4;
+    padding: 14px 16px; position: sticky; top: 57px; z-index: 4;
   }
-  .ledger-title { font-size: 17px; font-weight: 700; color: #1A1A19; margin-bottom: 10px; }
-  .ledger-badges { display: flex; gap: 8px; margin-bottom: 10px; }
+  .ledger-header-row {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+  }
+  .ledger-title { font-size: 18px; font-weight: 700; color: #1A1A19; }
+  .ledger-add-btn {
+    background: #1D9E75; color: #fff; border: none; border-radius: 8px;
+    padding: 10px 20px; font-size: 14px; font-family: inherit;
+    cursor: pointer; font-weight: 600;
+  }
+  .ledger-add-btn:active { background: #0F6E56; }
+  .ledger-badges { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
   .ledger-badge {
-    flex: 1; display: flex; align-items: center; gap: 8px;
-    background: #F8F7F2; border: 1px solid #E8E7E1; border-radius: 10px; padding: 8px 10px;
+    display: flex; align-items: center; gap: 10px;
+    background: #F8F7F2; border: 1px solid #E8E7E1; border-radius: 12px; padding: 10px 12px;
   }
   .ledger-badge-icon {
-    width: 30px; height: 30px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
   }
   .ledger-badge-icon.bank { background: #E6F1FB; }
   .ledger-badge-icon.cash { background: #FAEEDA; }
-  .ledger-badge-label { font-size: 10px; color: #6A6A65; font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; }
-  .ledger-badge-val { font-size: 14px; font-weight: 700; color: #1A1A19; }
-  .ledger-controls { display: flex; align-items: center; gap: 8px; }
-  .ledger-month-nav {
-    display: flex; align-items: center; gap: 4px;
-    background: #F0EFE9; border-radius: 8px; padding: 4px;
-  }
-  .ledger-month-nav button {
-    background: none; border: none; cursor: pointer; color: #1D9E75;
-    font-size: 18px; width: 28px; height: 28px; border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .ledger-month-nav button:active { background: #E0EFE4; }
-  .ledger-month-label { font-size: 13px; font-weight: 600; color: #1A1A19; min-width: 80px; text-align: center; }
+  .ledger-badge-label { font-size: 10px; color: #6A6A65; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .ledger-badge-val { font-size: 16px; font-weight: 700; color: #1A1A19; margin-top: 1px; }
+  .ledger-controls { display: flex; gap: 10px; align-items: center; }
   .ledger-search {
-    flex: 1; padding: 8px 12px; border: 1px solid #D8D6CB;
+    flex: 1; padding: 9px 12px; border: 1px solid #D8D6CB;
     border-radius: 8px; background: #F8F7F2; font-size: 13px;
     font-family: inherit; outline: none; color: #1A1A19;
   }
   .ledger-search:focus { border-color: #1D9E75; background: #fff; }
-  .ledger-add-btn {
-    background: #1D9E75; color: #fff; border: none; border-radius: 8px;
-    padding: 9px 14px; font-size: 13px; font-family: inherit;
-    cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap; font-weight: 500;
+  .ledger-month-nav {
+    display: flex; align-items: center; gap: 0;
+    border: 1px solid #D8D6CB; border-radius: 8px; overflow: hidden; background: #fff;
   }
-  .ledger-add-btn:active { background: #0F6E56; }
-  .ledger-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 10px; }
-  .ledger-table { border-radius: 12px; overflow: hidden; border: 1px solid #E8E7E1; }
-  .ledger-table-header {
-    padding: 10px 12px; font-size: 13px; font-weight: 700;
-    color: #fff; display: flex; align-items: center; gap: 6px;
+  .ledger-month-nav button {
+    background: #F8F7F2; border: none; cursor: pointer; color: #1D9E75;
+    font-size: 18px; width: 34px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
   }
-  .ledger-table-header.income { background: #1D7A45; }
-  .ledger-table-header.expense { background: #8B2020; }
-  .ledger-col-heads {
-    display: grid; grid-template-columns: 28px 1fr 48px;
-    padding: 5px 8px; font-size: 9px; font-weight: 600;
-    color: #6A6A65; text-transform: uppercase; letter-spacing: 0.04em;
-    background: #F8F7F2; border-bottom: 1px solid #E8E7E1;
+  .ledger-month-nav button:active { background: #E0EFE4; }
+  .ledger-month-label {
+    font-size: 13px; font-weight: 600; color: #1A1A19;
+    padding: 0 12px; border-left: 1px solid #E8E7E1; border-right: 1px solid #E8E7E1;
+    height: 36px; display: flex; align-items: center; white-space: nowrap;
   }
-  .ledger-entry {
-    display: grid; grid-template-columns: 28px 1fr 48px;
-    padding: 8px 8px; border-bottom: 1px solid #F4F3EE;
-    align-items: center; cursor: pointer; background: #fff;
+
+  /* THE LEDGER TABLES */
+  .ledger-body { padding: 12px; }
+  .ledger-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .ledger-table { border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+  .lt-header {
+    padding: 13px 14px; font-size: 15px; font-weight: 700;
+    color: #fff; display: flex; align-items: center; gap: 8px;
   }
-  .ledger-entry:last-child { border-bottom: none; }
-  .ledger-entry:active { background: #F8F7F2; }
-  .ledger-entry-date { font-size: 9px; color: #6A6A65; line-height: 1.3; }
-  .ledger-entry-desc { font-size: 11px; color: #1A1A19; line-height: 1.3; padding: 0 4px; }
-  .ledger-entry-desc .method-icon { font-size: 9px; color: #6A6A65; display: block; }
-  .ledger-entry-amt { font-size: 11px; font-weight: 600; text-align: right; }
-  .ledger-entry-amt.income { color: #1D7A45; }
-  .ledger-entry-amt.expense { color: #8B2020; }
-  .ledger-entry.auto { background: #F5FAF0; }
-  .ledger-add-entry {
-    display: flex; align-items: center; justify-content: center; gap: 4px;
-    padding: 8px; font-size: 11px; font-weight: 500; cursor: pointer;
-    border-top: 1px dashed #D8D6CB; background: #FAFAF8; color: #6A6A65;
+  .lt-header.income { background: #1D6B3E; }
+  .lt-header.expense { background: #7B1A1A; }
+  .lt-header i { font-size: 18px; }
+
+  .lt-col-row {
+    display: grid; gap: 0; background: #2A2A2A; color: rgba(255,255,255,0.7);
+    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
   }
-  .ledger-add-entry:active { background: #F0EFE9; }
-  .ledger-table-footer {
-    padding: 9px 10px; display: flex; justify-content: space-between;
-    font-size: 12px; font-weight: 700; color: #fff;
+  .lt-col-row.income { background: #155230; }
+  .lt-col-row.expense { background: #5C1313; }
+  .lt-col-row > span { padding: 6px 8px; }
+
+  /* 4 columns: Date | Description | Method | Amount */
+  .lt-row-4 { grid-template-columns: 32px 1fr 44px 52px; }
+
+  .lt-entry {
+    display: grid; align-items: center;
+    border-bottom: 1px solid #F0EFE9;
+    background: #fff; cursor: pointer; transition: background 0.1s;
   }
-  .ledger-table-footer.income { background: #1D7A45; }
-  .ledger-table-footer.expense { background: #8B2020; }
-  .ledger-summary {
-    margin: 0 10px; display: grid; grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
+  .lt-entry:last-of-type { border-bottom: none; }
+  .lt-entry:active { background: #F4F3EE; }
+  .lt-entry.auto-entry { background: #F0FAF5; }
+  .lt-entry > div { padding: 10px 8px; }
+
+  .lt-date { font-size: 10px; color: #6A6A65; line-height: 1.3; }
+  .lt-desc { font-size: 12px; color: #1A1A19; font-weight: 500; line-height: 1.3; }
+  .lt-desc small { font-size: 10px; color: #6A6A65; font-weight: 400; display: block; }
+  .lt-method { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .lt-method-icon { font-size: 14px; }
+  .lt-method-label { font-size: 8px; color: #6A6A65; }
+  .lt-amt { font-size: 12px; font-weight: 700; text-align: right; padding-right: 10px; }
+  .lt-amt.income { color: #1D6B3E; }
+  .lt-amt.expense { color: #7B1A1A; }
+
+  .lt-add-row {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 11px; font-size: 12px; font-weight: 500; cursor: pointer;
+    background: #FAFAF8; border-top: 1px dashed #D8D6CB;
   }
-  .ledger-sum-card {
-    background: #fff; border: 1px solid #E8E7E1; border-radius: 12px; padding: 12px;
+  .lt-add-row.income-add { color: #1D6B3E; }
+  .lt-add-row.income-add:active { background: #EAF3DE; }
+  .lt-add-row.expense-add { color: #7B1A1A; }
+  .lt-add-row.expense-add:active { background: #FCEBEB; }
+
+  .lt-footer {
+    padding: 11px 14px; display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; font-weight: 700; color: #fff;
   }
-  .ledger-sum-label { font-size: 10px; color: #6A6A65; font-weight: 500; text-transform: uppercase; margin-bottom: 4px; }
-  .ledger-sum-val { font-size: 15px; font-weight: 700; }
-  .ledger-sum-card.net { background: linear-gradient(135deg, #1D9E75, #0F6E56); border-color: transparent; }
-  .ledger-sum-card.net .ledger-sum-label { color: rgba(255,255,255,0.8); }
-  .ledger-sum-card.net .ledger-sum-val { color: #fff; font-size: 16px; }
+  .lt-footer.income { background: #1D6B3E; }
+  .lt-footer.expense { background: #7B1A1A; }
+
+  /* SUMMARY */
+  .ledger-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .ls-card { background: #fff; border: 1px solid #E8E7E1; border-radius: 12px; padding: 14px 12px; }
+  .ls-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #6A6A65; margin-bottom: 6px; }
+  .ls-val { font-size: 15px; font-weight: 700; }
+  .ls-card.net { background: linear-gradient(135deg, #1D9E75, #0F6E56); border-color: transparent; }
+  .ls-card.net .ls-label { color: rgba(255,255,255,0.8); }
+  .ls-card.net .ls-val { color: #fff; font-size: 16px; }
 </style>
 </head>
 <body>
@@ -1214,53 +1240,50 @@ function renderExpenses() {
   </div>`;
 }
 
-// ─── BALANCE SHEET v2 ─────────────────────────────
+// ─── BALANCE SHEET v3 ─────────────────────────────
 let bsSearch = '';
 
 function renderBalanceSheet() {
-  const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const monthKey = `${bsYear}-${String(bsMonth+1).padStart(2,'0')}`;
-
   const monthEntries = balanceSheetEntries.filter(e => e.monthKey === monthKey);
-  let incomeEntries = monthEntries.filter(e => e.side === 'income').sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0));
-  let expenseEntries = monthEntries.filter(e => e.side === 'expense').sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  let incomeList = monthEntries.filter(e=>e.side==='income').sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0));
+  let expenseList = monthEntries.filter(e=>e.side==='expense').sort((a,b)=>(a.date||'').localeCompare(b.date||''));
 
-  // Search filter
   if (bsSearch) {
     const q = bsSearch.toLowerCase();
-    incomeEntries = incomeEntries.filter(e => e.name.toLowerCase().includes(q));
-    expenseEntries = expenseEntries.filter(e => e.name.toLowerCase().includes(q));
+    incomeList = incomeList.filter(e=>e.name.toLowerCase().includes(q));
+    expenseList = expenseList.filter(e=>e.name.toLowerCase().includes(q));
   }
 
-  // Auto maintenance collections
-  const monthPayments = payments.filter(p => p.month === bsMonth);
-  const cashMaint = monthPayments.filter(p => (p.mode||'cash')==='cash').reduce((s,p)=>s+p.amount,0);
-  const bankMaint = monthPayments.filter(p => p.mode==='bank').reduce((s,p)=>s+p.amount,0);
-
-  const manualIncome = incomeEntries.reduce((s,e)=>s+e.amount,0);
-  const totalIncome = manualIncome + cashMaint + bankMaint;
-  const totalExpense = expenseEntries.reduce((s,e)=>s+e.amount,0);
+  const mPays = payments.filter(p=>p.month===bsMonth);
+  const cashMaint = mPays.filter(p=>(p.mode||'cash')==='cash').reduce((s,p)=>s+p.amount,0);
+  const bankMaint = mPays.filter(p=>p.mode==='bank').reduce((s,p)=>s+p.amount,0);
+  const totalIncome = incomeList.reduce((s,e)=>s+e.amount,0) + cashMaint + bankMaint;
+  const totalExpense = expenseList.reduce((s,e)=>s+e.amount,0);
   const netBalance = totalIncome - totalExpense;
 
-  function methodIcon(mode) {
-    return mode === 'bank'
-      ? '<span style="font-size:9px;color:#185FA5">🏦 Bank</span>'
-      : '<span style="font-size:9px;color:#854F0B">💵 Cash</span>';
+  function methodCell(method) {
+    return method === 'bank'
+      ? `<div class="lt-method"><span class="lt-method-icon">🏦</span><span class="lt-method-label">Bank</span></div>`
+      : `<div class="lt-method"><span class="lt-method-icon">💵</span><span class="lt-method-label">Cash</span></div>`;
+  }
+
+  function entryRow(e, side) {
+    return `<div class="lt-entry lt-row-4" onclick="openBSEntryDetail('${e.id}')">
+      <div class="lt-date">${e.dateLabel||e.date||'—'}</div>
+      <div class="lt-desc">${e.name}<small>${e.category||''}</small></div>
+      ${methodCell(e.method||'cash')}
+      <div class="lt-amt ${side}">${rupee(e.amount)}</div>
+    </div>`;
   }
 
   return `<div class="ledger-wrap">
-
-    <!-- TOPBAR -->
     <div class="ledger-topbar">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="ledger-title">${MONTHS[bsMonth]} ${bsYear} — Monthly Ledger</div>
-        <button class="ledger-add-btn" onclick="openAddBSEntry('expense','${monthKey}')">
-          <i class="ti ti-plus"></i>Add
-        </button>
+      <div class="ledger-header-row">
+        <div class="ledger-title">${MN[bsMonth]} ${bsYear} — Monthly Ledger</div>
+        <button class="ledger-add-btn" onclick="openAddBSEntry('expense','${monthKey}')">+ ADD</button>
       </div>
-
-      <!-- Bank + Cash badges -->
       <div class="ledger-badges">
         <div class="ledger-badge">
           <div class="ledger-badge-icon bank">🏦</div>
@@ -1271,87 +1294,80 @@ function renderBalanceSheet() {
           <div><div class="ledger-badge-label">Cash on Hand</div><div class="ledger-badge-val">${rupee(cashInHand)}</div></div>
         </div>
       </div>
-
-      <!-- Search + Month nav -->
       <div class="ledger-controls">
-        <input class="ledger-search" placeholder="Search transactions..." value="${bsSearch}"
-          oninput="bsSearch=this.value;render()">
+        <input class="ledger-search" placeholder="Search transactions..." value="${bsSearch}" oninput="bsSearch=this.value;render()">
         <div class="ledger-month-nav">
           <button onclick="bsChangeMonth(-1)">‹</button>
-          <span class="ledger-month-label">${MONTHS[bsMonth]} ${bsYear}</span>
+          <span class="ledger-month-label">${MN[bsMonth]} ${bsYear}</span>
           <button onclick="bsChangeMonth(1)">›</button>
         </div>
       </div>
     </div>
 
-    <!-- TABLES -->
-    <div class="ledger-tables">
+    <div class="ledger-body">
+      <div class="ledger-grid">
 
-      <!-- INCOME TABLE -->
-      <div class="ledger-table">
-        <div class="ledger-table-header income"><i class="ti ti-trending-up" style="font-size:15px"></i> Income</div>
-        <div class="ledger-col-heads"><span>Date</span><span style="padding:0 4px">Description</span><span style="text-align:right">Amount</span></div>
-
-        ${incomeEntries.map(e=>`
-          <div class="ledger-entry" onclick="openBSEntryDetail('${e.id}')">
-            <div class="ledger-entry-date">${e.dateLabel||e.date||'—'}</div>
-            <div class="ledger-entry-desc">${e.name}<span class="method-icon">${e.method==='bank'?'🏦':'💵'}</span></div>
-            <div class="ledger-entry-amt income">${rupee(e.amount)}</div>
-          </div>`).join('')}
-
-        ${bankMaint>0?`<div class="ledger-entry auto">
-          <div class="ledger-entry-date">${MONTHS[bsMonth]}</div>
-          <div class="ledger-entry-desc">Maint.(Bank)<span class="method-icon">🏦 auto</span></div>
-          <div class="ledger-entry-amt income">${rupee(bankMaint)}</div>
-        </div>`:''}
-        ${cashMaint>0?`<div class="ledger-entry auto">
-          <div class="ledger-entry-date">${MONTHS[bsMonth]}</div>
-          <div class="ledger-entry-desc">Maint.(Cash)<span class="method-icon">💵 auto</span></div>
-          <div class="ledger-entry-amt income">${rupee(cashMaint)}</div>
-        </div>`:''}
-
-        ${incomeEntries.length===0&&cashMaint===0&&bankMaint===0?'<div style="padding:16px;text-align:center;font-size:11px;color:#ABABA3;background:#fff">No income entries</div>':''}
-
-        <div class="ledger-add-entry" onclick="openAddBSEntry('income','${monthKey}')">
-          <i class="ti ti-plus" style="font-size:12px"></i> Add income
+        <!-- INCOME TABLE -->
+        <div class="ledger-table">
+          <div class="lt-header income"><i class="ti ti-trending-up"></i> Income</div>
+          <div class="lt-col-row lt-row-4 income">
+            <span>Date</span><span>Description</span><span style="text-align:center">Method</span><span style="text-align:right;padding-right:10px">Amount (₹)</span>
+          </div>
+          ${incomeList.map(e=>entryRow(e,'income')).join('')}
+          ${bankMaint>0?`<div class="lt-entry lt-row-4 auto-entry">
+            <div class="lt-date">${MN[bsMonth]}</div>
+            <div class="lt-desc">Maint.(Bank)<small>Auto • Payments</small></div>
+            ${methodCell('bank')}
+            <div class="lt-amt income">${rupee(bankMaint)}</div>
+          </div>`:''}
+          ${cashMaint>0?`<div class="lt-entry lt-row-4 auto-entry">
+            <div class="lt-date">${MN[bsMonth]}</div>
+            <div class="lt-desc">Maint.(Cash)<small>Auto • Payments</small></div>
+            ${methodCell('cash')}
+            <div class="lt-amt income">${rupee(cashMaint)}</div>
+          </div>`:''}
+          ${incomeList.length===0&&cashMaint===0&&bankMaint===0
+            ?'<div style="padding:20px;text-align:center;font-size:12px;color:#ABABA3;background:#fff">No income entries yet</div>':''}
+          <div class="lt-add-row income-add" onclick="openAddBSEntry('income','${monthKey}')">
+            <i class="ti ti-plus" style="font-size:14px"></i> Add income entry
+          </div>
+          <div class="lt-footer income">
+            <span>Total Income</span><span>${rupee(totalIncome)}</span>
+          </div>
         </div>
-        <div class="ledger-table-footer income"><span>Total Income</span><span>${rupee(totalIncome)}</span></div>
-      </div>
 
-      <!-- EXPENSE TABLE -->
-      <div class="ledger-table">
-        <div class="ledger-table-header expense"><i class="ti ti-trending-down" style="font-size:15px"></i> Expense</div>
-        <div class="ledger-col-heads"><span>Date</span><span style="padding:0 4px">Description</span><span style="text-align:right">Amount</span></div>
-
-        ${expenseEntries.map(e=>`
-          <div class="ledger-entry" onclick="openBSEntryDetail('${e.id}')">
-            <div class="ledger-entry-date">${e.date||'—'}</div>
-            <div class="ledger-entry-desc">${e.name}<span class="method-icon">${e.method==='bank'?'🏦':'💵'}</span></div>
-            <div class="ledger-entry-amt expense">${rupee(e.amount)}</div>
-          </div>`).join('')}
-
-        ${expenseEntries.length===0?'<div style="padding:16px;text-align:center;font-size:11px;color:#ABABA3;background:#fff">No expenses yet</div>':''}
-
-        <div class="ledger-add-entry" onclick="openAddBSEntry('expense','${monthKey}')" style="color:#8B2020">
-          <i class="ti ti-plus" style="font-size:12px"></i> Add expense
+        <!-- EXPENSE TABLE -->
+        <div class="ledger-table">
+          <div class="lt-header expense"><i class="ti ti-trending-down"></i> Expense</div>
+          <div class="lt-col-row lt-row-4 expense">
+            <span>Date</span><span>Description</span><span style="text-align:center">Method</span><span style="text-align:right;padding-right:10px">Amount (₹)</span>
+          </div>
+          ${expenseList.map(e=>entryRow(e,'expense')).join('')}
+          ${expenseList.length===0
+            ?'<div style="padding:20px;text-align:center;font-size:12px;color:#ABABA3;background:#fff">No expenses yet</div>':''}
+          <div class="lt-add-row expense-add" onclick="openAddBSEntry('expense','${monthKey}')">
+            <i class="ti ti-plus" style="font-size:14px"></i> Add expense entry
+          </div>
+          <div class="lt-footer expense">
+            <span>Total Expense</span><span>${rupee(totalExpense)}</span>
+          </div>
         </div>
-        <div class="ledger-table-footer expense"><span>Total Expense</span><span>${rupee(totalExpense)}</span></div>
       </div>
-    </div>
 
-    <!-- SUMMARY BAR -->
-    <div class="ledger-summary">
-      <div class="ledger-sum-card">
-        <div class="ledger-sum-label">Total Income</div>
-        <div class="ledger-sum-val" style="color:#1D7A45">${rupee(totalIncome)}</div>
-      </div>
-      <div class="ledger-sum-card net">
-        <div class="ledger-sum-label">Net Balance</div>
-        <div class="ledger-sum-val">${rupee(netBalance)}</div>
-      </div>
-      <div class="ledger-sum-card">
-        <div class="ledger-sum-label">Total Expense</div>
-        <div class="ledger-sum-val" style="color:#8B2020">${rupee(totalExpense)}</div>
+      <!-- SUMMARY BAR -->
+      <div class="ledger-summary">
+        <div class="ls-card">
+          <div class="ls-label">Total Income</div>
+          <div class="ls-val" style="color:#1D6B3E">${rupee(totalIncome)}</div>
+        </div>
+        <div class="ls-card net">
+          <div class="ls-label">Net Balance</div>
+          <div class="ls-val">${rupee(netBalance)}</div>
+        </div>
+        <div class="ls-card">
+          <div class="ls-label">Total Expense</div>
+          <div class="ls-val" style="color:#7B1A1A">${rupee(totalExpense)}</div>
+        </div>
       </div>
     </div>
   </div>`;
@@ -1366,19 +1382,18 @@ window.bsChangeMonth = function(dir) {
 };
 
 window.openAddBSEntry = function(side, monthKey) {
-  const isExpense = side === 'expense';
+  const isExp = side === 'expense';
   document.getElementById('modal-root').innerHTML = `
   <div class="modal-wrap" onclick="closeSheet(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
-      <div class="sheet-title" style="color:${isExpense?'#8B2020':'#1D7A45'}">
-        ${isExpense?'<i class="ti ti-trending-down"></i>':'<i class="ti ti-trending-up"></i>'}
-        Add ${isExpense?'Expense':'Income'}
+      <div class="sheet-title" style="color:${isExp?'#7B1A1A':'#1D6B3E'}">
+        <span>${isExp?'➖ Add Expense':'➕ Add Income'}</span>
         <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
       </div>
       <div class="sheet-body">
         <div class="field"><label>Description *</label>
-          <input type="text" id="bse-name" placeholder="${isExpense?'e.g. Water Tanker, Watchman Salary':'e.g. Last Month Cash, Opening Balance'}">
+          <input type="text" id="bse-name" placeholder="${isExp?'e.g. Water Tanker, Watchman Salary':'e.g. Last Month Cash, Opening Balance'}">
         </div>
         <div class="two-col">
           <div class="field"><label>Date</label>
@@ -1397,16 +1412,16 @@ window.openAddBSEntry = function(side, monthKey) {
         </div>
         <div class="field"><label>Category</label>
           <select id="bse-cat">
-            ${isExpense
+            ${isExp
               ? '<option>Water Tanker</option><option>Watchman Salary</option><option>Kachra Salary</option><option>Motor/Plumbing</option><option>Pipe Repairing</option><option>Cleaning</option><option>Electricity</option><option>Repairs</option><option>Xerox/Stationery</option><option>Other</option>'
-              : '<option value="carryover">Last Month Carryover (Cash)</option><option value="carryover_bank">Last Month Carryover (Bank)</option><option value="maintenance">Maintenance Collection</option><option value="other">Other Income</option>'}
+              : '<option>Last Month Cash</option><option>Last Month Bank</option><option>Maintenance Collection</option><option>Other Income</option>'}
           </select>
         </div>
         <div class="err" id="bse-err"></div>
       </div>
       <div class="sheet-footer">
         <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-        <button class="btn" style="background:${isExpense?'#8B2020':'#1D7A45'};border-color:transparent;color:#fff" onclick="saveBSEntry('${side}','${monthKey}')">Save</button>
+        <button class="btn" style="background:${isExp?'#7B1A1A':'#1D6B3E'};border-color:transparent;color:#fff;font-weight:600" onclick="saveBSEntry('${side}','${monthKey}')">Save Entry</button>
       </div>
     </div>
   </div>`;
@@ -1443,7 +1458,7 @@ window.saveBSEntry = async function(side, monthKey) {
 
 window.openBSEntryDetail = function(eid) {
   const e = balanceSheetEntries.find(x=>x.id===eid); if(!e) return;
-  const isExpense = e.side === 'expense';
+  const isExp = e.side === 'expense';
   document.getElementById('modal-root').innerHTML = `
   <div class="modal-wrap" onclick="closeSheet(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
@@ -1454,12 +1469,12 @@ window.openBSEntryDetail = function(eid) {
       <div class="sheet-body">
         <div style="background:#F8F7F2;border-radius:12px;padding:16px;margin-bottom:14px">
           <div style="font-size:16px;font-weight:600;margin-bottom:8px">${e.name}</div>
-          <div style="display:flex;gap:16px;font-size:12px;color:#6A6A65;margin-bottom:12px">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#6A6A65;margin-bottom:12px">
             <span>📅 ${e.date||'—'}</span>
             <span>📁 ${e.category||'—'}</span>
             <span>${e.method==='bank'?'🏦 Bank':'💵 Cash'}</span>
           </div>
-          <div style="font-size:22px;font-weight:700;color:${isExpense?'#8B2020':'#1D7A45'}">${isExpense?'-':'+'} ${rupee(e.amount)}</div>
+          <div style="font-size:24px;font-weight:700;color:${isExp?'#7B1A1A':'#1D6B3E'}">${isExp?'- ':''} ${rupee(e.amount)}</div>
         </div>
       </div>
       <div class="sheet-footer">
@@ -1481,6 +1496,7 @@ window.deleteBSEntry = async function(eid) {
 };
 
 // ─── PAYMENT MODAL
+
 // ─── PAYMENT MODAL ────────────────────────────────
 window.openBankModal = window.openBankModal || function(){};
 window.openPaymentModal = function() { openPaymentModalFor(null,null); };
