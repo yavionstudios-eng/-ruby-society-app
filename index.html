@@ -369,33 +369,41 @@
   .lt-header i { font-size: 18px; }
 
   .lt-col-row {
-    display: grid; gap: 0; background: #2A2A2A; color: rgba(255,255,255,0.7);
+    display: grid; gap: 0; color: rgba(255,255,255,0.75);
     font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
   }
   .lt-col-row.income { background: #155230; }
   .lt-col-row.expense { background: #5C1313; }
   .lt-col-row > span { padding: 6px 8px; }
+  .lt-3col { grid-template-columns: 34px 1fr 60px; }
 
-  /* 4 columns: Date | Description | Method | Amount */
-  .lt-row-4 { grid-template-columns: 32px 1fr 44px 52px; }
+  /* 3 columns: Date | Description+Method | Amount */
+  .lt-row-3 { grid-template-columns: 34px 1fr 60px; }
 
   .lt-entry {
     display: grid; align-items: center;
     border-bottom: 1px solid #F0EFE9;
-    background: #fff; cursor: pointer; transition: background 0.1s;
+    background: #fff; cursor: pointer;
   }
   .lt-entry:last-of-type { border-bottom: none; }
   .lt-entry:active { background: #F4F3EE; }
   .lt-entry.auto-entry { background: #F0FAF5; }
-  .lt-entry > div { padding: 10px 8px; }
+  .lt-entry > div { padding: 10px 6px; }
 
-  .lt-date { font-size: 10px; color: #6A6A65; line-height: 1.3; }
-  .lt-desc { font-size: 12px; color: #1A1A19; font-weight: 500; line-height: 1.3; }
-  .lt-desc small { font-size: 10px; color: #6A6A65; font-weight: 400; display: block; }
-  .lt-method { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .lt-method-icon { font-size: 14px; }
-  .lt-method-label { font-size: 8px; color: #6A6A65; }
-  .lt-amt { font-size: 12px; font-weight: 700; text-align: right; padding-right: 10px; }
+  .lt-date { font-size: 10px; color: #6A6A65; line-height: 1.4; padding-left: 8px !important; }
+  .lt-desc-col { padding: 8px 4px !important; }
+  .lt-name { font-size: 12px; color: #1A1A19; font-weight: 500; line-height: 1.3; }
+  .lt-meta { display: flex; align-items: center; gap: 4px; margin-top: 3px; }
+  .lt-method-badge {
+    display: inline-flex; align-items: center; gap: 2px;
+    font-size: 9px; font-weight: 600; padding: 2px 5px;
+    border-radius: 4px; line-height: 1;
+  }
+  .lt-method-badge.bank { background: #E6F1FB; color: #185FA5; }
+  .lt-method-badge.cash { background: #FAEEDA; color: #854F0B; }
+  .lt-cat { font-size: 9px; color: #ABABA3; }
+  .lt-amt-col { padding: 8px 8px 8px 4px !important; text-align: right; }
+  .lt-amt { font-size: 13px; font-weight: 700; white-space: nowrap; }
   .lt-amt.income { color: #1D6B3E; }
   .lt-amt.expense { color: #7B1A1A; }
 
@@ -1263,18 +1271,19 @@ function renderBalanceSheet() {
   const totalExpense = expenseList.reduce((s,e)=>s+e.amount,0);
   const netBalance = totalIncome - totalExpense;
 
-  function methodCell(method) {
-    return method === 'bank'
-      ? `<div class="lt-method"><span class="lt-method-icon">🏦</span><span class="lt-method-label">Bank</span></div>`
-      : `<div class="lt-method"><span class="lt-method-icon">💵</span><span class="lt-method-label">Cash</span></div>`;
+  function methodBadge(method) {
+    const m = method || 'cash';
+    return `<span class="lt-method-badge ${m}">${m === 'bank' ? '🏦 Bank' : '💵 Cash'}</span>`;
   }
 
   function entryRow(e, side) {
-    return `<div class="lt-entry lt-row-4" onclick="openBSEntryDetail('${e.id}')">
+    return `<div class="lt-entry lt-row-3" onclick="openBSEntryDetail('${e.id}')">
       <div class="lt-date">${e.dateLabel||e.date||'—'}</div>
-      <div class="lt-desc">${e.name}<small>${e.category||''}</small></div>
-      ${methodCell(e.method||'cash')}
-      <div class="lt-amt ${side}">${rupee(e.amount)}</div>
+      <div class="lt-desc-col">
+        <div class="lt-name">${e.name}</div>
+        <div class="lt-meta">${methodBadge(e.method)}${e.category?`<span class="lt-cat">${e.category}</span>`:''}</div>
+      </div>
+      <div class="lt-amt-col"><span class="lt-amt ${side}">${rupee(e.amount)}</span></div>
     </div>`;
   }
 
@@ -1310,21 +1319,25 @@ function renderBalanceSheet() {
         <!-- INCOME TABLE -->
         <div class="ledger-table">
           <div class="lt-header income"><i class="ti ti-trending-up"></i> Income</div>
-          <div class="lt-col-row lt-row-4 income">
-            <span>Date</span><span>Description</span><span style="text-align:center">Method</span><span style="text-align:right;padding-right:10px">Amount (₹)</span>
+          <div class="lt-col-row lt-3col income">
+            <span>Date</span><span>Description</span><span style="text-align:right;padding-right:8px">Amount (₹)</span>
           </div>
           ${incomeList.map(e=>entryRow(e,'income')).join('')}
-          ${bankMaint>0?`<div class="lt-entry lt-row-4 auto-entry">
+          ${bankMaint>0?`<div class="lt-entry lt-row-3 auto-entry">
             <div class="lt-date">${MN[bsMonth]}</div>
-            <div class="lt-desc">Maint.(Bank)<small>Auto • Payments</small></div>
-            ${methodCell('bank')}
-            <div class="lt-amt income">${rupee(bankMaint)}</div>
+            <div class="lt-desc-col">
+              <div class="lt-name">Maintenance</div>
+              <div class="lt-meta"><span class="lt-method-badge bank">🏦 Bank</span><span class="lt-cat">Auto</span></div>
+            </div>
+            <div class="lt-amt-col"><span class="lt-amt income">${rupee(bankMaint)}</span></div>
           </div>`:''}
-          ${cashMaint>0?`<div class="lt-entry lt-row-4 auto-entry">
+          ${cashMaint>0?`<div class="lt-entry lt-row-3 auto-entry">
             <div class="lt-date">${MN[bsMonth]}</div>
-            <div class="lt-desc">Maint.(Cash)<small>Auto • Payments</small></div>
-            ${methodCell('cash')}
-            <div class="lt-amt income">${rupee(cashMaint)}</div>
+            <div class="lt-desc-col">
+              <div class="lt-name">Maintenance</div>
+              <div class="lt-meta"><span class="lt-method-badge cash">💵 Cash</span><span class="lt-cat">Auto</span></div>
+            </div>
+            <div class="lt-amt-col"><span class="lt-amt income">${rupee(cashMaint)}</span></div>
           </div>`:''}
           ${incomeList.length===0&&cashMaint===0&&bankMaint===0
             ?'<div style="padding:20px;text-align:center;font-size:12px;color:#ABABA3;background:#fff">No income entries yet</div>':''}
@@ -1339,8 +1352,8 @@ function renderBalanceSheet() {
         <!-- EXPENSE TABLE -->
         <div class="ledger-table">
           <div class="lt-header expense"><i class="ti ti-trending-down"></i> Expense</div>
-          <div class="lt-col-row lt-row-4 expense">
-            <span>Date</span><span>Description</span><span style="text-align:center">Method</span><span style="text-align:right;padding-right:10px">Amount (₹)</span>
+          <div class="lt-col-row lt-3col expense">
+            <span>Date</span><span>Description</span><span style="text-align:right;padding-right:8px">Amount (₹)</span>
           </div>
           ${expenseList.map(e=>entryRow(e,'expense')).join('')}
           ${expenseList.length===0
