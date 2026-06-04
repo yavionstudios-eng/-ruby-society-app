@@ -302,84 +302,103 @@
   .setup-summary-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #F0EFE9; font-size:13px; }
   .setup-summary-row:last-child { border-bottom:none; }
 
-  /* BALANCE SHEET — Accounting Ledger */
-  .lg { background:#F4F3EE; padding-bottom:24px; }
-  .lg-top { background:#fff; border-bottom:1px solid #E0DED8; padding:14px 16px; position:sticky; top:57px; z-index:4; }
-  .lg-title-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-  .lg-title { font-size:18px; font-weight:700; color:#1A1A19; }
-  .lg-add-btn { background:#1A2456; color:#fff; border:none; border-radius:8px; padding:10px 18px; font-size:13px; font-family:inherit; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px; }
-  .lg-add-btn:active { background:#111840; }
-  .lg-badges { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
-  .lg-badge { display:flex; align-items:center; gap:10px; background:#2A2A2A; border-radius:10px; padding:10px 12px; }
-  .lg-badge-icon { width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
-  .lg-badge-icon.bank { background:#D4A843; }
-  .lg-badge-icon.cash { background:#A3845A; }
-  .lg-badge-label { font-size:9px; color:rgba(255,255,255,0.6); font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
-  .lg-badge-val { font-size:15px; font-weight:700; color:#fff; margin-top:1px; }
-  .lg-controls { display:flex; gap:8px; align-items:center; }
-  .lg-search { flex:1; padding:9px 12px 9px 32px; border:1px solid #D8D6CB; border-radius:8px; background:#F8F7F2 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236A6A65' viewBox='0 0 24 24'%3E%3Cpath d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' stroke='%236A6A65' stroke-width='2' fill='none'/%3E%3C/svg%3E") 10px center no-repeat; font-size:13px; font-family:inherit; outline:none; color:#1A1A19; }
-  .lg-search:focus { border-color:#1D9E75; background-color:#fff; }
-  .lg-month-nav { display:flex; align-items:center; border:1px solid #D8D6CB; border-radius:8px; overflow:hidden; background:#fff; flex-shrink:0; }
-  .lg-month-nav button { background:#F0EFE9; border:none; cursor:pointer; color:#1D9E75; font-size:16px; width:30px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:700; }
-  .lg-month-nav button:active { background:#DDE8D8; }
-  .lg-month-label { font-size:12px; font-weight:600; color:#1A1A19; padding:0 10px; border-left:1px solid #E8E7E1; border-right:1px solid #E8E7E1; height:36px; display:flex; align-items:center; white-space:nowrap; }
+  /* LEDGER SYSTEM v4 */
+  .lg{background:#F4F3EE;padding-bottom:24px}
+  .lg-top{background:#fff;border-bottom:1px solid #E0DED8;padding:14px 16px;position:sticky;top:57px;z-index:4}
+  .lg-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .lg-title{font-size:17px;font-weight:700;color:#1A1A19}
+  .lg-add-btn{background:#1A2456;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-family:inherit;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:5px}
+  .lg-add-btn:active{background:#111840}
 
-  /* TABLES */
-  .lg-body { padding:12px 10px; }
-  .lg-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
-  .lg-table { border-radius:10px; overflow:hidden; border:1px solid #D8D6CB; background:#fff; }
-  .lg-th { padding:11px 10px; font-size:14px; font-weight:700; color:#fff; display:flex; align-items:center; gap:6px; }
-  .lg-th i { font-size:16px; }
-  .lg-th.inc { background:#1D6B3E; }
-  .lg-th.exp { background:#6B1D1D; }
-  .lg-colh { display:grid; grid-template-columns:30px 1fr 36px 50px; padding:5px 6px; font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#6A6A65; background:#F0EFE9; border-bottom:1px solid #E0DED8; }
-  .lg-colh span:nth-child(3) { text-align:center; }
-  .lg-colh span:nth-child(4) { text-align:right; padding-right:6px; }
+  /* SUMMARY CARDS */
+  .lg-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+  .lg-card{background:#fff;border:1px solid #E8E7E1;border-radius:10px;padding:10px 12px}
+  .lg-card-label{font-size:9px;color:#6A6A65;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;display:flex;align-items:center;gap:4px}
+  .lg-card-val{font-size:15px;font-weight:700}
+  .lg-card.bank-open{border-left:3px solid #185FA5}
+  .lg-card.cash-open{border-left:3px solid #854F0B}
+  .lg-card.bank-close{border-left:3px solid #1D6B3E;background:#F0FAF5}
+  .lg-card.cash-close{border-left:3px solid #854F0B;background:#FFF8ED}
+  .lg-card.total-inc{border-left:3px solid #1D9E75}
+  .lg-card.total-exp{border-left:3px solid #A32D2D}
+  .lg-card.total-funds{background:linear-gradient(135deg,#1D9E75,#0F6E56);border:none;grid-column:span 2}
+  .lg-card.total-funds .lg-card-label{color:rgba(255,255,255,0.8)}
+  .lg-card.total-funds .lg-card-val{color:#fff;font-size:20px}
 
-  /* ROWS */
-  .lg-row { display:grid; grid-template-columns:30px 1fr 36px 50px; padding:0; border-bottom:1px solid #F0EFE9; align-items:center; min-height:38px; cursor:pointer; }
-  .lg-row:last-of-type { border-bottom:none; }
-  .lg-row:active { background:#F4F3EE; }
-  .lg-row.auto { background:#F5FAF0; }
-  .lg-row > div { padding:6px; }
-  .lg-r-date { font-size:9px; color:#6A6A65; padding-left:8px !important; line-height:1.3; }
-  .lg-r-desc { font-size:11px; color:#1A1A19; font-weight:500; line-height:1.35; }
-  .lg-r-desc small { font-size:9px; color:#ABABA3; display:block; font-weight:400; }
-  .lg-r-method { display:flex; justify-content:center; gap:2px; }
-  .lg-m-icon {
-    width:14px; height:14px; border-radius:3px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:8px;
-  }
-  .lg-m-icon.bank { background:#D4A843; }
-  .lg-m-icon.cash { background:#8B9D5A; }
-  .lg-r-amt { font-size:11px; font-weight:700; text-align:right; padding-right:8px !important; white-space:nowrap; }
-  .lg-r-amt.inc { color:#1D6B3E; }
-  .lg-r-amt.exp { color:#6B1D1D; }
+  /* CONTROLS */
+  .lg-controls{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+  .lg-search{flex:1;padding:9px 12px;border:1px solid #D8D6CB;border-radius:8px;background:#F8F7F2;font-size:13px;font-family:inherit;outline:none;color:#1A1A19}
+  .lg-search:focus{border-color:#1D9E75;background:#fff}
+  .lg-month-nav{display:flex;align-items:center;border:1px solid #D8D6CB;border-radius:8px;overflow:hidden;background:#fff;flex-shrink:0}
+  .lg-month-nav button{background:#F0EFE9;border:none;cursor:pointer;color:#1D9E75;font-size:16px;width:30px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .lg-month-nav button:active{background:#DDE8D8}
+  .lg-month-label{font-size:12px;font-weight:600;color:#1A1A19;padding:0 10px;border-left:1px solid #E8E7E1;border-right:1px solid #E8E7E1;height:36px;display:flex;align-items:center;white-space:nowrap}
 
-  /* EMPTY ROW */
-  .lg-row.empty-row { opacity:0.45; cursor:default; }
-  .lg-row.empty-row:active { background:transparent; }
+  /* TABS */
+  .lg-tabs{display:flex;gap:0;background:#fff;border:1px solid #E0DED8;border-radius:8px;overflow:hidden;margin-bottom:12px}
+  .lg-tab{flex:1;padding:8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;background:#F8F7F2;color:#6A6A65;border:none;font-family:inherit;border-right:1px solid #E0DED8}
+  .lg-tab:last-child{border-right:none}
+  .lg-tab.active{background:#1A2456;color:#fff}
 
-  /* ADD ROW */
-  .lg-add-row { display:flex; align-items:center; justify-content:center; gap:5px; padding:9px; font-size:11px; font-weight:500; cursor:pointer; border-top:1px dashed #D8D6CB; background:#FAFAF8; }
-  .lg-add-row.inc { color:#1D6B3E; }
-  .lg-add-row.exp { color:#6B1D1D; }
-  .lg-add-row:active { background:#F0EFE9; }
+  /* TABLE */
+  .lg-body{padding:0 12px 12px}
+  .lg-table{border-radius:10px;overflow:hidden;border:1px solid #D8D6CB;background:#fff;margin-bottom:12px}
+  .lg-th{padding:11px 12px;font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
+  .lg-th i{font-size:16px}
+  .lg-th.all{background:#1A2456}
+  .lg-th.inc{background:#1D6B3E}
+  .lg-th.exp{background:#6B1D1D}
+  .lg-th.bnk{background:#185FA5}
+  .lg-th.csh{background:#854F0B}
+  .lg-colh{display:grid;gap:0;padding:5px 6px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#6A6A65;background:#F0EFE9;border-bottom:1px solid #E0DED8}
+  .lg-colh-5{grid-template-columns:30px 1fr 40px 30px 50px}
+  .lg-colh-5 span:nth-child(3),.lg-colh-5 span:nth-child(4){text-align:center}
+  .lg-colh-5 span:nth-child(5){text-align:right;padding-right:6px}
+  .lg-row{display:grid;grid-template-columns:30px 1fr 40px 30px 50px;border-bottom:1px solid #F0EFE9;align-items:center;min-height:38px;cursor:pointer}
+  .lg-row:last-of-type{border-bottom:none}
+  .lg-row:active{background:#F4F3EE}
+  .lg-row.auto{background:#F5FAF0}
+  .lg-row.empty-row{opacity:0.35;cursor:default}
+  .lg-row.empty-row:active{background:transparent}
+  .lg-row>div{padding:6px}
+  .lg-r-date{font-size:9px;color:#6A6A65;padding-left:6px!important;line-height:1.3}
+  .lg-r-desc{font-size:11px;color:#1A1A19;font-weight:500;line-height:1.3}
+  .lg-r-desc small{font-size:9px;color:#ABABA3;display:block;font-weight:400}
+  .lg-r-type{text-align:center}
+  .lg-type-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
+  .lg-type-dot.inc{background:#1D6B3E}
+  .lg-type-dot.exp{background:#A32D2D}
+  .lg-r-mode{text-align:center;font-size:12px}
+  .lg-r-amt{font-size:11px;font-weight:700;text-align:right;padding-right:8px!important;white-space:nowrap}
+  .lg-r-amt.inc{color:#1D6B3E}
+  .lg-r-amt.exp{color:#A32D2D}
+  .lg-add-row{display:flex;align-items:center;justify-content:center;gap:5px;padding:9px;font-size:11px;font-weight:500;cursor:pointer;border-top:1px dashed #D8D6CB;background:#FAFAF8;color:#1A2456}
+  .lg-add-row:active{background:#F0EFE9}
+  .lg-tf{padding:10px 12px;display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#fff}
+  .lg-tf.all{background:#1A2456}
+  .lg-tf.inc{background:#1D6B3E}
+  .lg-tf.exp{background:#6B1D1D}
+  .lg-tf.bnk{background:#185FA5}
+  .lg-tf.csh{background:#854F0B}
 
-  /* FOOTER */
-  .lg-tf { padding:10px 12px; display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:#fff; }
-  .lg-tf.inc { background:#1D6B3E; }
-  .lg-tf.exp { background:#6B1D1D; }
+  /* BANK/CASH SUMMARY SECTION */
+  .lg-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .lg-sum-box{background:#fff;border:1px solid #E0DED8;border-radius:12px;overflow:hidden}
+  .lg-sum-header{padding:10px 12px;font-weight:700;font-size:12px;color:#fff;display:flex;align-items:center;gap:6px}
+  .lg-sum-header.bnk{background:#185FA5}
+  .lg-sum-header.csh{background:#854F0B}
+  .lg-sum-row{display:flex;justify-content:space-between;padding:8px 12px;font-size:12px;border-bottom:1px solid #F0EFE9}
+  .lg-sum-row:last-child{border-bottom:none}
+  .lg-sum-row.closing{background:#F0FAF5;font-weight:700;font-size:13px;border-top:1.5px solid #1D9E75}
+  .lg-sum-row.closing.csh{background:#FFF8ED;border-top-color:#D4A843}
+  .lg-sum-total{background:linear-gradient(135deg,#1D9E75,#0F6E56);border-radius:12px;padding:14px;text-align:center;color:#fff}
+  .lg-sum-total-label{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;opacity:0.85;margin-bottom:4px}
+  .lg-sum-total-val{font-size:22px;font-weight:700}
 
-  /* SUMMARY */
-  .lg-summary { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; background:#fff; border:1px solid #E0DED8; border-radius:12px; padding:14px 10px; margin:0 10px; }
-  .lg-s-col { text-align:center; }
-  .lg-s-label { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#6A6A65; margin-bottom:6px; }
-  .lg-s-val { font-size:16px; font-weight:700; }
-  .lg-s-col.net { background:linear-gradient(135deg,#1D6B3E,#155230); border-radius:10px; padding:12px 6px; margin:-6px 0; }
-  .lg-s-col.net .lg-s-label { color:rgba(255,255,255,0.75); }
-  .lg-s-col.net .lg-s-val { color:#fff; }
+  /* OPENING BALANCE EDIT */
+  .lg-ob-btn{background:#F8F7F2;border:1px solid #D8D6CB;border-radius:6px;padding:4px 8px;font-size:10px;font-family:inherit;cursor:pointer;color:#6A6A65;font-weight:500}
+  .lg-ob-btn:active{background:#EAF3DE}
+
 </style>
 </head>
 <body>
@@ -1196,178 +1215,217 @@ function renderExpenses() {
   </div>`;
 }
 
-// ─── BALANCE SHEET — Accounting Ledger ────────────
+// ─── LEDGER SYSTEM v4 ────────────────────────────
 let bsSearch = '';
-const EMPTY_ROWS = 8;
+let bsView = 'all'; // all, income, expense, bank, cash
+const CATEGORIES = ['Maintenance','Repair Fund','Penalty','Water Charges','Electricity','Salary','Stationery','Cleaning','Other'];
 
 function renderBalanceSheet() {
-  const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const monthKey = `${bsYear}-${String(bsMonth+1).padStart(2,'0')}`;
-  const allEntries = balanceSheetEntries.filter(e => e.monthKey === monthKey);
-  let incList = allEntries.filter(e=>e.side==='income').sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0));
-  let expList = allEntries.filter(e=>e.side==='expense').sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthKey=`${bsYear}-${String(bsMonth+1).padStart(2,'0')}`;
+  const allE=balanceSheetEntries.filter(e=>e.monthKey===monthKey);
 
-  if (bsSearch) {
-    const q = bsSearch.toLowerCase();
-    incList = incList.filter(e=>e.name.toLowerCase().includes(q));
-    expList = expList.filter(e=>e.name.toLowerCase().includes(q));
-  }
+  // Opening balances (stored in settings or default 0)
+  const openBank=cashInHand?0:bankBalance; // use bankBalance as opening if no separate field
+  const openCash=cashInHand||0;
+  // We'll use separate opening fields from settings
+  const obKey=`ob_${monthKey}`;
 
-  // Auto maintenance
-  const mPays = payments.filter(p=>p.month===bsMonth);
-  const cashM = mPays.filter(p=>(p.mode||'cash')==='cash').reduce((s,p)=>s+p.amount,0);
-  const bankM = mPays.filter(p=>p.mode==='bank').reduce((s,p)=>s+p.amount,0);
-  const totInc = incList.reduce((s,e)=>s+e.amount,0) + cashM + bankM;
-  const totExp = expList.reduce((s,e)=>s+e.amount,0);
-  const netBal = totInc - totExp;
+  // Filter entries
+  let entries=[...allE];
+  if(bsSearch){const q=bsSearch.toLowerCase();entries=entries.filter(e=>e.name.toLowerCase().includes(q)||( e.category||'').toLowerCase().includes(q))}
+  if(bsView==='income')entries=entries.filter(e=>e.side==='income');
+  else if(bsView==='expense')entries=entries.filter(e=>e.side==='expense');
+  else if(bsView==='bank')entries=entries.filter(e=>(e.method||'cash')==='bank');
+  else if(bsView==='cash')entries=entries.filter(e=>(e.method||'cash')==='cash');
+  entries.sort((a,b)=>(a.date||'').localeCompare(b.date||'')||(a.createdAt||'').localeCompare(b.createdAt||''));
 
-  // Method icons column
-  const mIcons = `<div class="lg-r-method"><div class="lg-m-icon bank">🏦</div><div class="lg-m-icon cash">💵</div></div>`;
+  // Auto maintenance from payments
+  const mPays=payments.filter(p=>p.month===bsMonth);
+  const autoCashM=mPays.filter(p=>(p.mode||'cash')==='cash').reduce((s,p)=>s+p.amount,0);
+  const autoBankM=mPays.filter(p=>p.mode==='bank').reduce((s,p)=>s+p.amount,0);
 
-  // Build filled rows
-  function filledRow(e, type) {
-    const mIcon = (e.method||'cash') === 'bank'
-      ? `<div class="lg-r-method"><div class="lg-m-icon bank">🏦</div></div>`
-      : `<div class="lg-r-method"><div class="lg-m-icon cash">💵</div></div>`;
+  // Calculations - ALL entries (not filtered)
+  const allIncome=allE.filter(e=>e.side==='income');
+  const allExpense=allE.filter(e=>e.side==='expense');
+
+  const bankIncTotal=allIncome.filter(e=>(e.method||'cash')==='bank').reduce((s,e)=>s+e.amount,0)+autoBankM;
+  const bankExpTotal=allExpense.filter(e=>(e.method||'cash')==='bank').reduce((s,e)=>s+e.amount,0);
+  const cashIncTotal=allIncome.filter(e=>(e.method||'cash')==='cash').reduce((s,e)=>s+e.amount,0)+autoCashM;
+  const cashExpTotal=allExpense.filter(e=>(e.method||'cash')==='cash').reduce((s,e)=>s+e.amount,0);
+
+  const closingBank=bankBalance+bankIncTotal-bankExpTotal;
+  const closingCash=cashInHand+cashIncTotal-cashExpTotal;
+  const totalInc=bankIncTotal+cashIncTotal;
+  const totalExp=bankExpTotal+cashExpTotal;
+  const netBal=totalInc-totalExp;
+  const totalFunds=closingBank+closingCash;
+
+  // Build table rows
+  function txRow(e){
+    const isInc=e.side==='income';
+    const isBank=(e.method||'cash')==='bank';
     return `<div class="lg-row" onclick="openBSEntryDetail('${e.id}')">
-      <div class="lg-r-date">${e.dateLabel||e.date||''}</div>
+      <div class="lg-r-date">${e.date||'—'}</div>
       <div class="lg-r-desc">${e.name}<small>${e.category||''}</small></div>
-      ${mIcon}
-      <div class="lg-r-amt ${type}">${rupee(e.amount)}</div>
+      <div class="lg-r-type"><span class="lg-type-dot ${isInc?'inc':'exp'}" title="${isInc?'Income':'Expense'}"></span></div>
+      <div class="lg-r-mode">${isBank?'🏦':'💵'}</div>
+      <div class="lg-r-amt ${isInc?'inc':'exp'}">${isInc?'+':'-'}${rupee(e.amount)}</div>
     </div>`;
   }
 
-  function autoRow(label, method, amt) {
-    const mIcon = method === 'bank'
-      ? `<div class="lg-r-method"><div class="lg-m-icon bank">🏦</div></div>`
-      : `<div class="lg-r-method"><div class="lg-m-icon cash">💵</div></div>`;
-    return `<div class="lg-row auto">
-      <div class="lg-r-date">${MN[bsMonth]}</div>
-      <div class="lg-r-desc">${label}<small>Auto</small></div>
-      ${mIcon}
-      <div class="lg-r-amt inc">${rupee(amt)}</div>
-    </div>`;
+  // Auto rows for maintenance
+  function autoRows(){
+    let html='';
+    if(autoBankM>0&&(bsView==='all'||bsView==='income'||bsView==='bank')){
+      html+=`<div class="lg-row auto"><div class="lg-r-date">${MN[bsMonth]}</div><div class="lg-r-desc">Maint. Collection<small>Auto • Bank</small></div><div class="lg-r-type"><span class="lg-type-dot inc"></span></div><div class="lg-r-mode">🏦</div><div class="lg-r-amt inc">+${rupee(autoBankM)}</div></div>`;
+    }
+    if(autoCashM>0&&(bsView==='all'||bsView==='income'||bsView==='cash')){
+      html+=`<div class="lg-row auto"><div class="lg-r-date">${MN[bsMonth]}</div><div class="lg-r-desc">Maint. Collection<small>Auto • Cash</small></div><div class="lg-r-type"><span class="lg-type-dot inc"></span></div><div class="lg-r-mode">💵</div><div class="lg-r-amt inc">+${rupee(autoCashM)}</div></div>`;
+    }
+    return html;
   }
 
-  // Empty placeholder rows
-  function emptyRow() {
-    return `<div class="lg-row empty-row">
-      <div class="lg-r-date"></div>
-      <div class="lg-r-desc"></div>
-      ${mIcons}
-      <div class="lg-r-amt">0.00/-</div>
-    </div>`;
-  }
-
-  // Income rows: filled + auto + empty padding
-  const incFilled = incList.map(e=>filledRow(e,'inc')).join('');
-  const incAuto = (bankM>0?autoRow('Maintenance (Bank)','bank',bankM):'') + (cashM>0?autoRow('Maintenance (Cash)','cash',cashM):'');
-  const incFilledCount = incList.length + (bankM>0?1:0) + (cashM>0?1:0);
-  const incEmptyCount = Math.max(0, EMPTY_ROWS - incFilledCount);
-  const incEmpty = Array(incEmptyCount).fill(0).map(()=>emptyRow()).join('');
-
-  // Expense rows: filled + empty padding
-  const expFilled = expList.map(e=>filledRow(e,'exp')).join('');
-  const expEmptyCount = Math.max(0, EMPTY_ROWS - expList.length);
-  const expEmpty = Array(expEmptyCount).fill(0).map(()=>emptyRow()).join('');
+  const viewLabel={all:'All Transactions',income:'Income Only',expense:'Expenses Only',bank:'Bank Only',cash:'Cash Only'};
+  const viewColor={all:'all',income:'inc',expense:'exp',bank:'bnk',cash:'csh'};
 
   return `<div class="lg">
     <div class="lg-top">
       <div class="lg-title-row">
-        <div class="lg-title">${MN[bsMonth].toUpperCase()} ${bsYear} - Monthly Ledger</div>
-        <button class="lg-add-btn" onclick="openAddBSEntry('income','${monthKey}')"><i class="ti ti-plus"></i> ADD TRANSACTION</button>
+        <div class="lg-title">${MN[bsMonth].toUpperCase()} ${bsYear} — Ledger</div>
+        <button class="lg-add-btn" onclick="openAddBSEntry('income','${monthKey}')"><i class="ti ti-plus"></i> ADD</button>
       </div>
-      <div class="lg-badges">
-        <div class="lg-badge">
-          <div class="lg-badge-icon bank">🏦</div>
-          <div><div class="lg-badge-label">Bank Cash:</div><div class="lg-badge-val">${rupee(bankBalance)}</div></div>
+
+      <!-- SUMMARY CARDS -->
+      <div class="lg-cards">
+        <div class="lg-card bank-open">
+          <div class="lg-card-label">🏦 Opening Bank</div>
+          <div class="lg-card-val" style="color:#185FA5">${rupee(bankBalance)}</div>
         </div>
-        <div class="lg-badge">
-          <div class="lg-badge-icon cash">💵</div>
-          <div><div class="lg-badge-label">Cash on Hand:</div><div class="lg-badge-val">${rupee(cashInHand)}</div></div>
+        <div class="lg-card cash-open">
+          <div class="lg-card-label">💵 Opening Cash</div>
+          <div class="lg-card-val" style="color:#854F0B">${rupee(cashInHand)}</div>
+        </div>
+        <div class="lg-card total-inc">
+          <div class="lg-card-label"><i class="ti ti-trending-up" style="font-size:11px"></i> Total Income</div>
+          <div class="lg-card-val" style="color:#1D6B3E">${rupee(totalInc)}</div>
+        </div>
+        <div class="lg-card total-exp">
+          <div class="lg-card-label"><i class="ti ti-trending-down" style="font-size:11px"></i> Total Expense</div>
+          <div class="lg-card-val" style="color:#A32D2D">${rupee(totalExp)}</div>
+        </div>
+        <div class="lg-card bank-close">
+          <div class="lg-card-label">🏦 Closing Bank</div>
+          <div class="lg-card-val" style="color:#155230">${rupee(closingBank)}</div>
+        </div>
+        <div class="lg-card cash-close">
+          <div class="lg-card-label">💵 Closing Cash</div>
+          <div class="lg-card-val" style="color:#854F0B">${rupee(closingCash)}</div>
+        </div>
+        <div class="lg-card total-funds">
+          <div class="lg-card-label">💰 Total Available Funds</div>
+          <div class="lg-card-val">${rupee(totalFunds)}</div>
         </div>
       </div>
+
+      <!-- CONTROLS -->
       <div class="lg-controls">
-        <input class="lg-search" placeholder="Search Transactions..." value="${bsSearch}" oninput="bsSearch=this.value;render()">
+        <input class="lg-search" placeholder="Search..." value="${bsSearch}" oninput="bsSearch=this.value;render()">
         <div class="lg-month-nav">
           <button onclick="bsChangeMonth(-1)">‹</button>
           <span class="lg-month-label">${MN[bsMonth]} ${bsYear}</span>
           <button onclick="bsChangeMonth(1)">›</button>
         </div>
       </div>
+
+      <!-- VIEW TABS -->
+      <div class="lg-tabs">
+        <button class="lg-tab ${bsView==='all'?'active':''}" onclick="bsSetView('all')">All</button>
+        <button class="lg-tab ${bsView==='income'?'active':''}" onclick="bsSetView('income')">Income</button>
+        <button class="lg-tab ${bsView==='expense'?'active':''}" onclick="bsSetView('expense')">Expense</button>
+        <button class="lg-tab ${bsView==='bank'?'active':''}" onclick="bsSetView('bank')">Bank</button>
+        <button class="lg-tab ${bsView==='cash'?'active':''}" onclick="bsSetView('cash')">Cash</button>
+      </div>
     </div>
 
     <div class="lg-body">
-      <div class="lg-grid">
-        <!-- INCOME -->
-        <div class="lg-table">
-          <div class="lg-th inc"><i class="ti ti-trending-up"></i> Income</div>
-          <div class="lg-colh"><span>Date</span><span>Description</span><span>Method</span><span>Amount (₹)</span></div>
-          ${incFilled}${incAuto}${incEmpty}
-          <div class="lg-add-row inc" onclick="openAddBSEntry('income','${monthKey}')">
-            <i class="ti ti-plus" style="font-size:12px"></i> Add income
-          </div>
-          <div class="lg-tf inc"><span>Total Income:</span><span>₹ ${totInc.toLocaleString('en-IN')}/-</span></div>
+      <!-- TRANSACTION TABLE -->
+      <div class="lg-table">
+        <div class="lg-th ${viewColor[bsView]}"><i class="ti ti-list"></i> ${viewLabel[bsView]} — ${MN[bsMonth]} ${bsYear}</div>
+        <div class="lg-colh lg-colh-5">
+          <span>Date</span><span>Particulars</span><span>Type</span><span>Mode</span><span>Amount</span>
         </div>
-
-        <!-- EXPENSE -->
-        <div class="lg-table">
-          <div class="lg-th exp"><i class="ti ti-trending-down"></i> Expense</div>
-          <div class="lg-colh"><span>Date</span><span>Description</span><span>Method</span><span>Amount (₹)</span></div>
-          ${expFilled}${expEmpty}
-          <div class="lg-add-row exp" onclick="openAddBSEntry('expense','${monthKey}')">
-            <i class="ti ti-plus" style="font-size:12px"></i> Add expense
-          </div>
-          <div class="lg-tf exp"><span>Total Expense:</span><span>₹ ${totExp.toLocaleString('en-IN')}/-</span></div>
+        ${entries.map(e=>txRow(e)).join('')}
+        ${autoRows()}
+        ${entries.length===0&&autoCashM===0&&autoBankM===0?`<div style="padding:24px;text-align:center;font-size:12px;color:#ABABA3;background:#fff">No transactions for ${MN[bsMonth]} ${bsYear}</div>`:''}
+        <div class="lg-add-row" onclick="openAddBSEntry('income','${monthKey}')">
+          <i class="ti ti-plus" style="font-size:13px"></i> Add Transaction
+        </div>
+        <div class="lg-tf ${viewColor[bsView]}">
+          <span>Net: ${rupee(netBal)}</span>
+          <span>${entries.length+(autoCashM>0?1:0)+(autoBankM>0?1:0)} entries</span>
         </div>
       </div>
 
-      <!-- SUMMARY -->
-      <div class="lg-summary">
-        <div class="lg-s-col">
-          <div class="lg-s-label">Total Income</div>
-          <div class="lg-s-val" style="color:#1D6B3E">₹ ${totInc.toLocaleString('en-IN')}/-</div>
+      <!-- BANK vs CASH SUMMARY -->
+      <div class="lg-summary-grid">
+        <div class="lg-sum-box">
+          <div class="lg-sum-header bnk">🏦 Bank Summary</div>
+          <div class="lg-sum-row"><span style="color:#6A6A65">Opening Balance</span><span style="font-weight:600">${rupee(bankBalance)}</span></div>
+          <div class="lg-sum-row"><span style="color:#1D6B3E">+ Bank Income</span><span style="font-weight:600;color:#1D6B3E">${rupee(bankIncTotal)}</span></div>
+          <div class="lg-sum-row"><span style="color:#A32D2D">- Bank Expense</span><span style="font-weight:600;color:#A32D2D">${rupee(bankExpTotal)}</span></div>
+          <div class="lg-sum-row closing"><span>Closing Balance</span><span style="color:#155230">${rupee(closingBank)}</span></div>
         </div>
-        <div class="lg-s-col net">
-          <div class="lg-s-label">Net Balance</div>
-          <div class="lg-s-val">₹ ${netBal.toLocaleString('en-IN')}/-</div>
+        <div class="lg-sum-box">
+          <div class="lg-sum-header csh">💵 Cash Summary</div>
+          <div class="lg-sum-row"><span style="color:#6A6A65">Opening Balance</span><span style="font-weight:600">${rupee(cashInHand)}</span></div>
+          <div class="lg-sum-row"><span style="color:#1D6B3E">+ Cash Income</span><span style="font-weight:600;color:#1D6B3E">${rupee(cashIncTotal)}</span></div>
+          <div class="lg-sum-row"><span style="color:#A32D2D">- Cash Expense</span><span style="font-weight:600;color:#A32D2D">${rupee(cashExpTotal)}</span></div>
+          <div class="lg-sum-row closing csh"><span>Closing Balance</span><span style="color:#854F0B">${rupee(closingCash)}</span></div>
         </div>
-        <div class="lg-s-col">
-          <div class="lg-s-label">Total Expense</div>
-          <div class="lg-s-val" style="color:#6B1D1D">₹ ${totExp.toLocaleString('en-IN')}/-</div>
-        </div>
+      </div>
+
+      <!-- TOTAL AVAILABLE FUNDS -->
+      <div class="lg-sum-total">
+        <div class="lg-sum-total-label">Total Available Funds (Bank + Cash)</div>
+        <div class="lg-sum-total-val">${rupee(totalFunds)}</div>
       </div>
     </div>
   </div>`;
 }
 
+window.bsSetView = function(view) { bsView = view; render(); };
 window.bsChangeMonth = function(dir) {
-  bsMonth += dir;
-  if (bsMonth < 0) { bsMonth = 11; bsYear--; }
-  if (bsMonth > 11) { bsMonth = 0; bsYear++; }
-  bsSearch = '';
-  render();
+  bsMonth+=dir;
+  if(bsMonth<0){bsMonth=11;bsYear--}
+  if(bsMonth>11){bsMonth=0;bsYear++}
+  bsSearch=''; bsView='all'; render();
 };
 
 window.openAddBSEntry = function(side, monthKey) {
-  const isExp = side === 'expense';
   document.getElementById('modal-root').innerHTML = `
   <div class="modal-wrap" onclick="closeSheet(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
-      <div class="sheet-title" style="color:${isExp?'#6B1D1D':'#1D6B3E'}">
-        <span>${isExp?'Add Expense Entry':'Add Income Entry'}</span>
+      <div class="sheet-title">
+        <span><i class="ti ti-plus"></i> Add Transaction</span>
         <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
       </div>
       <div class="sheet-body">
-        <div class="field"><label>Description *</label>
-          <input type="text" id="bse-name" placeholder="${isExp?'e.g. Water Tanker, Watchman Salary':'e.g. Last Month Cash, Bank Balance'}">
+        <div class="field"><label>Date *</label>
+          <input type="text" id="bse-date" placeholder="e.g. 01-06-26" value="">
         </div>
-        <div class="two-col">
-          <div class="field"><label>Date</label><input type="text" id="bse-date" placeholder="e.g. 5-7-26"></div>
-          <div class="field"><label>Amount (₹) *</label><input type="number" id="bse-amt" inputmode="numeric" placeholder="0"></div>
+        <div class="field"><label>Particulars / Description *</label>
+          <input type="text" id="bse-name" placeholder="e.g. Maintenance Collection, Electric Bill">
         </div>
-        <div class="field"><label>Method</label>
+        <div class="field"><label>Transaction Type *</label>
+          <div class="pay-mode-toggle">
+            <div class="pay-mode-btn ${side==='income'?'active':''}" id="bse-type-inc" onclick="selBSType('income')" style="border-color:#1D6B3E;${side==='income'?'background:#EAF3DE;color:#1D6B3E':''}"><i class="ti ti-trending-up"></i>Income</div>
+            <div class="pay-mode-btn ${side==='expense'?'active':''}" id="bse-type-exp" onclick="selBSType('expense')" style="border-color:#A32D2D;${side==='expense'?'background:#FCEBEB;color:#A32D2D':''}"><i class="ti ti-trending-down"></i>Expense</div>
+          </div>
+          <input type="hidden" id="bse-type" value="${side}">
+        </div>
+        <div class="field"><label>Payment Mode *</label>
           <div class="pay-mode-toggle">
             <div class="pay-mode-btn active" id="bse-mode-cash" onclick="selBSMode('cash')"><i class="ti ti-cash"></i>Cash</div>
             <div class="pay-mode-btn" id="bse-mode-bank" onclick="selBSMode('bank')"><i class="ti ti-building-bank"></i>Bank</div>
@@ -1375,46 +1433,66 @@ window.openAddBSEntry = function(side, monthKey) {
           <input type="hidden" id="bse-mode" value="cash">
         </div>
         <div class="field"><label>Category</label>
-          <select id="bse-cat">${isExp
-            ?'<option>Water Tanker</option><option>Watchman Salary</option><option>Kachra Salary</option><option>Motor/Plumbing</option><option>Pipe Repairing</option><option>Cleaning</option><option>Electricity</option><option>Repairs</option><option>Xerox/Stationery</option><option>Other</option>'
-            :'<option>Last Month Cash</option><option>Last Month Bank</option><option>Maintenance Collection</option><option>Other Income</option>'
-          }</select>
+          <select id="bse-cat">
+            ${CATEGORIES.map(c=>`<option>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label>Amount (₹) *</label>
+          <input type="number" id="bse-amt" inputmode="numeric" placeholder="0" style="font-size:20px;font-weight:600">
+        </div>
+        <div class="field"><label>Remarks / Notes</label>
+          <input type="text" id="bse-note" placeholder="Optional notes">
         </div>
         <div class="err" id="bse-err"></div>
       </div>
       <div class="sheet-footer">
         <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-        <button class="btn" style="background:${isExp?'#6B1D1D':'#1D6B3E'};border-color:transparent;color:#fff;font-weight:600" onclick="saveBSEntry('${side}','${monthKey}')">Save Entry</button>
+        <button class="btn primary" style="font-weight:600" onclick="saveBSEntry('${monthKey}')">Save Transaction</button>
       </div>
     </div>
   </div>`;
-  setTimeout(()=>document.getElementById('bse-name')?.focus(),200);
+  setTimeout(()=>document.getElementById('bse-date')?.focus(),200);
 };
 
+window.selBSType = function(type) {
+  document.getElementById('bse-type').value=type;
+  const incBtn=document.getElementById('bse-type-inc');
+  const expBtn=document.getElementById('bse-type-exp');
+  incBtn.style.background=type==='income'?'#EAF3DE':'';
+  incBtn.style.color=type==='income'?'#1D6B3E':'';
+  incBtn.classList.toggle('active',type==='income');
+  expBtn.style.background=type==='expense'?'#FCEBEB':'';
+  expBtn.style.color=type==='expense'?'#A32D2D':'';
+  expBtn.classList.toggle('active',type==='expense');
+};
 window.selBSMode = function(mode) {
   document.getElementById('bse-mode').value=mode;
   document.getElementById('bse-mode-cash').classList.toggle('active',mode==='cash');
   document.getElementById('bse-mode-bank').classList.toggle('active',mode==='bank');
 };
 
-window.saveBSEntry = async function(side, monthKey) {
+window.saveBSEntry = async function(monthKey) {
+  const date=document.getElementById('bse-date').value.trim();
   const name=document.getElementById('bse-name').value.trim();
-  const dateVal=document.getElementById('bse-date').value.trim();
+  const side=document.getElementById('bse-type').value;
+  const method=document.getElementById('bse-mode').value;
+  const cat=document.getElementById('bse-cat').value;
   const amt=parseInt(document.getElementById('bse-amt').value);
-  const method=document.getElementById('bse-mode')?.value||'cash';
-  const cat=document.getElementById('bse-cat')?.value||'Other';
+  const note=document.getElementById('bse-note').value.trim();
   const err=document.getElementById('bse-err');
-  if(!name){err.textContent='Description required';err.style.display='block';return;}
-  if(!amt||amt<=0){err.textContent='Enter valid amount';err.style.display='block';return;}
+  if(!date){err.textContent='Date is required';err.style.display='block';return}
+  if(!name){err.textContent='Description is required';err.style.display='block';return}
+  if(!side){err.textContent='Select Income or Expense';err.style.display='block';return}
+  if(!amt||amt<=0){err.textContent='Amount must be positive';err.style.display='block';return}
   setSyncDot('syncing');
-  await setDoc(doc(db,'balanceEntries',newId('BS')),{
-    side,monthKey,name,date:dateVal,dateLabel:dateVal,amount:amt,category:cat,method,
-    sortOrder:balanceSheetEntries.filter(e=>e.side===side&&e.monthKey===monthKey).length,
+  await setDoc(doc(db,'balanceEntries',newId('TX')),{
+    side,monthKey,name,date,dateLabel:date,amount:amt,category:cat,method,note,
+    sortOrder:balanceSheetEntries.filter(e=>e.monthKey===monthKey).length,
     createdAt:new Date().toISOString()
   });
   setSyncDot('online');
   closeSheetDirect();
-  showToast('Entry saved ✓','success');
+  showToast('Transaction saved ✓','success');
 };
 
 window.openBSEntryDetail = function(eid) {
@@ -1424,25 +1502,88 @@ window.openBSEntryDetail = function(eid) {
   <div class="modal-wrap" onclick="closeSheet(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="sheet-handle"></div>
-      <div class="sheet-title">Entry Details
+      <div class="sheet-title">Transaction #${e.id.slice(-6)}
         <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
       </div>
       <div class="sheet-body">
         <div style="background:#F8F7F2;border-radius:12px;padding:16px;margin-bottom:14px">
-          <div style="font-size:16px;font-weight:600;margin-bottom:8px">${e.name}</div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#6A6A65;margin-bottom:12px">
-            <span>📅 ${e.date||'—'}</span><span>📁 ${e.category||'—'}</span>
-            <span>${e.method==='bank'?'🏦 Bank':'💵 Cash'}</span>
+          <div style="font-size:17px;font-weight:600;margin-bottom:10px">${e.name}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:14px">
+            <div><span style="color:#6A6A65">Date:</span> ${e.date||'—'}</div>
+            <div><span style="color:#6A6A65">Type:</span> <span style="color:${isExp?'#A32D2D':'#1D6B3E'};font-weight:600">${isExp?'Expense':'Income'}</span></div>
+            <div><span style="color:#6A6A65">Mode:</span> ${e.method==='bank'?'🏦 Bank':'💵 Cash'}</div>
+            <div><span style="color:#6A6A65">Category:</span> ${e.category||'—'}</div>
           </div>
-          <div style="font-size:24px;font-weight:700;color:${isExp?'#6B1D1D':'#1D6B3E'}">${isExp?'- ':''}${rupee(e.amount)}</div>
+          ${e.note?`<div style="font-size:12px;color:#6A6A65;margin-bottom:14px;padding:8px;background:#fff;border-radius:6px">📝 ${e.note}</div>`:''}
+          <div style="font-size:26px;font-weight:700;color:${isExp?'#A32D2D':'#1D6B3E'}">${isExp?'- ':'+ '}${rupee(e.amount)}</div>
         </div>
       </div>
       <div class="sheet-footer">
         <button class="btn danger" onclick="deleteBSEntry('${eid}')"><i class="ti ti-trash"></i> Delete</button>
+        <button class="btn" onclick="editBSEntry('${eid}')"><i class="ti ti-edit"></i> Edit</button>
         <button class="btn primary" onclick="closeSheetDirect()">Close</button>
       </div>
     </div>
   </div>`;
+};
+
+window.editBSEntry = function(eid) {
+  const e=balanceSheetEntries.find(x=>x.id===eid);if(!e)return;
+  closeSheetDirect();
+  setTimeout(()=>{
+    document.getElementById('modal-root').innerHTML=`
+    <div class="modal-wrap" onclick="closeSheet(event)">
+      <div class="modal-sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Edit Transaction
+          <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
+        </div>
+        <div class="sheet-body">
+          <div class="field"><label>Date</label><input type="text" id="ed-date" value="${e.date||''}"></div>
+          <div class="field"><label>Description</label><input type="text" id="ed-name" value="${(e.name||'').replace(/"/g,'&quot;')}"></div>
+          <div class="two-col">
+            <div class="field"><label>Type</label>
+              <select id="ed-type"><option value="income" ${e.side==='income'?'selected':''}>Income</option><option value="expense" ${e.side==='expense'?'selected':''}>Expense</option></select>
+            </div>
+            <div class="field"><label>Mode</label>
+              <select id="ed-mode"><option value="cash" ${(e.method||'cash')==='cash'?'selected':''}>Cash</option><option value="bank" ${e.method==='bank'?'selected':''}>Bank</option></select>
+            </div>
+          </div>
+          <div class="field"><label>Category</label>
+            <select id="ed-cat">${CATEGORIES.map(c=>`<option ${e.category===c?'selected':''}>${c}</option>`).join('')}</select>
+          </div>
+          <div class="field"><label>Amount (₹)</label><input type="number" id="ed-amt" inputmode="numeric" value="${e.amount}"></div>
+          <div class="field"><label>Notes</label><input type="text" id="ed-note" value="${(e.note||'').replace(/"/g,'&quot;')}"></div>
+          <div class="err" id="ed-err"></div>
+        </div>
+        <div class="sheet-footer">
+          <button class="btn" onclick="closeSheetDirect()">Cancel</button>
+          <button class="btn primary" onclick="updateBSEntry('${eid}')">Save</button>
+        </div>
+      </div>
+    </div>`;
+  },100);
+};
+
+window.updateBSEntry = async function(eid) {
+  const date=document.getElementById('ed-date').value.trim();
+  const name=document.getElementById('ed-name').value.trim();
+  const side=document.getElementById('ed-type').value;
+  const method=document.getElementById('ed-mode').value;
+  const cat=document.getElementById('ed-cat').value;
+  const amt=parseInt(document.getElementById('ed-amt').value);
+  const note=document.getElementById('ed-note').value.trim();
+  const err=document.getElementById('ed-err');
+  if(!name){err.textContent='Description required';err.style.display='block';return}
+  if(!amt||amt<=0){err.textContent='Valid amount required';err.style.display='block';return}
+  setSyncDot('syncing');
+  const e=balanceSheetEntries.find(x=>x.id===eid);
+  await setDoc(doc(db,'balanceEntries',eid),{
+    ...e,side,name,date,dateLabel:date,amount:amt,category:cat,method,note
+  });
+  setSyncDot('online');
+  closeSheetDirect();
+  showToast('Transaction updated ✓','success');
 };
 
 window.deleteBSEntry = async function(eid) {
@@ -1452,10 +1593,12 @@ window.deleteBSEntry = async function(eid) {
   await deleteDoc(doc(db,'balanceEntries',eid));
   setSyncDot('online');
   closeSheetDirect();
-  showToast('Entry deleted','error');
+  showToast('Deleted','error');
 };
 
 // ─── PAYMENT MODAL
+
+
 
 
 // ─── PAYMENT MODAL ────────────────────────────────
