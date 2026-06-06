@@ -3,2091 +3,249 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1D9E75">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1A2456">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Ruby Social Society</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/[email protected]/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/dist/tabler-icons.min.css">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    background: #F4F3EE; color: #1A1A19;
-    overflow-x: hidden; overscroll-behavior: none;
-  }
-  .shell { max-width: 480px; margin: 0 auto; min-height: 100vh; background: #F4F3EE; padding-bottom: 80px; }
-
-  /* LOADING SCREEN */
-  .loading-screen {
-    position: fixed; inset: 0; background: #0F6E56;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 999; transition: opacity 0.4s ease;
-  }
-  .loading-screen.hidden { opacity: 0; pointer-events: none; }
-  .loading-logo { font-size: 48px; margin-bottom: 16px; }
-  .loading-title { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 6px; }
-  .loading-sub { font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 40px; }
-  .loading-spinner {
-    width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.3);
-    border-top-color: #fff; border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  .loading-status { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 14px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* TOPBAR */
-  .topbar {
-    background: #fff; border-bottom: 1px solid #E8E7E1;
-    padding: 14px 16px; display: flex; align-items: center;
-    justify-content: space-between; position: sticky; top: 0; z-index: 5;
-  }
-  .topbar-left .title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-  .topbar-left .sub { font-size: 11px; color: #6A6A65; margin-top: 2px; }
-  .sync-dot {
-    width: 8px; height: 8px; border-radius: 50%; background: #ccc;
-    display: inline-block; margin-left: 6px; vertical-align: middle;
-  }
-  .sync-dot.online { background: #1D9E75; }
-  .sync-dot.syncing { background: #FAC775; animation: pulse 1s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .pay-btn {
-    background: #1D9E75; color: #fff; border: none; border-radius: 50px;
-    padding: 9px 18px; font-size: 14px; cursor: pointer;
-    display: flex; align-items: center; gap: 6px; font-weight: 500;
-  }
-  .pay-btn:active { background: #0F6E56; transform: scale(0.97); }
-  .content { padding: 14px 14px 24px; }
-
-  /* BOTTOM NAV */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 480px; background: #fff;
-    border-top: 1px solid #E8E7E1;
-    display: grid; grid-template-columns: repeat(5, 1fr); z-index: 10;
-    padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
-  }
-  .nav-item {
-    display: flex; flex-direction: column; align-items: center;
-    padding: 8px 0; gap: 3px; border: none; background: none;
-    cursor: pointer; color: #6A6A65; font-size: 10px; font-family: inherit;
-  }
-  .nav-item i { font-size: 20px; }
-  .nav-item.active { color: #1D9E75; }
-
-  /* CARDS & STATS */
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .stats-grid.three { grid-template-columns: repeat(3, 1fr); }
-  .stat-card { background: #fff; border-radius: 14px; padding: 14px; border: 1px solid #E8E7E1; }
-  .stat-card.compact { padding: 10px 12px; }
-  .stat-label { font-size: 11px; color: #6A6A65; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
-  .stat-val { font-size: 19px; font-weight: 600; }
-  .stat-val.green { color: #0F6E56; }
-  .stat-val.red { color: #A32D2D; }
-  .stat-val.amber { color: #854F0B; }
-  .stat-val.blue { color: #185FA5; }
-  .stat-val.muted { color: #1A1A19; }
-  .stat-val small { font-size: 13px; color: #6A6A65; font-weight: 400; }
-
-  /* BANK CARD */
-  .bank-card {
-    background: linear-gradient(135deg, #1D9E75 0%, #0F6E56 100%);
-    border-radius: 16px; padding: 16px; margin-bottom: 14px;
-    color: #fff; position: relative; overflow: hidden;
-  }
-  .bank-card::before {
-    content: ''; position: absolute; top: -30px; right: -30px;
-    width: 120px; height: 120px; background: rgba(255,255,255,0.08);
-    border-radius: 50%;
-  }
-  .bank-label { font-size: 11px; color: rgba(255,255,255,0.85); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
-  .bank-amount { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
-  .bank-actions { display: flex; gap: 8px; }
-  .bank-actions button {
-    flex: 1; padding: 8px; background: rgba(255,255,255,0.18);
-    color: #fff; border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 8px; font-size: 12px; font-family: inherit;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;
-  }
-  .bank-actions button:active { background: rgba(255,255,255,0.3); }
-
-  .card { background: #fff; border: 1px solid #E8E7E1; border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
-  .card-header { padding: 12px 14px; border-bottom: 1px solid #E8E7E1; display: flex; align-items: center; justify-content: space-between; }
-  .card-title { font-size: 13px; font-weight: 600; }
-
-  /* MEMBER ROW */
-  .member-row {
-    padding: 13px 14px; border-bottom: 1px solid #F0EFE9;
-    display: flex; align-items: center; gap: 12px; cursor: pointer;
-  }
-  .member-row:last-child { border-bottom: none; }
-  .member-row:active { background: #F4F3EE; }
-  .avatar {
-    width: 38px; height: 38px; border-radius: 50%; background: #9FE1CB;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 600; color: #085041; flex-shrink: 0;
-  }
-  .avatar.rented { background: #FAC775; color: #633806; }
-  .member-info { flex: 1; min-width: 0; }
-  .member-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
-  .member-flat { font-size: 12px; color: #6A6A65; margin-top: 1px; }
-
-  /* BADGES */
-  .badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 500; }
-  .badge.paid { background: #EAF3DE; color: #3B6D11; }
-  .badge.unpaid { background: #FCEBEB; color: #A32D2D; }
-  .badge.overdue { background: #FFE4E1; color: #8B1A0E; border: 1px solid #F09595; }
-  .badge.owner { background: #E1F5EE; color: #0F6E56; }
-  .badge.rented { background: #FAEEDA; color: #854F0B; }
-
-  /* BUTTONS */
-  .btn { padding: 9px 14px; border: 1px solid #D8D6CB; border-radius: 8px; background: #fff; cursor: pointer; font-size: 13px; font-family: inherit; color: #1A1A19; }
-  .btn:active { background: #F4F3EE; }
-  .btn.primary { background: #1D9E75; border-color: #1D9E75; color: #fff; }
-  .btn.primary:active { background: #0F6E56; }
-  .btn.danger { background: #fff; border-color: #F09595; color: #A32D2D; }
-  .btn.danger:active { background: #FCEBEB; }
-  .btn.whatsapp { background: #25D366; border-color: #25D366; color: #fff; }
-  .btn.whatsapp:active { background: #1da851; }
-  .btn.sm { padding: 6px 12px; font-size: 12px; }
-  .btn.icon-only { padding: 8px; min-width: 36px; display: inline-flex; align-items: center; justify-content: center; }
-  .btn.icon-only i { font-size: 16px; }
-
-  .search-wrap { padding: 10px 14px; border-bottom: 1px solid #E8E7E1; }
-  .search-wrap input { width: 100%; padding: 10px 12px; border: 1px solid #D8D6CB; border-radius: 10px; background: #F8F7F2; color: #1A1A19; font-size: 14px; font-family: inherit; outline: none; }
-  .search-wrap input:focus { border-color: #1D9E75; background: #fff; }
-
-  /* PAYMENT ROWS */
-  .pay-row { padding: 12px 14px; border-bottom: 1px solid #F0EFE9; cursor: pointer; }
-  .pay-row:last-child { border-bottom: none; }
-  .pay-row:active { background: #F4F3EE; }
-  .pay-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-  .pay-name { font-size: 14px; font-weight: 500; }
-  .pay-amt { font-size: 15px; font-weight: 600; color: #0F6E56; }
-  .pay-sub { display: flex; justify-content: space-between; }
-  .pay-info { font-size: 11px; color: #6A6A65; }
-  .pay-mode-tag { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 600; margin-left: 4px; vertical-align: middle; }
-  .pay-mode-tag.cash { background: #FAEEDA; color: #633806; }
-  .pay-mode-tag.bank { background: #E6F1FB; color: #0C447C; }
-
-  /* DUE ROWS */
-  .due-row { padding: 13px 14px; border-bottom: 1px solid #F0EFE9; display: flex; align-items: center; gap: 10px; }
-  .due-row:last-child { border-bottom: none; }
-  .due-info { flex: 1; min-width: 0; }
-  .due-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .due-sub { font-size: 11px; color: #6A6A65; margin-top: 1px; }
-  .due-amt { font-size: 14px; font-weight: 600; color: #A32D2D; white-space: nowrap; }
-
-  /* EXPENSE */
-  .expense-row { padding: 12px 14px; border-bottom: 1px solid #F0EFE9; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-  .expense-row:last-child { border-bottom: none; }
-  .expense-icon { width: 36px; height: 36px; border-radius: 50%; background: #FCEBEB; display: flex; align-items: center; justify-content: center; color: #A32D2D; flex-shrink: 0; }
-  .expense-info { flex: 1; min-width: 0; }
-  .expense-title { font-size: 13px; font-weight: 500; }
-  .expense-sub { font-size: 11px; color: #6A6A65; margin-top: 1px; }
-  .expense-amt { font-size: 14px; font-weight: 600; color: #A32D2D; }
-
-  .empty { padding: 40px 20px; text-align: center; color: #6A6A65; font-size: 14px; }
-  .empty i { font-size: 36px; display: block; margin-bottom: 10px; color: #1D9E75; }
-
-  /* MODAL SHEETS */
-  .modal-wrap {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-    z-index: 100; display: flex; align-items: flex-end; justify-content: center;
-    animation: fadeIn 0.18s ease;
-  }
-  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-  .modal-sheet {
-    background: #fff; border-radius: 22px 22px 0 0;
-    width: 100%; max-width: 480px;
-    padding-bottom: env(safe-area-inset-bottom, 16px);
-    max-height: 92vh; overflow-y: auto;
-    animation: slideUp 0.22s ease;
-  }
-  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-  .sheet-handle { width: 38px; height: 4px; background: #D8D6CB; border-radius: 4px; margin: 10px auto 14px; }
-  .sheet-title { font-size: 16px; font-weight: 600; padding: 0 16px 12px; border-bottom: 1px solid #E8E7E1; display: flex; justify-content: space-between; align-items: center; }
-  .sheet-body { padding: 16px; }
-  .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 12px; color: #6A6A65; margin-bottom: 6px; font-weight: 500; }
-  .field input, .field select, .field textarea {
-    width: 100%; padding: 12px; border: 1px solid #D8D6CB;
-    border-radius: 10px; background: #F8F7F2; color: #1A1A19;
-    font-size: 15px; font-family: inherit; outline: none;
-    -webkit-appearance: none; appearance: none;
-  }
-  .field textarea { min-height: 80px; resize: vertical; }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: #1D9E75; background: #fff; }
-  .field select {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3e%3cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236A6A65' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3e%3c/svg%3e");
-    background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
-  }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .three-col { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-  .sheet-footer { padding: 12px 16px 16px; display: flex; gap: 10px; border-top: 1px solid #E8E7E1; }
-  .sheet-footer .btn { flex: 1; padding: 13px; font-size: 15px; font-weight: 500; text-align: center; }
-  .err { color: #A32D2D; font-size: 12px; margin-top: 6px; display: none; background: #FCEBEB; padding: 8px 10px; border-radius: 6px; }
-
-  /* PAY MODE TOGGLE */
-  .pay-mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .pay-mode-btn { padding: 12px; border: 1px solid #D8D6CB; border-radius: 10px; background: #F8F7F2; cursor: pointer; font-family: inherit; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6A6A65; }
-  .pay-mode-btn.active { background: #EAF3DE; border-color: #1D9E75; color: #0F6E56; }
-  .pay-mode-btn i { font-size: 22px; }
-
-  /* ATTACHMENT */
-  .attachment-zone { border: 2px dashed #D8D6CB; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; background: #F8F7F2; }
-  .attachment-zone:active { background: #EAF3DE; border-color: #1D9E75; }
-  .attachment-zone i { font-size: 28px; color: #6A6A65; display: block; margin-bottom: 6px; }
-  .attachment-zone.has-file { border-style: solid; border-color: #1D9E75; background: #EAF3DE; }
-  .attachment-preview { margin-top: 8px; max-width: 100%; max-height: 120px; border-radius: 6px; }
-
-  /* HEATMAP */
-  .heatmap-row { display: grid; grid-template-columns: 70px 1fr; gap: 6px; align-items: center; margin-bottom: 5px; }
-  .hmap-name { font-size: 11px; color: #6A6A65; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .hmap-dots { display: grid; grid-template-columns: repeat(12,1fr); gap: 3px; }
-  .hmap-dot { height: 14px; border-radius: 3px; }
-
-  .section-label { font-size: 11px; font-weight: 600; color: #6A6A65; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; padding: 0 4px; }
-  .legend { display: flex; gap: 12px; margin-bottom: 12px; font-size: 11px; color: #6A6A65; }
-  .legend span { display: flex; align-items: center; gap: 5px; }
-  .legend .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-
-  .alert-box { background: #FFF7ED; border: 1px solid #F0997B; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; display: flex; gap: 10px; }
-  .alert-box i { color: #993C1D; font-size: 20px; flex-shrink: 0; }
-  .alert-title { font-size: 13px; font-weight: 600; color: #993C1D; margin-bottom: 2px; }
-  .alert-text { font-size: 12px; color: #712B13; }
-
-  .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px; }
-  .summary-row.total { border-top: 1px solid #E8E7E1; padding-top: 12px; margin-top: 8px; font-weight: 600; font-size: 15px; }
-
-  .receipt-preview { background: #fff; border: 1px dashed #D8D6CB; border-radius: 10px; padding: 14px; margin-bottom: 14px; font-size: 12px; line-height: 1.6; }
-  .receipt-preview .head { text-align: center; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #0F6E56; }
-
-  .quick-action-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; padding: 12px; }
-  .quick-action { padding: 14px 10px; border: 1px solid #E8E7E1; border-radius: 10px; background: #F8F7F2; text-align: center; cursor: pointer; font-size: 12px; font-family: inherit; color: #1A1A19; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .quick-action:active { background: #EAF3DE; border-color: #1D9E75; }
-  .quick-action i { font-size: 22px; color: #1D9E75; }
-
-  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #1A1A19; color: #fff; padding: 12px 20px; border-radius: 50px; font-size: 13px; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,0.2); animation: toastIn 0.3s ease; max-width: 90%; text-align: center; }
-  .toast.success { background: #0F6E56; }
-  .toast.error { background: #A32D2D; }
-  @keyframes toastIn { from{opacity:0;transform:translate(-50%,20px)} to{opacity:1;transform:translate(-50%,0)} }
-
-  /* SETUP WIZARD */
-  .setup-screen { position:fixed; inset:0; background:#F4F3EE; z-index:90; overflow-y:auto; display:none; flex-direction:column; }
-  .setup-screen.visible { display:flex; }
-  .setup-hero { background:linear-gradient(135deg,#1D9E75,#0F6E56); padding:40px 24px 28px; color:#fff; }
-  .setup-hero h1 { font-size:22px; font-weight:700; margin-bottom:6px; }
-  .setup-hero p { font-size:13px; color:rgba(255,255,255,0.85); line-height:1.5; }
-  .setup-steps { display:flex; gap:6px; margin-top:16px; }
-  .setup-step-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.4); transition:all 0.3s; }
-  .setup-step-dot.active { background:#fff; width:24px; border-radius:4px; }
-  .setup-body { padding:20px 16px 120px; flex:1; }
-  .setup-section-title { font-size:16px; font-weight:600; margin-bottom:4px; color:#1A1A19; }
-  .setup-section-sub { font-size:13px; color:#6A6A65; margin-bottom:16px; line-height:1.5; }
-  .setup-footer { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:#fff; border-top:1px solid #E8E7E1; padding:14px 16px; display:flex; gap:10px; z-index:91; }
-  .setup-footer .btn { flex:1; padding:14px; font-size:15px; font-weight:600; }
-  .member-balance-row { background:#fff; border:1px solid #E8E7E1; border-radius:12px; padding:12px 14px; margin-bottom:10px; }
-  .member-balance-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-  .mbr-avatar { width:34px; height:34px; border-radius:50%; background:#9FE1CB; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#085041; flex-shrink:0; }
-  .mbr-avatar.rented { background:#FAC775; color:#633806; }
-  .balance-type-toggle { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:10px; }
-  .btb { padding:8px 4px; border:1.5px solid #D8D6CB; border-radius:8px; background:#F8F7F2; cursor:pointer; font-family:inherit; font-size:11px; text-align:center; color:#6A6A65; font-weight:500; }
-  .btb.ac { background:#EAF3DE; border-color:#1D9E75; color:#0F6E56; }
-  .btb.ad { background:#FCEBEB; border-color:#E09090; color:#A32D2D; }
-  .btb.aa { background:#E6F1FB; border-color:#90B8E0; color:#185FA5; }
-  .amt-row { display:flex; align-items:center; gap:8px; }
-  .amt-row input { flex:1; padding:10px 12px; border:1px solid #D8D6CB; border-radius:8px; background:#F8F7F2; font-size:15px; font-family:inherit; outline:none; }
-  .amt-row input:focus { border-color:#1D9E75; background:#fff; }
-  .info-box { background:#EAF3DE; border:1px solid #B8DFA0; border-radius:10px; padding:12px 14px; margin-bottom:16px; font-size:12px; color:#2D5A11; line-height:1.6; }
-  .setup-summary-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #F0EFE9; font-size:13px; }
-  .setup-summary-row:last-child { border-bottom:none; }
-
-  /* LEDGER SYSTEM v4 */
-  .lg{background:#F4F3EE;padding-bottom:24px}
-  .lg-top{background:#fff;border-bottom:1px solid #E0DED8;padding:14px 16px;position:sticky;top:57px;z-index:4}
-  .lg-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-  .lg-title{font-size:17px;font-weight:700;color:#1A1A19}
-  .lg-add-btn{background:#1A2456;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-family:inherit;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:5px}
-  .lg-add-btn:active{background:#111840}
-
-  /* SUMMARY CARDS */
-  .lg-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
-  .lg-card{background:#fff;border:1px solid #E8E7E1;border-radius:10px;padding:10px 12px}
-  .lg-card-label{font-size:9px;color:#6A6A65;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;display:flex;align-items:center;gap:4px}
-  .lg-card-val{font-size:15px;font-weight:700}
-  .lg-card.bank-open{border-left:3px solid #185FA5}
-  .lg-card.cash-open{border-left:3px solid #854F0B}
-  .lg-card.bank-close{border-left:3px solid #1D6B3E;background:#F0FAF5}
-  .lg-card.cash-close{border-left:3px solid #854F0B;background:#FFF8ED}
-  .lg-card.total-inc{border-left:3px solid #1D9E75}
-  .lg-card.total-exp{border-left:3px solid #A32D2D}
-  .lg-card.total-funds{background:linear-gradient(135deg,#1D9E75,#0F6E56);border:none;grid-column:span 2}
-  .lg-card.total-funds .lg-card-label{color:rgba(255,255,255,0.8)}
-  .lg-card.total-funds .lg-card-val{color:#fff;font-size:20px}
-
-  /* CONTROLS */
-  .lg-controls{display:flex;gap:8px;align-items:center;margin-bottom:12px}
-  .lg-search{flex:1;padding:9px 12px;border:1px solid #D8D6CB;border-radius:8px;background:#F8F7F2;font-size:13px;font-family:inherit;outline:none;color:#1A1A19}
-  .lg-search:focus{border-color:#1D9E75;background:#fff}
-  .lg-month-nav{display:flex;align-items:center;border:1px solid #D8D6CB;border-radius:8px;overflow:hidden;background:#fff;flex-shrink:0}
-  .lg-month-nav button{background:#F0EFE9;border:none;cursor:pointer;color:#1D9E75;font-size:16px;width:30px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700}
-  .lg-month-nav button:active{background:#DDE8D8}
-  .lg-month-label{font-size:12px;font-weight:600;color:#1A1A19;padding:0 10px;border-left:1px solid #E8E7E1;border-right:1px solid #E8E7E1;height:36px;display:flex;align-items:center;white-space:nowrap}
-
-  /* TABS */
-  .lg-tabs{display:flex;gap:0;background:#fff;border:1px solid #E0DED8;border-radius:8px;overflow:hidden;margin-bottom:12px}
-  .lg-tab{flex:1;padding:8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;background:#F8F7F2;color:#6A6A65;border:none;font-family:inherit;border-right:1px solid #E0DED8}
-  .lg-tab:last-child{border-right:none}
-  .lg-tab.active{background:#1A2456;color:#fff}
-
-  /* TABLE */
-  .lg-body{padding:0 12px 12px}
-  .lg-table{border-radius:10px;overflow:hidden;border:1px solid #D8D6CB;background:#fff;margin-bottom:12px}
-  .lg-th{padding:11px 12px;font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
-  .lg-th i{font-size:16px}
-  .lg-th.all{background:#1A2456}
-  .lg-th.inc{background:#1D6B3E}
-  .lg-th.exp{background:#6B1D1D}
-  .lg-th.bnk{background:#185FA5}
-  .lg-th.csh{background:#854F0B}
-  .lg-colh{display:grid;gap:0;padding:5px 6px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#6A6A65;background:#F0EFE9;border-bottom:1px solid #E0DED8}
-  .lg-colh-5{grid-template-columns:30px 1fr 40px 30px 50px}
-  .lg-colh-5 span:nth-child(3),.lg-colh-5 span:nth-child(4){text-align:center}
-  .lg-colh-5 span:nth-child(5){text-align:right;padding-right:6px}
-  .lg-row{display:grid;grid-template-columns:30px 1fr 40px 30px 50px;border-bottom:1px solid #F0EFE9;align-items:center;min-height:38px;cursor:pointer}
-  .lg-row:last-of-type{border-bottom:none}
-  .lg-row:active{background:#F4F3EE}
-  .lg-row.auto{background:#F5FAF0}
-  .lg-row.empty-row{opacity:0.35;cursor:default}
-  .lg-row.empty-row:active{background:transparent}
-  .lg-row>div{padding:6px}
-  .lg-r-date{font-size:9px;color:#6A6A65;padding-left:6px!important;line-height:1.3}
-  .lg-r-desc{font-size:11px;color:#1A1A19;font-weight:500;line-height:1.3}
-  .lg-r-desc small{font-size:9px;color:#ABABA3;display:block;font-weight:400}
-  .lg-r-type{text-align:center}
-  .lg-type-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
-  .lg-type-dot.inc{background:#1D6B3E}
-  .lg-type-dot.exp{background:#A32D2D}
-  .lg-r-mode{text-align:center;font-size:12px}
-  .lg-r-amt{font-size:11px;font-weight:700;text-align:right;padding-right:8px!important;white-space:nowrap}
-  .lg-r-amt.inc{color:#1D6B3E}
-  .lg-r-amt.exp{color:#A32D2D}
-  .lg-add-row{display:flex;align-items:center;justify-content:center;gap:5px;padding:9px;font-size:11px;font-weight:500;cursor:pointer;border-top:1px dashed #D8D6CB;background:#FAFAF8;color:#1A2456}
-  .lg-add-row:active{background:#F0EFE9}
-  .lg-tf{padding:10px 12px;display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#fff}
-  .lg-tf.all{background:#1A2456}
-  .lg-tf.inc{background:#1D6B3E}
-  .lg-tf.exp{background:#6B1D1D}
-  .lg-tf.bnk{background:#185FA5}
-  .lg-tf.csh{background:#854F0B}
-
-  /* BANK/CASH SUMMARY SECTION */
-  .lg-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-  .lg-sum-box{background:#fff;border:1px solid #E0DED8;border-radius:12px;overflow:hidden}
-  .lg-sum-header{padding:10px 12px;font-weight:700;font-size:12px;color:#fff;display:flex;align-items:center;gap:6px}
-  .lg-sum-header.bnk{background:#185FA5}
-  .lg-sum-header.csh{background:#854F0B}
-  .lg-sum-row{display:flex;justify-content:space-between;padding:8px 12px;font-size:12px;border-bottom:1px solid #F0EFE9}
-  .lg-sum-row:last-child{border-bottom:none}
-  .lg-sum-row.closing{background:#F0FAF5;font-weight:700;font-size:13px;border-top:1.5px solid #1D9E75}
-  .lg-sum-row.closing.csh{background:#FFF8ED;border-top-color:#D4A843}
-  .lg-sum-total{background:linear-gradient(135deg,#1D9E75,#0F6E56);border-radius:12px;padding:14px;text-align:center;color:#fff}
-  .lg-sum-total-label{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;opacity:0.85;margin-bottom:4px}
-  .lg-sum-total-val{font-size:22px;font-weight:700}
-
-  /* OPENING BALANCE EDIT */
-  .lg-ob-btn{background:#F8F7F2;border:1px solid #D8D6CB;border-radius:6px;padding:4px 8px;font-size:10px;font-family:inherit;cursor:pointer;color:#6A6A65;font-weight:500}
-  .lg-ob-btn:active{background:#EAF3DE}
-
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#F4F3EE;color:#1A1A19;overflow-x:hidden}
+.shell{max-width:480px;margin:0 auto;min-height:100vh;background:#F4F3EE;padding-bottom:80px}
+.loading-screen{position:fixed;inset:0;background:#1A2456;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity 0.4s}
+.loading-screen.hidden{opacity:0;pointer-events:none}
+.loading-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:6px}
+.loading-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:30px}
+.loading-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
+.loading-status{font-size:11px;color:rgba(255,255,255,0.5);margin-top:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.topbar{background:#1A2456;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+.topbar-left .title{font-size:15px;font-weight:600;color:#fff;display:flex;align-items:center;gap:6px}
+.topbar-left .sub{font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#666;display:inline-block;margin-left:6px}
+.sync-dot.online{background:#4ADE80}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #E0DED8;display:grid;grid-template-columns:repeat(3,1fr);z-index:10;padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}
+.nav-item{display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:3px;border:none;background:none;cursor:pointer;color:#6A6A65;font-size:10px;font-family:inherit}
+.nav-item i{font-size:22px}
+.nav-item.active{color:#1A2456;font-weight:600}
+.card{background:#fff;border:1px solid #E0DED8;border-radius:12px;margin:0 12px 10px;overflow:hidden}
+.card-header{padding:12px 14px;border-bottom:1px solid #E8E7E1;display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:600}
+.bal-badges{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 12px 0}
+.bal-badge{background:#2A2A2A;border-radius:10px;padding:10px 12px}
+.bal-badge-label{font-size:9px;color:rgba(255,255,255,0.55);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px}
+.bal-badge-val{font-size:17px;font-weight:700;color:#fff;margin-bottom:8px}
+.bal-badge-actions{display:flex;gap:4px}
+.bal-badge-actions button{flex:1;padding:5px;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);border:1px solid rgba(255,255,255,0.15);border-radius:6px;font-size:10px;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:2px}
+.bal-badge-actions button:active{background:rgba(255,255,255,0.25)}
+.lg-controls{display:flex;gap:8px;align-items:center;padding:10px 12px}
+.lg-search{flex:1;padding:9px 12px;border:1px solid #D8D6CB;border-radius:8px;background:#F8F7F2;font-size:13px;font-family:inherit;outline:none;color:#1A1A19}
+.lg-search:focus{border-color:#1A2456;background:#fff}
+.lg-month-nav{display:flex;align-items:center;border:1px solid #D8D6CB;border-radius:8px;overflow:hidden;background:#fff;flex-shrink:0}
+.lg-month-nav button{background:#F0EFE9;border:none;cursor:pointer;color:#1A2456;font-size:16px;width:30px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.lg-month-nav button:active{background:#DDE8D8}
+.lg-month-label{font-size:12px;font-weight:600;color:#1A1A19;padding:0 10px;border-left:1px solid #E8E7E1;border-right:1px solid #E8E7E1;height:36px;display:flex;align-items:center;white-space:nowrap}
+.lg-tabs{display:flex;gap:0;background:#fff;border:1px solid #E0DED8;border-radius:8px;overflow:hidden;margin:0 12px 10px}
+.lg-tab{flex:1;padding:8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;background:#F8F7F2;color:#6A6A65;border:none;font-family:inherit;border-right:1px solid #E0DED8}
+.lg-tab:last-child{border-right:none}
+.lg-tab.active{background:#1A2456;color:#fff}
+.lg-table{background:#fff;border:1px solid #D8D6CB;border-radius:10px;overflow:hidden;margin:0 12px 10px}
+.lg-th{padding:10px 12px;font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:space-between}
+.lg-th.all{background:#1A2456}.lg-th.inc{background:#1D6B3E}.lg-th.exp{background:#6B1D1D}.lg-th.bnk{background:#185FA5}.lg-th.csh{background:#854F0B}
+.lg-colh{display:grid;grid-template-columns:34px 1fr 28px 54px;padding:5px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#6A6A65;background:#F0EFE9;border-bottom:1px solid #E0DED8}
+.lg-colh span:nth-child(3){text-align:center}.lg-colh span:nth-child(4){text-align:right}
+.lg-row{display:grid;grid-template-columns:34px 1fr 28px 54px;border-bottom:1px solid #F0EFE9;align-items:center;min-height:40px;cursor:pointer}
+.lg-row:last-of-type{border-bottom:none}.lg-row:active{background:#F4F3EE}.lg-row.auto{background:#F0FAF5}
+.lg-row>div{padding:7px 6px}
+.lg-r-date{font-size:9px;color:#6A6A65;padding-left:8px!important}
+.lg-r-desc{font-size:11px;color:#1A1A19;font-weight:500}
+.lg-r-desc small{font-size:9px;color:#ABABA3;display:block;font-weight:400}
+.lg-r-mode{text-align:center;font-size:13px}
+.lg-r-amt{font-size:11px;font-weight:700;text-align:right;padding-right:8px!important;white-space:nowrap}
+.lg-r-amt.inc{color:#1D6B3E}.lg-r-amt.exp{color:#A32D2D}
+.lg-add-row{display:flex;align-items:center;justify-content:center;gap:5px;padding:10px;font-size:12px;font-weight:500;cursor:pointer;border-top:1px dashed #D8D6CB;background:#FAFAF8;color:#1A2456}
+.lg-add-row:active{background:#F0EFE9}
+.lg-tf{padding:10px 12px;display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#fff}
+.lg-tf.all{background:#1A2456}.lg-tf.inc{background:#1D6B3E}.lg-tf.exp{background:#6B1D1D}
+.lg-sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 12px 10px}
+.lg-sum-box{background:#fff;border:1px solid #E0DED8;border-radius:10px;overflow:hidden}
+.lg-sum-h{padding:9px 10px;font-weight:700;font-size:11px;color:#fff}
+.lg-sum-h.bnk{background:#185FA5}.lg-sum-h.csh{background:#854F0B}
+.lg-sum-r{display:flex;justify-content:space-between;padding:7px 10px;font-size:11px;border-bottom:1px solid #F0EFE9}
+.lg-sum-r:last-child{border-bottom:none}
+.lg-sum-r.closing{background:#F0FAF5;font-weight:700;border-top:1.5px solid #1D9E75}
+.lg-sum-r.closing.csh{background:#FFF8ED;border-top-color:#D4A843}
+.lg-total-card{margin:0 12px 12px;background:linear-gradient(135deg,#1A2456,#0F1740);border-radius:12px;padding:16px;text-align:center;color:#fff}
+.lg-total-label{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;opacity:0.7;margin-bottom:4px}
+.lg-total-val{font-size:24px;font-weight:700}
+.member-row{padding:12px 14px;border-bottom:1px solid #F0EFE9;display:flex;align-items:center;gap:12px;cursor:pointer}
+.member-row:last-child{border-bottom:none}.member-row:active{background:#F4F3EE}
+.avatar{width:36px;height:36px;border-radius:50%;background:#9FE1CB;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#085041;flex-shrink:0}
+.avatar.rented{background:#FAC775;color:#633806}
+.member-info{flex:1;min-width:0}
+.member-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member-flat{font-size:11px;color:#6A6A65;margin-top:1px}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:500}
+.badge.paid{background:#EAF3DE;color:#3B6D11}.badge.unpaid{background:#FCEBEB;color:#A32D2D}
+.badge.owner{background:#E1F5EE;color:#0F6E56}.badge.rented{background:#FAEEDA;color:#854F0B}
+.tick-btn{width:32px;height:32px;border-radius:50%;border:2px solid #D8D6CB;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all 0.2s}
+.tick-btn.ticked{background:#1D6B3E;border-color:#1D6B3E;color:#fff}
+.tick-btn:active{transform:scale(0.9)}
+.search-wrap{padding:10px 14px;border-bottom:1px solid #E8E7E1}
+.search-wrap input{width:100%;padding:9px 12px;border:1px solid #D8D6CB;border-radius:8px;background:#F8F7F2;color:#1A1A19;font-size:13px;font-family:inherit;outline:none}
+.due-row{padding:12px 14px;border-bottom:1px solid #F0EFE9;display:flex;align-items:center;gap:10px}
+.due-row:last-child{border-bottom:none}
+.due-info{flex:1;min-width:0}
+.due-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.due-sub{font-size:11px;color:#6A6A65;margin-top:1px}
+.btn{padding:9px 14px;border:1px solid #D8D6CB;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;font-family:inherit;color:#1A1A19}
+.btn:active{background:#F4F3EE}
+.btn.primary{background:#1A2456;border-color:#1A2456;color:#fff}.btn.primary:active{background:#0F1740}
+.btn.danger{border-color:#F09595;color:#A32D2D}
+.btn.whatsapp{background:#25D366;border-color:#25D366;color:#fff}
+.btn.sm{padding:6px 10px;font-size:11px}
+.btn.icon-only{padding:7px;min-width:32px;display:inline-flex;align-items:center;justify-content:center}
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn 0.15s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-sheet{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:480px;padding-bottom:env(safe-area-inset-bottom,16px);max-height:92vh;overflow-y:auto;animation:slideUp 0.2s}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:38px;height:4px;background:#D8D6CB;border-radius:4px;margin:10px auto 14px}
+.sheet-title{font-size:16px;font-weight:600;padding:0 16px 12px;border-bottom:1px solid #E8E7E1;display:flex;justify-content:space-between;align-items:center}
+.sheet-body{padding:16px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:#6A6A65;margin-bottom:6px;font-weight:500}
+.field input,.field select{width:100%;padding:12px;border:1px solid #D8D6CB;border-radius:10px;background:#F8F7F2;color:#1A1A19;font-size:15px;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus{border-color:#1A2456;background:#fff}
+.field select{background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3e%3cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236A6A65' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sheet-footer{padding:12px 16px 16px;display:flex;gap:10px;border-top:1px solid #E8E7E1}
+.sheet-footer .btn{flex:1;padding:13px;font-size:15px;font-weight:500;text-align:center}
+.err{color:#A32D2D;font-size:12px;margin-top:6px;display:none;background:#FCEBEB;padding:8px 10px;border-radius:6px}
+.pay-mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pay-mode-btn{padding:12px;border:1px solid #D8D6CB;border-radius:10px;background:#F8F7F2;cursor:pointer;font-family:inherit;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:4px;color:#6A6A65}
+.pay-mode-btn.active{background:#EAF3DE;border-color:#1D6B3E;color:#0F6E56}
+.pay-mode-btn i{font-size:22px}
+.empty{padding:40px 20px;text-align:center;color:#6A6A65;font-size:13px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1A2456;color:#fff;padding:12px 20px;border-radius:50px;font-size:13px;z-index:200;max-width:90%;text-align:center;animation:toastIn 0.3s}
+.toast.success{background:#0F6E56}.toast.error{background:#A32D2D}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
 </style>
 </head>
 <body>
-
-<!-- SETUP WIZARD -->
-<div class="setup-screen" id="setupScreen">
-  <div class="setup-hero">
-    <h1 id="setupHeroTitle">Welcome!</h1>
-    <p id="setupHeroSub">Let's set up your society books correctly. This takes 2 minutes and only happens once.</p>
-    <div class="setup-steps">
-      <div class="setup-step-dot active" id="dot0"></div>
-      <div class="setup-step-dot" id="dot1"></div>
-      <div class="setup-step-dot" id="dot2"></div>
-      <div class="setup-step-dot" id="dot3"></div>
-    </div>
-  </div>
-  <div class="setup-body" id="setupBody"></div>
-  <div class="setup-footer">
-    <button class="btn" id="setupBackBtn" onclick="setupBack()" style="display:none">Back</button>
-    <button class="btn primary" id="setupNextBtn" onclick="setupNext()">Get Started</button>
-  </div>
-</div>
-
-<!-- LOADING SCREEN -->
-<div class="loading-screen" id="loadingScreen">
-  <div class="loading-logo">🏢</div>
-  <div class="loading-title">Ruby Social Society</div>
-  <div class="loading-sub">Third Floor · 2026</div>
-  <div class="loading-spinner"></div>
-  <div class="loading-status" id="loadingStatus">Connecting to Firebase...</div>
-</div>
-
+<div class="loading-screen" id="loadingScreen"><div style="font-size:40px;margin-bottom:14px">🏢</div><div class="loading-title">Ruby Social Society</div><div class="loading-sub">Third Floor · 2026</div><div class="loading-spinner"></div><div class="loading-status" id="loadingStatus">Connecting...</div></div>
 <div class="shell">
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="title">
-        <i class="ti ti-building"></i>Ruby Social Society
-        <span class="sync-dot" id="syncDot" title="Sync status"></span>
-      </div>
-      <div class="sub">Third Floor &nbsp;·&nbsp; 2026</div>
-    </div>
-    <button class="pay-btn" onclick="openPaymentModal()"><i class="ti ti-plus"></i>Pay</button>
-  </div>
-  <div class="content" id="content"></div>
-  <nav class="bottom-nav" style="grid-template-columns:repeat(6,1fr)">
-    <button class="nav-item active" onclick="showTab('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Home</button>
-    <button class="nav-item" onclick="showTab('members',this)"><i class="ti ti-users"></i>Members</button>
-    <button class="nav-item" onclick="showTab('payments',this)"><i class="ti ti-receipt"></i>Payments</button>
-    <button class="nav-item" onclick="showTab('expenses',this)"><i class="ti ti-cash"></i>Expenses</button>
-    <button class="nav-item" onclick="showTab('dues',this)"><i class="ti ti-alert-circle"></i>Dues</button>
-    <button class="nav-item" onclick="showTab('balancesheet',this)"><i class="ti ti-report-money"></i>Sheet</button>
-  </nav>
-  <div id="modal-root"></div>
-  <div id="toast-root"></div>
+<div class="topbar"><div class="topbar-left"><div class="title"><i class="ti ti-building"></i>Ruby Social Society<span class="sync-dot" id="syncDot"></span></div><div class="sub">Third Floor · 2026</div></div><button class="btn primary" style="padding:8px 16px;font-size:13px;border-radius:50px" onclick="openAddTx()"><i class="ti ti-plus"></i> Add</button></div>
+<div class="content" id="content"></div>
+<nav class="bottom-nav"><button class="nav-item active" onclick="showTab('sheet',this)"><i class="ti ti-report-money"></i>Sheet</button><button class="nav-item" onclick="showTab('members',this)"><i class="ti ti-users"></i>Members</button><button class="nav-item" onclick="showTab('dues',this)"><i class="ti ti-alert-circle"></i>Dues</button></nav>
+<div id="modal-root"></div><div id="toast-root"></div>
 </div>
-
-<!-- FIREBASE SDK -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getFirestore, collection, doc, getDocs, setDoc, deleteDoc,
-  onSnapshot, writeBatch, getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCs_izHLvuN4jEbo7JS9w_VOku4H0upRR4",
-  authDomain: "ruby-society-5656f.firebaseapp.com",
-  projectId: "ruby-society-5656f",
-  storageBucket: "ruby-society-5656f.firebasestorage.app",
-  messagingSenderId: "97702634272",
-  appId: "1:97702634272:web:ac82592bf7e79b20222d45"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// ─── CONSTANTS ─────────────────────────────────────
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const CURRENT_MONTH = 5;
-const MONTHLY_AMT = 800;
-
-// ─── STATE ─────────────────────────────────────────
-let members = [];
-let payments = [];
-let expenses = [];
-let bankBalance = 0;
-let nextId = Date.now();
-let activeTab = 'dashboard';
-let currentAttachment = null;
-let unsubscribers = [];
-let cashInHand = 0;
-let setupStep = 0;
-let setupOpeningData = {};
-let bsMonth = new Date().getMonth(); // 0=Jan
-let bsYear = new Date().getFullYear();
-let balanceSheetEntries = []; // loaded from Firebase
-
-// ─── HELPERS ───────────────────────────────────────
-function rupee(n) { return '\u20B9' + Number(n).toLocaleString('en-IN'); }
-function initials(name) { return name.split(/[\s\/]/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
-function getMember(id) { return members.find(m => m.id === id); }
-function getPayment(id) { return payments.find(p => p.id === id); }
-function getMemberPay(mid) { return payments.filter(p => p.memberId === mid); }
-function isPaidThisMonth(mid) { return payments.some(p => p.memberId === mid && p.month === CURRENT_MONTH - 1); }
-function totalCollected() { return payments.reduce((s,p) => s+p.amount, 0); }
-function thisMonthCollected() { return payments.filter(p=>p.month===CURRENT_MONTH-1).reduce((s,p)=>s+p.amount,0); }
-function totalExpenses() { return expenses.reduce((s,e) => s+e.amount, 0); }
-function getMemberDueMonths(mid) {
-  const due = [];
-  for (let i = 0; i < CURRENT_MONTH; i++) {
-    if (!payments.find(p => p.memberId === mid && p.month === i)) due.push(i);
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,collection,doc,getDocs,setDoc,deleteDoc,onSnapshot,writeBatch,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyCs_izHLvuN4jEbo7JS9w_VOku4H0upRR4",authDomain:"ruby-society-5656f.firebaseapp.com",projectId:"ruby-society-5656f",storageBucket:"ruby-society-5656f.firebasestorage.app",messagingSenderId:"97702634272",appId:"1:97702634272:web:ac82592bf7e79b20222d45"});
+const db=getFirestore(app);
+const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const CATS=['Maintenance','Repair Fund','Penalty','Water Charges','Electricity','Salary','Stationery','Cleaning','Water Tanker','Plumbing','Other'];
+const MA=800;
+let members=[],transactions=[],bankBalance=0,cashInHand=0;
+let activeTab='sheet',bsMonth=new Date().getMonth(),bsYear=new Date().getFullYear(),bsView='all',bsSearch='';
+let loaded={m:false,tx:false,s:false};
+function rupee(n){return'\u20B9'+Number(n).toLocaleString('en-IN')}
+function initials(n){return n.split(/[\s\/]/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()}
+function newId(p){return p+'_'+Date.now()+'_'+Math.random().toString(36).substr(2,5)}
+function setSyncDot(s){const d=document.getElementById('syncDot');if(d)d.className='sync-dot '+s}
+function showToast(m,t){const r=document.getElementById('toast-root');r.innerHTML=`<div class="toast ${t||''}">${m}</div>`;setTimeout(()=>r.innerHTML='',2200)}
+function mk(m,y){return`${y}-${String(m+1).padStart(2,'0')}`}
+function getOpening(month,year){
+  if(month===bsMonth&&year===bsYear){
+    const pm=month===0?11:month-1,py=month===0?year-1:year;
+    const pk=mk(pm,py);
+    const prevTx=transactions.filter(t=>t.monthKey===pk&&!t.isCarryForward);
+    if(prevTx.length===0)return{bank:bankBalance,cash:cashInHand};
+    const prevOpen=month===0&&year<=2026?{bank:bankBalance,cash:cashInHand}:getOpeningRecurse(pm,py);
+    const bi=prevTx.filter(t=>t.side==='income'&&t.method==='bank').reduce((s,t)=>s+t.amount,0);
+    const be=prevTx.filter(t=>t.side==='expense'&&t.method==='bank').reduce((s,t)=>s+t.amount,0);
+    const ci=prevTx.filter(t=>t.side==='income'&&t.method!=='bank').reduce((s,t)=>s+t.amount,0);
+    const ce=prevTx.filter(t=>t.side==='expense'&&t.method!=='bank').reduce((s,t)=>s+t.amount,0);
+    return{bank:prevOpen.bank+bi-be,cash:prevOpen.cash+ci-ce};
   }
-  return due;
+  return{bank:bankBalance,cash:cashInHand};
 }
-function totalDue() {
-  let d = 0;
-  members.forEach(m => { getMemberDueMonths(m.id).forEach(() => d += MONTHLY_AMT); });
-  return d;
+function getOpeningRecurse(m,y){return{bank:bankBalance,cash:cashInHand}}
+function sendWA(ph,msg){const c=(ph||'').replace(/\D/g,'');const n=c.length===10?'91'+c:c;window.open(n?`https://wa.me/${n}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank')}
+function buildReminder(m){return['*Reminder*','Ruby Social Society','','Dear *'+m.name+'*,','Flat: '+m.flat,'','Your maintenance is pending. Kindly pay.','','Thank you','_- Management_'].join('\n')}
+async function initFirebase(){
+  document.getElementById('loadingStatus').textContent='Loading...';
+  try{
+    onSnapshot(collection(db,'members'),s=>{members=s.docs.map(d=>({id:d.id,...d.data()}));loaded.m=true;tryRender()});
+    onSnapshot(collection(db,'balanceEntries'),s=>{transactions=s.docs.map(d=>({id:d.id,...d.data()}));loaded.tx=true;tryRender()});
+    onSnapshot(doc(db,'settings','main'),s=>{if(s.exists()){bankBalance=s.data().bankBalance||0;cashInHand=s.data().cashInHand||0}loaded.s=true;tryRender()});
+    await setDoc(doc(db,'settings','main'),{seeded:true},{merge:true});
+    setTimeout(()=>document.getElementById('loadingScreen').classList.add('hidden'),800);
+  }catch(e){document.getElementById('loadingStatus').textContent='Error: '+e.message}
 }
-function formatDate(iso) {
-  if (!iso) return '';
-  return new Date(iso).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'});
+function tryRender(){if(loaded.m&&loaded.tx&&loaded.s){setSyncDot('online');render()}}
+window.showTab=function(t,b){activeTab=t;document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));b.classList.add('active');window.scrollTo(0,0);render()};
+function render(){const el=document.getElementById('content');if(!el)return;if(activeTab==='sheet')el.innerHTML=renderSheet();else if(activeTab==='members')el.innerHTML=renderMembers();else el.innerHTML=renderDues()}
+function renderSheet(){
+  const mkey=mk(bsMonth,bsYear);const op=getOpening(bsMonth,bsYear);
+  const allTx=transactions.filter(t=>t.monthKey===mkey&&!t.isCarryForward);
+  let fil=[...allTx];
+  if(bsSearch){const q=bsSearch.toLowerCase();fil=fil.filter(t=>(t.name||'').toLowerCase().includes(q)||(t.category||'').toLowerCase().includes(q))}
+  if(bsView==='income')fil=fil.filter(t=>t.side==='income');
+  else if(bsView==='expense')fil=fil.filter(t=>t.side==='expense');
+  else if(bsView==='bank')fil=fil.filter(t=>t.method==='bank');
+  else if(bsView==='cash')fil=fil.filter(t=>t.method!=='bank');
+  fil.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const bi=allTx.filter(t=>t.side==='income'&&t.method==='bank').reduce((s,t)=>s+t.amount,0);
+  const be=allTx.filter(t=>t.side==='expense'&&t.method==='bank').reduce((s,t)=>s+t.amount,0);
+  const ci=allTx.filter(t=>t.side==='income'&&t.method!=='bank').reduce((s,t)=>s+t.amount,0);
+  const ce=allTx.filter(t=>t.side==='expense'&&t.method!=='bank').reduce((s,t)=>s+t.amount,0);
+  const cb=op.bank+bi-be,cc=op.cash+ci-ce,ti=bi+ci,te=be+ce,tf=cb+cc;
+  const vc={all:'all',income:'inc',expense:'exp',bank:'bnk',cash:'csh'};
+  return`<div class="bal-badges"><div class="bal-badge"><div class="bal-badge-label">🏦 Bank Balance</div><div class="bal-badge-val">${rupee(op.bank)}</div><div class="bal-badge-actions"><button onclick="openBalModal('bank','add')"><i class="ti ti-plus" style="font-size:12px"></i>Add</button><button onclick="openBalModal('bank','subtract')"><i class="ti ti-minus" style="font-size:12px"></i>Out</button><button onclick="openBalModal('bank','set')"><i class="ti ti-edit" style="font-size:12px"></i>Set</button></div></div><div class="bal-badge"><div class="bal-badge-label">💵 Cash on Hand</div><div class="bal-badge-val">${rupee(op.cash)}</div><div class="bal-badge-actions"><button onclick="openBalModal('cash','add')"><i class="ti ti-plus" style="font-size:12px"></i>Add</button><button onclick="openBalModal('cash','subtract')"><i class="ti ti-minus" style="font-size:12px"></i>Out</button><button onclick="openBalModal('cash','set')"><i class="ti ti-edit" style="font-size:12px"></i>Set</button></div></div></div>
+  <div class="lg-controls"><input class="lg-search" placeholder="Search..." value="${bsSearch}" oninput="bsSearch=this.value;render()"><div class="lg-month-nav"><button onclick="bsNav(-1)">\u2039</button><span class="lg-month-label">${MN[bsMonth]} ${bsYear}</span><button onclick="bsNav(1)">\u203A</button></div></div>
+  <div class="lg-tabs"><button class="lg-tab ${bsView==='all'?'active':''}" onclick="bsSetView('all')">All</button><button class="lg-tab ${bsView==='income'?'active':''}" onclick="bsSetView('income')">Income</button><button class="lg-tab ${bsView==='expense'?'active':''}" onclick="bsSetView('expense')">Expense</button><button class="lg-tab ${bsView==='bank'?'active':''}" onclick="bsSetView('bank')">Bank</button><button class="lg-tab ${bsView==='cash'?'active':''}" onclick="bsSetView('cash')">Cash</button></div>
+  <div class="lg-table"><div class="lg-th ${vc[bsView]||'all'}"><span><i class="ti ti-list"></i> ${MN[bsMonth]} ${bsYear} Ledger</span><span style="font-size:11px;opacity:0.8">${fil.length} entries</span></div><div class="lg-colh"><span>Date</span><span>Particulars</span><span>Mode</span><span>Amount</span></div>${fil.map(t=>`<div class="lg-row" onclick="openTxDetail('${t.id}')"><div class="lg-r-date">${t.date?t.date.split('-').reverse().slice(0,2).join('/'):'\u2014'}</div><div class="lg-r-desc">${t.name}<small>${t.category||''}</small></div><div class="lg-r-mode">${t.method==='bank'?'🏦':'💵'}</div><div class="lg-r-amt ${t.side==='income'?'inc':'exp'}">${t.side==='income'?'+':'-'}${rupee(t.amount)}</div></div>`).join('')}${fil.length===0?'<div style="padding:24px;text-align:center;font-size:12px;color:#ABABA3">No transactions</div>':''}<div class="lg-add-row" onclick="openAddTx()"><i class="ti ti-plus"></i> Add Transaction</div><div class="lg-tf ${vc[bsView]||'all'}"><span>Net: ${rupee(ti-te)}</span><span>Total: ${rupee(ti+te)}</span></div></div>
+  <div class="lg-sum-grid"><div class="lg-sum-box"><div class="lg-sum-h bnk">🏦 Bank Summary</div><div class="lg-sum-r"><span style="color:#6A6A65">Opening</span><span>${rupee(op.bank)}</span></div><div class="lg-sum-r"><span style="color:#1D6B3E">+ Income</span><span style="color:#1D6B3E">${rupee(bi)}</span></div><div class="lg-sum-r"><span style="color:#A32D2D">- Expense</span><span style="color:#A32D2D">${rupee(be)}</span></div><div class="lg-sum-r closing"><span>Closing</span><span style="color:#155230">${rupee(cb)}</span></div></div><div class="lg-sum-box"><div class="lg-sum-h csh">💵 Cash Summary</div><div class="lg-sum-r"><span style="color:#6A6A65">Opening</span><span>${rupee(op.cash)}</span></div><div class="lg-sum-r"><span style="color:#1D6B3E">+ Income</span><span style="color:#1D6B3E">${rupee(ci)}</span></div><div class="lg-sum-r"><span style="color:#A32D2D">- Expense</span><span style="color:#A32D2D">${rupee(ce)}</span></div><div class="lg-sum-r closing csh"><span>Closing</span><span style="color:#854F0B">${rupee(cc)}</span></div></div></div>
+  <div class="lg-total-card"><div class="lg-total-label">Total Available Funds (Bank + Cash)</div><div class="lg-total-val">${rupee(tf)}</div></div>`;
 }
-function setSyncDot(state) {
-  const dot = document.getElementById('syncDot');
-  if (!dot) return;
-  dot.className = 'sync-dot ' + state;
-  dot.title = state === 'online' ? 'Synced' : state === 'syncing' ? 'Syncing...' : 'Offline';
+function renderMembers(){
+  const mkey=mk(bsMonth,bsYear);
+  return`<div style="padding:12px 14px 8px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:15px;font-weight:700">Members (${members.length})</div><div style="display:flex;gap:6px"><div class="lg-month-nav" style="margin-right:4px"><button onclick="bsNav(-1)">\u2039</button><span class="lg-month-label">${MN[bsMonth]}</span><button onclick="bsNav(1)">\u203A</button></div><button class="btn sm primary" onclick="openAddMember()"><i class="ti ti-plus"></i></button></div></div>
+  <div class="card" style="margin-top:0"><div class="search-wrap"><input type="search" placeholder="Search..." oninput="filterMembers(this.value)"></div><div id="mlist">${members.map(m=>{const ticked=transactions.some(t=>t.monthKey===mkey&&t.tickMemberId===m.id);return`<div class="member-row" id="mr${m.id}"><button class="tick-btn ${ticked?'ticked':''}" onclick="event.stopPropagation();toggleTick('${m.id}','${mkey}')">${ticked?'<i class="ti ti-check"></i>':''}</button><div class="avatar ${m.type==='rented'?'rented':''}">${initials(m.name)}</div><div class="member-info" onclick="openEditMember('${m.id}')"><div class="member-name">${m.name} <span class="badge ${m.type}">${m.type==='owner'?'Owner':'Tenant'}</span></div><div class="member-flat">Flat ${m.flat}${m.phone?' · '+m.phone:''}</div></div><span class="badge ${ticked?'paid':'unpaid'}">${ticked?'Paid':'Due'}</span></div>`}).join('')}</div></div>`;
 }
-
-// ─── FIREBASE REALTIME LISTENERS ──────────────────
-async function initFirebase() {
-  setLoadingStatus('Loading members...');
-  try {
-    // Track which collections have loaded
-    let loaded = {members: false, payments: false, expenses: false, settings: false, balanceEntries: false};
-    function checkAndRender() {
-      if (loaded.members && loaded.payments && loaded.expenses && loaded.settings && loaded.balanceEntries) {
-        setSyncDot('online');
-        render();
-      }
-    }
-
-    // Members listener
-    const unsubMembers = onSnapshot(collection(db, 'members'), snap => {
-      members = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      loaded.members = true;
-      checkAndRender();
-    });
-
-    // Payments listener
-    const unsubPayments = onSnapshot(collection(db, 'payments'), snap => {
-      payments = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      loaded.payments = true;
-      checkAndRender();
-    });
-
-    // Expenses listener
-    const unsubExpenses = onSnapshot(collection(db, 'expenses'), snap => {
-      expenses = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      loaded.expenses = true;
-      checkAndRender();
-    });
-
-    // Settings (bank balance + opening)
-    const unsubSettings = onSnapshot(doc(db, 'settings', 'main'), snap => {
-      if (snap.exists()) {
-        bankBalance = snap.data().bankBalance || 0;
-        nextId = snap.data().nextId || Date.now();
-        cashInHand = snap.data().cashInHand || 0;
-      }
-      loaded.settings = true;
-      checkAndRender();
-    });
-
-    // Balance Sheet entries listener
-    const unsubBS = onSnapshot(collection(db, 'balanceEntries'), snap => {
-      balanceSheetEntries = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      loaded.balanceEntries = true;
-      checkAndRender();
-    });
-
-    unsubscribers = [unsubMembers, unsubPayments, unsubExpenses, unsubSettings, unsubBS];
-
-    // Only seed once — check a permanent flag in Firebase
-    setLoadingStatus('Checking data...');
-    const settingsSnap = await getDoc(doc(db, 'settings', 'main'));
-    const alreadySeeded = settingsSnap.exists() && settingsSnap.data().seeded === true;
-    if (!alreadySeeded) {
-      setLoadingStatus('Setting up initial data...');
-      await seedInitialData();
-    }
-
-    setLoadingStatus('Ready!');
-    // Mark as seeded immediately so auto-seed never runs again
-    await setDoc(doc(db, 'settings', 'main'), {seeded: true}, {merge: true});
-    // Check if opening balance setup is done
-    const finalSettings = await getDoc(doc(db, 'settings', 'main'));
-    const openingDone = finalSettings.exists() && finalSettings.data().openingDone === true;
-    setTimeout(() => {
-      document.getElementById('loadingScreen').classList.add('hidden');
-      if (!openingDone) {
-        showSetupWizard();
-      }
-    }, 600);
-
-  } catch(e) {
-    console.error('Firebase error:', e);
-    setLoadingStatus('Error: ' + e.message);
-    setSyncDot('');
-  }
+function renderDues(){
+  const mkey=mk(bsMonth,bsYear);const unpaid=members.filter(m=>!transactions.some(t=>t.monthKey===mkey&&t.tickMemberId===m.id));
+  return`<div style="padding:12px 14px 8px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:15px;font-weight:700">Dues \u2014 ${MN[bsMonth]} ${bsYear}</div><div class="lg-month-nav"><button onclick="bsNav(-1)">\u2039</button><span class="lg-month-label">${MN[bsMonth]}</span><button onclick="bsNav(1)">\u203A</button></div></div>
+  <div style="padding:0 12px 8px;font-size:12px;color:#6A6A65">${unpaid.length} pending · ${members.length-unpaid.length} paid</div>
+  <div class="card" style="margin-top:0">${unpaid.length===0?'<div class="empty"><i class="ti ti-circle-check" style="font-size:32px;display:block;margin-bottom:8px;color:#1D6B3E"></i>All members paid!</div>':unpaid.map(m=>`<div class="due-row"><div class="avatar ${m.type==='rented'?'rented':''}">${initials(m.name)}</div><div class="due-info"><div class="due-name">${m.name}</div><div class="due-sub">Flat ${m.flat} · ${rupee(MA)}</div></div><button class="btn sm icon-only whatsapp" onclick="sendWA('${m.phone||''}',buildReminder(members.find(x=>x.id==='${m.id}')))"><i class="ti ti-brand-whatsapp"></i></button><button class="btn sm primary" onclick="toggleTick('${m.id}','${mk(bsMonth,bsYear)}')"><i class="ti ti-check"></i></button></div>`).join('')}</div>`;
 }
-
-function setLoadingStatus(msg) {
-  const el = document.getElementById('loadingStatus');
-  if (el) el.textContent = msg;
-}
-
-async function seedInitialData() {
-  const batch = writeBatch(db);
-  const initialMembers = [
-    {name:'Hiral Naresh Barot',flat:'301',phone:'',type:'owner'},
-    {name:'Thakkar Family',flat:'302',phone:'',type:'rented'},
-    {name:'Puja Nilesh Bhatt',flat:'303',phone:'',type:'owner'},
-    {name:'Maniben Wagh',flat:'304',phone:'',type:'owner'},
-    {name:'Ankodbhai Panchal',flat:'305',phone:'',type:'owner'},
-    {name:'Nakodiya Kapil',flat:'306',phone:'',type:'rented'},
-    {name:'Bhawani Patel',flat:'307',phone:'',type:'owner'},
-    {name:'Neha/Nikita Makwana',flat:'308',phone:'',type:'owner'},
-    {name:'Sanjay Patel',flat:'309',phone:'',type:'rented'},
-    {name:'Chandni Sharma',flat:'310',phone:'',type:'owner'},
-    {name:'Jignesh Kumar',flat:'311',phone:'',type:'owner'},
-    {name:'Raksha Ben',flat:'312',phone:'',type:'owner'},
-  ];
-  initialMembers.forEach((m, i) => {
-    batch.set(doc(db, 'members', 'M' + (i+1)), m);
-  });
-  const initialPayments = [
-    {memberId:'M1',month:0,amount:800,receipt:'118',date:'2026-01-05',mode:'cash',note:'',attachment:null},
-    {memberId:'M1',month:1,amount:800,receipt:'124',date:'2026-02-06',mode:'cash',note:'',attachment:null},
-    {memberId:'M1',month:2,amount:800,receipt:'200',date:'2026-03-04',mode:'cash',note:'',attachment:null},
-    {memberId:'M1',month:3,amount:800,receipt:'214',date:'2026-04-07',mode:'cash',note:'',attachment:null},
-    {memberId:'M2',month:0,amount:800,receipt:'119',date:'2026-01-08',mode:'cash',note:'',attachment:null},
-    {memberId:'M2',month:1,amount:700,receipt:'125',date:'2026-02-08',mode:'cash',note:'',attachment:null},
-    {memberId:'M2',month:2,amount:800,receipt:'201',date:'2026-03-09',mode:'cash',note:'',attachment:null},
-    {memberId:'M2',month:3,amount:900,receipt:'217',date:'2026-04-05',mode:'cash',note:'',attachment:null},
-    {memberId:'M3',month:0,amount:800,receipt:'120',date:'2026-01-10',mode:'cash',note:'',attachment:null},
-    {memberId:'M3',month:1,amount:800,receipt:'126',date:'2026-02-10',mode:'cash',note:'',attachment:null},
-    {memberId:'M3',month:2,amount:800,receipt:'202',date:'2026-03-11',mode:'cash',note:'',attachment:null},
-    {memberId:'M4',month:0,amount:800,receipt:'121',date:'2026-01-12',mode:'cash',note:'',attachment:null},
-    {memberId:'M4',month:1,amount:800,receipt:'130',date:'2026-02-12',mode:'cash',note:'',attachment:null},
-    {memberId:'M4',month:2,amount:800,receipt:'211',date:'2026-03-12',mode:'cash',note:'',attachment:null},
-    {memberId:'M4',month:3,amount:800,receipt:'221',date:'2026-04-14',mode:'cash',note:'',attachment:null},
-    {memberId:'M5',month:0,amount:800,receipt:'122',date:'2026-01-14',mode:'cash',note:'',attachment:null},
-    {memberId:'M5',month:1,amount:800,receipt:'162',date:'2026-02-14',mode:'cash',note:'',attachment:null},
-    {memberId:'M5',month:2,amount:800,receipt:'203',date:'2026-03-14',mode:'cash',note:'',attachment:null},
-    {memberId:'M5',month:3,amount:800,receipt:'222',date:'2026-04-20',mode:'cash',note:'',attachment:null},
-    {memberId:'M6',month:0,amount:800,receipt:'123',date:'2026-01-15',mode:'cash',note:'',attachment:null},
-    {memberId:'M6',month:1,amount:800,receipt:'163',date:'2026-02-15',mode:'cash',note:'',attachment:null},
-    {memberId:'M6',month:2,amount:800,receipt:'204',date:'2026-03-18',mode:'cash',note:'',attachment:null},
-    {memberId:'M6',month:3,amount:800,receipt:'228',date:'2026-04-22',mode:'cash',note:'',attachment:null},
-    {memberId:'M7',month:0,amount:800,receipt:'140',date:'2026-01-18',mode:'cash',note:'',attachment:null},
-    {memberId:'M7',month:1,amount:800,receipt:'148',date:'2026-02-18',mode:'cash',note:'',attachment:null},
-    {memberId:'M7',month:2,amount:800,receipt:'205',date:'2026-03-20',mode:'cash',note:'',attachment:null},
-    {memberId:'M8',month:0,amount:800,receipt:'141',date:'2026-01-19',mode:'cash',note:'',attachment:null},
-    {memberId:'M8',month:1,amount:800,receipt:'151',date:'2026-02-19',mode:'cash',note:'',attachment:null},
-    {memberId:'M8',month:2,amount:800,receipt:'206',date:'2026-03-22',mode:'cash',note:'',attachment:null},
-    {memberId:'M8',month:3,amount:800,receipt:'231',date:'2026-04-26',mode:'cash',note:'',attachment:null},
-    {memberId:'M9',month:0,amount:800,receipt:'142',date:'2026-01-20',mode:'cash',note:'',attachment:null},
-    {memberId:'M9',month:1,amount:800,receipt:'157',date:'2026-02-20',mode:'cash',note:'',attachment:null},
-    {memberId:'M9',month:2,amount:800,receipt:'207',date:'2026-03-24',mode:'cash',note:'',attachment:null},
-    {memberId:'M10',month:0,amount:800,receipt:'143',date:'2026-01-22',mode:'cash',note:'',attachment:null},
-    {memberId:'M10',month:1,amount:800,receipt:'194',date:'2026-02-22',mode:'cash',note:'',attachment:null},
-    {memberId:'M10',month:2,amount:800,receipt:'251',date:'2026-03-25',mode:'cash',note:'',attachment:null},
-    {memberId:'M10',month:3,amount:800,receipt:'256',date:'2026-04-28',mode:'cash',note:'',attachment:null},
-    {memberId:'M11',month:0,amount:800,receipt:'144',date:'2026-01-24',mode:'cash',note:'',attachment:null},
-    {memberId:'M11',month:1,amount:800,receipt:'137',date:'2026-02-24',mode:'cash',note:'',attachment:null},
-    {memberId:'M11',month:2,amount:800,receipt:'208',date:'2026-03-26',mode:'cash',note:'',attachment:null},
-    {memberId:'M11',month:3,amount:800,receipt:'234',date:'2026-04-29',mode:'cash',note:'',attachment:null},
-    {memberId:'M12',month:0,amount:800,receipt:'150',date:'2026-01-26',mode:'cash',note:'',attachment:null},
-    {memberId:'M12',month:1,amount:800,receipt:'127',date:'2026-02-26',mode:'cash',note:'',attachment:null},
-    {memberId:'M12',month:2,amount:800,receipt:'209',date:'2026-03-28',mode:'cash',note:'',attachment:null},
-  ];
-  initialPayments.forEach((p, i) => {
-    batch.set(doc(db, 'payments', 'P' + (i+1)), p);
-  });
-  batch.set(doc(db, 'settings', 'main'), {bankBalance: 0, nextId: 1000, seeded: true});
-  await batch.commit();
-}
-
-// ─── FIRESTORE CRUD ───────────────────────────────
-async function saveMemberFS(m) {
-  setSyncDot('syncing');
-  await setDoc(doc(db, 'members', m.id), {name:m.name,flat:m.flat,phone:m.phone,type:m.type});
-  setSyncDot('online');
-}
-async function deleteMemberFS(id) {
-  setSyncDot('syncing');
-  await deleteDoc(doc(db, 'members', id));
-  const payDocs = payments.filter(p => p.memberId === id);
-  const batch = writeBatch(db);
-  payDocs.forEach(p => batch.delete(doc(db, 'payments', p.id)));
-  await batch.commit();
-  setSyncDot('online');
-}
-async function savePaymentFS(p) {
-  setSyncDot('syncing');
-  const data = {memberId:p.memberId,month:p.month,amount:p.amount,receipt:p.receipt,date:p.date,mode:p.mode,note:p.note||'',attachment:p.attachment||null};
-  await setDoc(doc(db, 'payments', p.id), data);
-  setSyncDot('online');
-}
-async function deletePaymentFS(id) {
-  setSyncDot('syncing');
-  await deleteDoc(doc(db, 'payments', id));
-  setSyncDot('online');
-}
-async function saveExpenseFS(e) {
-  setSyncDot('syncing');
-  await setDoc(doc(db, 'expenses', e.id), {title:e.title,category:e.category,amount:e.amount,date:e.date,source:e.source,note:e.note||'',icon:e.icon,attachment:e.attachment||null});
-  setSyncDot('online');
-}
-async function deleteExpenseFS(id) {
-  setSyncDot('syncing');
-  await deleteDoc(doc(db, 'expenses', id));
-  setSyncDot('online');
-}
-async function saveBankBalance(amount) {
-  setSyncDot('syncing');
-  await setDoc(doc(db, 'settings', 'main'), {bankBalance: amount, nextId, seeded: true}, {merge: true});
-  setSyncDot('online');
-}
-function newId(prefix) {
-  return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
-}
-
-// ─── WHATSAPP MESSAGES ────────────────────────────
-function buildReceiptMsg(p) {
-  const m = getMember(p.memberId);
-  return [
-    '*\u2728 Ruby Social Society \u2728*',
-    'Third Floor \u2014 2026',
-    '\u2500'.repeat(20),
-    '*PAYMENT RECEIPT*','',
-    '*Receipt No:* #' + p.receipt,
-    '*Date:* ' + formatDate(p.date),
-    '*Member:* ' + m.name,
-    '*Flat:* ' + m.flat + ' (' + (m.type==='owner'?'Owner':'Tenant') + ')','',
-    '*Period:* ' + MONTHS[p.month] + ' 2026',
-    '*Amount:* ' + rupee(p.amount),
-    '*Mode:* ' + (p.mode==='cash'?'Cash':'Bank Transfer'),
-    p.note?'*Note:* '+p.note:null,
-    '\u2500'.repeat(20),
-    '\u2705 Payment received successfully','',
-    'Thank you for your timely payment! \ud83d\ude4f','',
-    '_- Society Management_'
-  ].filter(Boolean).join('\n');
-}
-function buildHistoryMsg(mid) {
-  const m = getMember(mid);
-  const mp = getMemberPay(mid).sort((a,b)=>a.month-b.month);
-  const due = getMemberDueMonths(mid);
-  const totalPaid = mp.reduce((s,p)=>s+p.amount,0);
-  return [
-    '*\u2728 Ruby Social Society \u2728*',
-    'Third Floor \u2014 2026',
-    '\u2500'.repeat(20),
-    '*PAYMENT HISTORY*','',
-    'Dear *'+m.name+'*,',
-    'Flat: ' + m.flat + ' (' + (m.type==='owner'?'Owner':'Tenant') + ')','',
-    '*\ud83d\udcc5 Months Paid:*',
-    ...( mp.length ? mp.map(p=>'\u2705 '+MONTHS[p.month]+' 2026 \u2014 '+rupee(p.amount)+' (#'+p.receipt+')') : ['_No payments yet_']),
-    '','*\u26a0\ufe0f Pending:*',
-    ...( due.length ? due.map(mo=>'\u274c '+MONTHS[mo]+' 2026 \u2014 '+rupee(MONTHLY_AMT)) : ['\ud83c\udf89 All clear!']),
-    '','\u2500'.repeat(20),
-    '*\ud83d\udcb0 Total Paid:* '+rupee(totalPaid),
-    due.length?'*\ud83d\udd34 Total Due:* '+rupee(due.length*MONTHLY_AMT):'',
-    '','',
-    due.length?'Kindly clear pending dues at the earliest. \ud83d\ude4f':'Thank you for your timely payments! \ud83c\udf89',
-    '','_- Society Management_'
-  ].filter(s=>s!==null&&s!==undefined).join('\n');
-}
-function buildOverdueMsg(mid) {
-  const m = getMember(mid);
-  const due = getMemberDueMonths(mid);
-  return [
-    '*\u26a0\ufe0f IMPORTANT NOTICE \u26a0\ufe0f*',
-    'Ruby Social Society \u2014 Third Floor',
-    '\u2500'.repeat(20),'',
-    'Dear *'+m.name+'*,','Flat: '+m.flat,'',
-    'Your maintenance dues are pending for *'+due.length+' months*:','',
-    ...due.map(mo=>'\u274c '+MONTHS[mo]+' 2026 \u2014 '+rupee(MONTHLY_AMT)),
-    '','*Total Outstanding: '+rupee(due.length*MONTHLY_AMT)+'*','',
-    'Please be informed that if dues are not cleared within *7 days*, the society reserves the right to *disconnect water supply* to your flat as per society bye-laws.','',
-    'Kindly contact the society management to settle your dues immediately.','',
-    'Thanking you for your cooperation.','',
-    '_- Society Management Committee_',
-    'Ruby Social Society'
-  ].join('\n');
-}
-function buildReminderMsg(mid) {
-  const m = getMember(mid);
-  const due = getMemberDueMonths(mid);
-  return [
-    '*\ud83d\udcec Friendly Reminder*',
-    'Ruby Social Society \u2014 Third Floor',
-    '\u2500'.repeat(20),'',
-    'Dear *'+m.name+'*,','Flat: '+m.flat,'',
-    'Your maintenance is pending for:','',
-    ...due.map(mo=>'\ud83d\udd38 '+MONTHS[mo]+' 2026 \u2014 '+rupee(MONTHLY_AMT)),
-    '','*Total Pending: '+rupee(due.length*MONTHLY_AMT)+'*','',
-    'Kindly arrange payment at your earliest. If already paid, share the receipt with us.','',
-    'Thank you \ud83d\ude4f','','_- Society Management_'
-  ].join('\n');
-}
-function sendWA(phone, msg) {
-  const clean = (phone||'').replace(/\D/g,'');
-  const num = clean.length===10?'91'+clean:clean;
-  window.open(num?`https://wa.me/${num}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
-}
-
-
-// ─── SETUP WIZARD ─────────────────────────────────
-window.showSetupWizard = function showSetupWizard() {
-  setupStep = 0;
-  setupOpeningData = {};
-  document.getElementById('setupScreen').classList.add('visible');
-  renderSetupStep();
-}
-
-window.renderSetupStep = function renderSetupStep() {
-  const titles = [
-    { h:'Step 1: Cash in Hand', p:'Count your physical cash right now and enter the exact amount below.' },
-    { h:'Step 2: Bank Balance', p:'Check your bank account and enter the current balance.' },
-    { h:'Step 3: Member Balances', p:'For each member, mark if they have outstanding dues or have paid in advance.' },
-    { h:'Review & Confirm', p:'Check everything below before saving your opening balances.' },
-  ];
-  document.getElementById('setupHeroTitle').textContent = titles[setupStep].h;
-  document.getElementById('setupHeroSub').textContent = titles[setupStep].p;
-  [0,1,2,3].forEach(i => {
-    const dot = document.getElementById('dot'+i);
-    dot.className = 'setup-step-dot' + (i === setupStep ? ' active' : '');
-  });
-  document.getElementById('setupBackBtn').style.display = setupStep > 0 ? 'block' : 'none';
-  document.getElementById('setupNextBtn').textContent = setupStep === 3 ? 'Save & Start App' : 'Next';
-  const body = document.getElementById('setupBody');
-  if (setupStep === 0) {
-    body.innerHTML = `
-      <div class="info-box"><strong>Tip:</strong> Count all cash notes physically. Include any cash kept at home or with you for society purposes.</div>
-      <div class="setup-section-title">Opening Cash in Hand</div>
-      <div class="setup-section-sub">How much cash do you physically have right now?</div>
-      <div style="background:#fff;border:1px solid #E8E7E1;border-radius:12px;padding:16px">
-        <div style="font-size:12px;color:#6A6A65;margin-bottom:8px;font-weight:500">Cash in Hand (&#8377;)</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:22px;font-weight:600;color:#854F0B">&#8377;</span>
-          <input type="number" id="setup-cash" inputmode="numeric" placeholder="0"
-            value="${setupOpeningData.cash||''}"
-            style="flex:1;padding:12px;border:1.5px solid #D8D6CB;border-radius:10px;background:#F8F7F2;font-size:20px;font-family:inherit;outline:none;font-weight:600"
-            onfocus="this.style.borderColor='#1D9E75'" onblur="this.style.borderColor='#D8D6CB'">
-        </div>
-      </div>`;
-    setTimeout(()=>document.getElementById('setup-cash')?.focus(), 200);
-  } else if (setupStep === 1) {
-    body.innerHTML = `
-      <div class="info-box"><strong>Tip:</strong> Open your bank app or passbook and enter the exact current balance of the society account.</div>
-      <div class="setup-section-title">Opening Bank Balance</div>
-      <div class="setup-section-sub">What is the current balance in the society bank account?</div>
-      <div style="background:#fff;border:1px solid #E8E7E1;border-radius:12px;padding:16px">
-        <div style="font-size:12px;color:#6A6A65;margin-bottom:8px;font-weight:500">Bank Balance (&#8377;)</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:22px;font-weight:600;color:#0F6E56">&#8377;</span>
-          <input type="number" id="setup-bank" inputmode="numeric" placeholder="0"
-            value="${setupOpeningData.bank||''}"
-            style="flex:1;padding:12px;border:1.5px solid #D8D6CB;border-radius:10px;background:#F8F7F2;font-size:20px;font-family:inherit;outline:none;font-weight:600"
-            onfocus="this.style.borderColor='#1D9E75'" onblur="this.style.borderColor='#D8D6CB'">
-        </div>
-      </div>`;
-    setTimeout(()=>document.getElementById('setup-bank')?.focus(), 200);
-  } else if (setupStep === 2) {
-    if (!setupOpeningData.members) {
-      setupOpeningData.members = {};
-      members.forEach(m => { setupOpeningData.members[m.id] = { type:'clear', amount:0 }; });
-    }
-    body.innerHTML = `
-      <div class="info-box"><strong>Check your old register/notebook</strong> and mark each member's status. Most will be Clear. Only mark due/advance if you know for sure.</div>
-      ${members.map(m => {
-        const mb = setupOpeningData.members[m.id] || {type:'clear',amount:0};
-        return `<div class="member-balance-row">
-          <div class="member-balance-top">
-            <div class="mbr-avatar ${m.type==='rented'?'rented':''}">${initials(m.name)}</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.name}</div>
-              <div style="font-size:11px;color:#6A6A65">Flat ${m.flat}</div>
-            </div>
-          </div>
-          <div class="balance-type-toggle">
-            <div class="btb ${mb.type==='clear'?'ac':''}" onclick="setMemberOpeningType('${m.id}','clear')">&#10003; Clear</div>
-            <div class="btb ${mb.type==='due'?'ad':''}" onclick="setMemberOpeningType('${m.id}','due')">&#8377; Due</div>
-            <div class="btb ${mb.type==='advance'?'aa':''}" onclick="setMemberOpeningType('${m.id}','advance')">&#8593; Advance</div>
-          </div>
-          ${mb.type !== 'clear' ? `
-          <div class="amt-row">
-            <span style="font-size:13px;color:#6A6A65">${mb.type==='due'?'Amount due:':'Advance paid:'}</span>
-            <input type="number" inputmode="numeric" placeholder="0" value="${mb.amount||''}"
-              onchange="setMemberOpeningAmount('${m.id}', this.value)"
-              style="width:130px;padding:9px 12px;border:1px solid #D8D6CB;border-radius:8px;background:#F8F7F2;font-size:14px;font-family:inherit;outline:none">
-          </div>` : ''}
-        </div>`;
-      }).join('')}`;
-  } else if (setupStep === 3) {
-    const dueList = members.filter(m => setupOpeningData.members?.[m.id]?.type === 'due');
-    const advList = members.filter(m => setupOpeningData.members?.[m.id]?.type === 'advance');
-    const clearList = members.filter(m => !setupOpeningData.members?.[m.id] || setupOpeningData.members[m.id].type === 'clear');
-    const totalDueAmt = dueList.reduce((s,m) => s+(setupOpeningData.members[m.id].amount||0), 0);
-    const totalAdvAmt = advList.reduce((s,m) => s+(setupOpeningData.members[m.id].amount||0), 0);
-    body.innerHTML = `
-      <div style="background:#fff;border:1px solid #E8E7E1;border-radius:12px;padding:16px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#1A1A19">Opening Balances</div>
-        <div class="setup-summary-row"><span style="color:#6A6A65">Cash in Hand</span><span style="font-weight:600;color:#854F0B">&#8377;${Number(setupOpeningData.cash||0).toLocaleString('en-IN')}</span></div>
-        <div class="setup-summary-row"><span style="color:#6A6A65">Bank Balance</span><span style="font-weight:600;color:#0F6E56">&#8377;${Number(setupOpeningData.bank||0).toLocaleString('en-IN')}</span></div>
-        <div class="setup-summary-row" style="border-top:1px solid #E8E7E1;margin-top:4px;padding-top:10px"><span style="font-weight:600">Total Funds</span><span style="font-weight:700;color:#0F6E56">&#8377;${Number((setupOpeningData.cash||0)+(setupOpeningData.bank||0)).toLocaleString('en-IN')}</span></div>
-      </div>
-      <div style="background:#fff;border:1px solid #E8E7E1;border-radius:12px;padding:16px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:600;margin-bottom:10px">Member Status</div>
-        <div class="setup-summary-row"><span style="color:#6A6A65">Clear (no balance)</span><span style="font-weight:600">${clearList.length} members</span></div>
-        ${dueList.length > 0 ? `<div class="setup-summary-row"><span style="color:#A32D2D">Outstanding due</span><span style="font-weight:600;color:#A32D2D">${dueList.length} members — &#8377;${totalDueAmt.toLocaleString('en-IN')}</span></div>` : ''}
-        ${advList.length > 0 ? `<div class="setup-summary-row"><span style="color:#185FA5">Paid in advance</span><span style="font-weight:600;color:#185FA5">${advList.length} members — &#8377;${totalAdvAmt.toLocaleString('en-IN')}</span></div>` : ''}
-      </div>
-      ${dueList.length > 0 ? `
-      <div style="background:#FCEBEB;border:1px solid #F09595;border-radius:12px;padding:14px;margin-bottom:14px">
-        <div style="font-size:12px;font-weight:600;color:#A32D2D;margin-bottom:8px">Members with outstanding dues:</div>
-        ${dueList.map(m=>`<div style="font-size:12px;display:flex;justify-content:space-between;padding:4px 0"><span>${m.name} (Flat ${m.flat})</span><span style="font-weight:600">&#8377;${setupOpeningData.members[m.id].amount}</span></div>`).join('')}
-      </div>` : ''}
-      <div class="info-box">Once you save, the app will start fresh from these opening balances. All future payments and expenses will be tracked from here.</div>`;
-  }
-}
-
-window.setMemberOpeningType = function(mid, type) {
-  if (!setupOpeningData.members) setupOpeningData.members = {};
-  if (!setupOpeningData.members[mid]) setupOpeningData.members[mid] = {};
-  setupOpeningData.members[mid].type = type;
-  if (type === 'clear') setupOpeningData.members[mid].amount = 0;
-  renderSetupStep();
-};
-window.setMemberOpeningAmount = function(mid, val) {
-  if (!setupOpeningData.members) setupOpeningData.members = {};
-  if (!setupOpeningData.members[mid]) setupOpeningData.members[mid] = {};
-  setupOpeningData.members[mid].amount = parseInt(val) || 0;
-};
-
-window.setupNext = async function() {
-  if (setupStep === 0) {
-    const cash = parseInt(document.getElementById('setup-cash')?.value) || 0;
-    setupOpeningData.cash = cash;
-    setupStep = 1;
-  } else if (setupStep === 1) {
-    const bank = parseInt(document.getElementById('setup-bank')?.value) || 0;
-    setupOpeningData.bank = bank;
-    setupStep = 2;
-  } else if (setupStep === 2) {
-    setupStep = 3;
-  } else if (setupStep === 3) {
-    await saveOpeningBalances();
-    return;
-  }
-  renderSetupStep();
-};
-
-window.setupBack = function() {
-  if (setupStep > 0) { setupStep--; renderSetupStep(); }
-};
-
-window.saveOpeningBalances = async function saveOpeningBalances() {
-  const btn = document.getElementById('setupNextBtn');
-  btn.textContent = 'Saving...'; btn.disabled = true;
-  try {
-    const batch = writeBatch(db);
-    // Save settings
-    bankBalance = setupOpeningData.bank || 0;
-    cashInHand = setupOpeningData.cash || 0;
-    batch.set(doc(db, 'settings', 'main'), {
-      bankBalance, cashInHand, seeded: true, openingDone: true,
-      openingDate: new Date().toISOString().split('T')[0]
-    }, {merge: true});
-    // Save member opening balances as special payments
-    const mData = setupOpeningData.members || {};
-    Object.entries(mData).forEach(([mid, mb]) => {
-      if (mb.type !== 'clear' && mb.amount > 0) {
-        const oid = newId('OB');
-        batch.set(doc(db, 'openingBalances', oid), {
-          memberId: mid, type: mb.type, amount: mb.amount,
-          date: new Date().toISOString().split('T')[0]
-        });
-      }
-    });
-    await batch.commit();
-    document.getElementById('setupScreen').classList.remove('visible');
-    showToast('Opening balances saved!', 'success');
-    render();
-  } catch(e) {
-    btn.textContent = 'Save & Start App'; btn.disabled = false;
-    showToast('Error saving: ' + e.message, 'error');
-  }
-}
-
-// ─── TABS ─────────────────────────────────────────
-window.showTab = function(tab, btn) {
-  activeTab = tab;
-  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  window.scrollTo(0,0);
-  render();
-};
-
-function render() {
-  const el = document.getElementById('content');
-  if (!el) return;
-  if (activeTab==='dashboard') el.innerHTML = renderDash();
-  else if (activeTab==='members') el.innerHTML = renderMembers();
-  else if (activeTab==='payments') el.innerHTML = renderPayments();
-  else if (activeTab==='expenses') el.innerHTML = renderExpenses();
-  else if (activeTab==='dues') el.innerHTML = renderDues();
-  else if (activeTab==='balancesheet') el.innerHTML = renderBalanceSheet();
-}
-
-// ─── DASHBOARD ────────────────────────────────────
-function renderDash() {
-  if (members.length === 0) {
-    return `<div style="padding:40px 20px;text-align:center;color:#6A6A65">
-      <div style="font-size:48px;margin-bottom:16px">🏢</div>
-      <div style="font-size:16px;font-weight:600;margin-bottom:8px;color:#1A1A19">No members yet</div>
-      <div style="font-size:13px;margin-bottom:24px">Go to Members tab and add your first member</div>
-      <button onclick="document.querySelectorAll('.nav-item')[1].click()" style="background:#1D9E75;color:#fff;border:none;border-radius:50px;padding:12px 24px;font-size:14px;font-family:inherit;cursor:pointer">+ Add Members</button>
-    </div>`;
-  }
-  const paidNow = members.filter(m=>isPaidThisMonth(m.id)).length;
-  const unpaid = members.length - paidNow;
-  const overdue3 = members.filter(m=>getMemberDueMonths(m.id).length>=3);
-  return `
-  <div class="bank-card">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start">
-      <div><div class="bank-label"><i class="ti ti-building-bank"></i> Bank Balance</div><div class="bank-amount">${rupee(bankBalance)}</div></div>
-      <div style="text-align:right"><div class="bank-label"><i class="ti ti-cash"></i> Cash in Hand</div><div style="font-size:18px;font-weight:600;color:rgba(255,255,255,0.9)">${rupee(cashInHand)}</div></div>
-    </div>
-    <div class="bank-actions">
-      <button onclick="openBankModal('add')"><i class="ti ti-plus"></i>Add</button>
-      <button onclick="openBankModal('subtract')"><i class="ti ti-minus"></i>Withdraw</button>
-      <button onclick="openBankModal('set')"><i class="ti ti-edit"></i>Set</button>
-    </div>
-  </div>
-  ${overdue3.length?`<div class="alert-box"><i class="ti ti-alert-triangle"></i><div><div class="alert-title">${overdue3.length} member(s) overdue 3+ months</div><div class="alert-text">Send final notice from Dues tab.</div></div></div>`:''}
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-label"><i class="ti ti-coins"></i>Total collected</div><div class="stat-val green">${rupee(totalCollected())}</div></div>
-    <div class="stat-card"><div class="stat-label"><i class="ti ti-calendar-month"></i>${MONTHS[CURRENT_MONTH-1]} collected</div><div class="stat-val blue">${rupee(thisMonthCollected())}</div></div>
-    <div class="stat-card"><div class="stat-label"><i class="ti ti-alert-triangle"></i>Pending dues</div><div class="stat-val red">${rupee(totalDue())}</div></div>
-    <div class="stat-card"><div class="stat-label"><i class="ti ti-circle-check"></i>Paid this month</div><div class="stat-val muted">${paidNow}<small>/${members.length}</small></div></div>
-  </div>
-  <div class="card"><div class="card-header"><span class="card-title">Quick actions</span></div>
-  <div class="quick-action-grid">
-    <button class="quick-action" onclick="openPaymentModal()"><i class="ti ti-receipt-rupee"></i>Record payment</button>
-    <button class="quick-action" onclick="openAddMember()"><i class="ti ti-user-plus"></i>Add member</button>
-    <button class="quick-action" onclick="openExpenseModal()"><i class="ti ti-cash-banknote"></i>Add expense</button>
-    <button class="quick-action" onclick="exportBackup()"><i class="ti ti-download"></i>Backup data</button>
-  </div></div>
-  <div class="section-label">${MONTHS[CURRENT_MONTH-1]} 2026 — status</div>
-  <div class="card">
-    ${members.map(m=>{
-      const due=getMemberDueMonths(m.id);
-      return `<div class="member-row" onclick="openMemberDetail('${m.id}')">
-        <div class="avatar ${m.type==='rented'?'rented':''}">${initials(m.name)}</div>
-        <div class="member-info">
-          <div class="member-name">${m.name}</div>
-          <div class="member-flat">Flat ${m.flat} · <span class="badge ${m.type}">${m.type==='owner'?'Owner':'Tenant'}</span></div>
-        </div>
-        ${due.length>=3?`<span class="badge overdue">${due.length}m due</span>`:`<span class="badge ${isPaidThisMonth(m.id)?'paid':'unpaid'}">${isPaidThisMonth(m.id)?'Paid':'Pending'}</span>`}
-        <i class="ti ti-chevron-right" style="font-size:18px;color:#ABABA3;margin-left:4px"></i>
-      </div>`;
-    }).join('')}
-  </div>
-  <div class="section-label">Payment heatmap</div>
-  <div class="card" style="padding:14px">
-    <div class="legend">
-      <span><span class="dot" style="background:#5DCAA5"></span>Paid</span>
-      <span><span class="dot" style="background:#F09595"></span>Pending</span>
-      <span><span class="dot" style="background:#E8E7E1"></span>Future</span>
-    </div>
-    ${members.map(m=>`
-      <div class="heatmap-row">
-        <div class="hmap-name">${m.name.split(/[\s\/]/)[0]}</div>
-        <div class="hmap-dots">${MONTHS.map((_,i)=>{
-          const future=i>=CURRENT_MONTH;
-          const paid=payments.find(p=>p.memberId===m.id&&p.month===i);
-          return `<div class="hmap-dot" style="background:${future?'#E8E7E1':paid?'#5DCAA5':'#F09595'}"></div>`;
-        }).join('')}</div>
-      </div>`).join('')}
-    <div class="heatmap-row" style="margin-top:6px">
-      <div></div>
-      <div class="hmap-dots">${MONTHS.map(m=>`<div style="font-size:9px;color:#6A6A65;text-align:center">${m[0]}</div>`).join('')}</div>
-    </div>
-  </div>`;
-}
-
-// ─── MEMBERS ──────────────────────────────────────
-function renderMembers() {
-  const owners = members.filter(m=>m.type==='owner').length;
-  const tenants = members.length-owners;
-  return `
-  <div class="stats-grid three">
-    <div class="stat-card compact"><div class="stat-label">Total</div><div class="stat-val muted">${members.length}</div></div>
-    <div class="stat-card compact"><div class="stat-label">Owners</div><div class="stat-val green">${owners}</div></div>
-    <div class="stat-card compact"><div class="stat-label">Tenants</div><div class="stat-val amber">${tenants}</div></div>
-  </div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">All members</span><button class="btn sm primary" onclick="openAddMember()"><i class="ti ti-plus"></i> Add</button></div>
-    <div class="search-wrap"><input type="search" placeholder="Search name or flat..." oninput="filterList(this.value)" id="msearch"></div>
-    <div id="mlist">${members.map(m=>`
-      <div class="member-row" id="mr${m.id}" onclick="openMemberDetail('${m.id}')">
-        <div class="avatar ${m.type==='rented'?'rented':''}">${initials(m.name)}</div>
-        <div class="member-info">
-          <div class="member-name">${m.name} <span class="badge ${m.type}">${m.type==='owner'?'Owner':'Tenant'}</span></div>
-          <div class="member-flat">Flat ${m.flat}${m.phone?' · '+m.phone:''}</div>
-        </div>
-        <span class="badge ${isPaidThisMonth(m.id)?'paid':'unpaid'}">${isPaidThisMonth(m.id)?'Current':'Pending'}</span>
-        <i class="ti ti-chevron-right" style="font-size:18px;color:#ABABA3;margin-left:4px"></i>
-      </div>`).join('')}
-    </div>
-  </div>`;
-}
-
-window.filterList = function(q) {
-  members.forEach(m=>{
-    const row=document.getElementById('mr'+m.id);
-    if(!row) return;
-    row.style.display=(m.name.toLowerCase().includes(q.toLowerCase())||m.flat.includes(q))?'':'none';
-  });
-};
-
-// ─── PAYMENTS ─────────────────────────────────────
-function renderPayments() {
-  const sorted=[...payments].sort((a,b)=>b.id.localeCompare(a.id));
-  const cashTotal=payments.filter(p=>p.mode==='cash').reduce((s,p)=>s+p.amount,0);
-  const bankTotal=payments.filter(p=>p.mode==='bank').reduce((s,p)=>s+p.amount,0);
-  return `
-  <div class="stats-grid">
-    <div class="stat-card compact"><div class="stat-label"><i class="ti ti-cash"></i>Cash</div><div class="stat-val amber">${rupee(cashTotal)}</div></div>
-    <div class="stat-card compact"><div class="stat-label"><i class="ti ti-building-bank"></i>Bank</div><div class="stat-val blue">${rupee(bankTotal)}</div></div>
-  </div>
-  <div class="section-label">${payments.length} records</div>
-  <div class="card">
-    ${sorted.length===0?`<div class="empty"><i class="ti ti-receipt"></i>No payments yet</div>`:
-    sorted.map(p=>{
-      const m=getMember(p.memberId);
-      return `<div class="pay-row" onclick="openPaymentDetail('${p.id}')">
-        <div class="pay-top"><span class="pay-name">${m?m.name:'Unknown'}</span><span class="pay-amt">${rupee(p.amount)}</span></div>
-        <div class="pay-sub">
-          <span class="pay-info">Flat ${m?m.flat:'—'} · ${MONTHS[p.month]} · #${p.receipt}<span class="pay-mode-tag ${p.mode||'cash'}">${(p.mode||'cash').toUpperCase()}</span></span>
-          <span class="pay-info">${formatDate(p.date)}</span>
-        </div>
-      </div>`;
-    }).join('')}
-  </div>`;
-}
-
-// ─── DUES ─────────────────────────────────────────
-function renderDues() {
-  const dueList=[];
-  members.forEach(m=>{const d=getMemberDueMonths(m.id);if(d.length>0)dueList.push({m,months:d});});
-  const overdue3=dueList.filter(d=>d.months.length>=3);
-  const totalDueAmt=dueList.reduce((s,d)=>s+d.months.length*MONTHLY_AMT,0);
-  return `
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-label">Total outstanding</div><div class="stat-val red">${rupee(totalDueAmt)}</div></div>
-    <div class="stat-card"><div class="stat-label">Members with dues</div><div class="stat-val amber">${dueList.length}</div></div>
-  </div>
-  ${overdue3.length?`
-  <div class="section-label" style="color:#A32D2D">⚠️ Critical: 3+ months overdue</div>
-  <div class="card" style="border-color:#F09595">
-    ${overdue3.map(d=>`<div class="due-row" style="background:#FFF7F5">
-      <div class="avatar" style="background:#FCEBEB;color:#A32D2D">${initials(d.m.name)}</div>
-      <div class="due-info"><div class="due-name">${d.m.name}</div><div class="due-sub">Flat ${d.m.flat} · ${d.months.length} months · ${rupee(d.months.length*MONTHLY_AMT)}</div></div>
-      <button class="btn sm" style="background:#A32D2D;color:#fff;border-color:#A32D2D" onclick="sendOverdueWarn('${d.m.id}')"><i class="ti ti-brand-whatsapp"></i> Warn</button>
-    </div>`).join('')}
-  </div>`:''}
-  <div class="section-label">All dues</div>
-  <div class="card">
-    ${dueList.length===0?`<div class="empty"><i class="ti ti-circle-check"></i>All dues cleared! 🎉</div>`:
-    dueList.map(d=>`<div class="due-row">
-      <div class="avatar ${d.m.type==='rented'?'rented':''}">${initials(d.m.name)}</div>
-      <div class="due-info"><div class="due-name">${d.m.name}</div><div class="due-sub">Flat ${d.m.flat} · ${d.months.length} month(s) · ${d.months.map(mo=>MONTHS[mo]).join(', ')}</div></div>
-      <button class="btn sm icon-only whatsapp" onclick="sendReminder('${d.m.id}')"><i class="ti ti-brand-whatsapp"></i></button>
-      <button class="btn sm primary" onclick="openPaymentModalFor('${d.m.id}',${d.months[0]})">Collect</button>
-    </div>`).join('')}
-  </div>`;
-}
-
-// ─── EXPENSES ─────────────────────────────────────
-function renderExpenses() {
-  const sorted=[...expenses].sort((a,b)=>b.id.localeCompare(a.id));
-  const total=totalExpenses();
-  const collected=totalCollected();
-  return `
-  <div class="stats-grid three">
-    <div class="stat-card compact"><div class="stat-label">Collected</div><div class="stat-val green">${rupee(collected)}</div></div>
-    <div class="stat-card compact"><div class="stat-label">Spent</div><div class="stat-val red">${rupee(total)}</div></div>
-    <div class="stat-card compact"><div class="stat-label">Net</div><div class="stat-val ${collected-total>=0?'green':'red'}">${rupee(collected-total)}</div></div>
-  </div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">Expenses</span><button class="btn sm primary" onclick="openExpenseModal()"><i class="ti ti-plus"></i> Add</button></div>
-    ${sorted.length===0?`<div class="empty"><i class="ti ti-cash"></i>No expenses yet.<br><small>Track watchman, cleaning, electricity etc.</small></div>`:
-    sorted.map(e=>`<div class="expense-row" onclick="openExpenseDetail('${e.id}')">
-      <div class="expense-icon"><i class="ti ti-${e.icon||'cash'}"></i></div>
-      <div class="expense-info"><div class="expense-title">${e.title}</div><div class="expense-sub">${e.category} · ${formatDate(e.date)}</div></div>
-      <div class="expense-amt">-${rupee(e.amount)}</div>
-    </div>`).join('')}
-  </div>`;
-}
-
-// ─── LEDGER SYSTEM v4 ────────────────────────────
-let bsSearch = '';
-let bsView = 'all'; // all, income, expense, bank, cash
-const CATEGORIES = ['Maintenance','Repair Fund','Penalty','Water Charges','Electricity','Salary','Stationery','Cleaning','Other'];
-
-function renderBalanceSheet() {
-  const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const monthKey=`${bsYear}-${String(bsMonth+1).padStart(2,'0')}`;
-  const allE=balanceSheetEntries.filter(e=>e.monthKey===monthKey);
-
-  // Opening balances (stored in settings or default 0)
-  const openBank=cashInHand?0:bankBalance; // use bankBalance as opening if no separate field
-  const openCash=cashInHand||0;
-  // We'll use separate opening fields from settings
-  const obKey=`ob_${monthKey}`;
-
-  // Filter entries
-  let entries=[...allE];
-  if(bsSearch){const q=bsSearch.toLowerCase();entries=entries.filter(e=>e.name.toLowerCase().includes(q)||( e.category||'').toLowerCase().includes(q))}
-  if(bsView==='income')entries=entries.filter(e=>e.side==='income');
-  else if(bsView==='expense')entries=entries.filter(e=>e.side==='expense');
-  else if(bsView==='bank')entries=entries.filter(e=>(e.method||'cash')==='bank');
-  else if(bsView==='cash')entries=entries.filter(e=>(e.method||'cash')==='cash');
-  entries.sort((a,b)=>(a.date||'').localeCompare(b.date||'')||(a.createdAt||'').localeCompare(b.createdAt||''));
-
-  // Auto maintenance from payments
-  const mPays=payments.filter(p=>p.month===bsMonth);
-  const autoCashM=mPays.filter(p=>(p.mode||'cash')==='cash').reduce((s,p)=>s+p.amount,0);
-  const autoBankM=mPays.filter(p=>p.mode==='bank').reduce((s,p)=>s+p.amount,0);
-
-  // Calculations - ALL entries (not filtered)
-  const allIncome=allE.filter(e=>e.side==='income');
-  const allExpense=allE.filter(e=>e.side==='expense');
-
-  const bankIncTotal=allIncome.filter(e=>(e.method||'cash')==='bank').reduce((s,e)=>s+e.amount,0)+autoBankM;
-  const bankExpTotal=allExpense.filter(e=>(e.method||'cash')==='bank').reduce((s,e)=>s+e.amount,0);
-  const cashIncTotal=allIncome.filter(e=>(e.method||'cash')==='cash').reduce((s,e)=>s+e.amount,0)+autoCashM;
-  const cashExpTotal=allExpense.filter(e=>(e.method||'cash')==='cash').reduce((s,e)=>s+e.amount,0);
-
-  const closingBank=bankBalance+bankIncTotal-bankExpTotal;
-  const closingCash=cashInHand+cashIncTotal-cashExpTotal;
-  const totalInc=bankIncTotal+cashIncTotal;
-  const totalExp=bankExpTotal+cashExpTotal;
-  const netBal=totalInc-totalExp;
-  const totalFunds=closingBank+closingCash;
-
-  // Build table rows
-  function txRow(e){
-    const isInc=e.side==='income';
-    const isBank=(e.method||'cash')==='bank';
-    return `<div class="lg-row" onclick="openBSEntryDetail('${e.id}')">
-      <div class="lg-r-date">${e.date||'—'}</div>
-      <div class="lg-r-desc">${e.name}<small>${e.category||''}</small></div>
-      <div class="lg-r-type"><span class="lg-type-dot ${isInc?'inc':'exp'}" title="${isInc?'Income':'Expense'}"></span></div>
-      <div class="lg-r-mode">${isBank?'🏦':'💵'}</div>
-      <div class="lg-r-amt ${isInc?'inc':'exp'}">${isInc?'+':'-'}${rupee(e.amount)}</div>
-    </div>`;
-  }
-
-  // Auto rows for maintenance
-  function autoRows(){
-    let html='';
-    if(autoBankM>0&&(bsView==='all'||bsView==='income'||bsView==='bank')){
-      html+=`<div class="lg-row auto"><div class="lg-r-date">${MN[bsMonth]}</div><div class="lg-r-desc">Maint. Collection<small>Auto • Bank</small></div><div class="lg-r-type"><span class="lg-type-dot inc"></span></div><div class="lg-r-mode">🏦</div><div class="lg-r-amt inc">+${rupee(autoBankM)}</div></div>`;
-    }
-    if(autoCashM>0&&(bsView==='all'||bsView==='income'||bsView==='cash')){
-      html+=`<div class="lg-row auto"><div class="lg-r-date">${MN[bsMonth]}</div><div class="lg-r-desc">Maint. Collection<small>Auto • Cash</small></div><div class="lg-r-type"><span class="lg-type-dot inc"></span></div><div class="lg-r-mode">💵</div><div class="lg-r-amt inc">+${rupee(autoCashM)}</div></div>`;
-    }
-    return html;
-  }
-
-  const viewLabel={all:'All Transactions',income:'Income Only',expense:'Expenses Only',bank:'Bank Only',cash:'Cash Only'};
-  const viewColor={all:'all',income:'inc',expense:'exp',bank:'bnk',cash:'csh'};
-
-  return `<div class="lg">
-    <div class="lg-top">
-      <div class="lg-title-row">
-        <div class="lg-title">${MN[bsMonth].toUpperCase()} ${bsYear} — Ledger</div>
-        <button class="lg-add-btn" onclick="openAddBSEntry('income','${monthKey}')"><i class="ti ti-plus"></i> ADD</button>
-      </div>
-
-      <!-- SUMMARY CARDS -->
-      <div class="lg-cards">
-        <div class="lg-card bank-open">
-          <div class="lg-card-label">🏦 Opening Bank</div>
-          <div class="lg-card-val" style="color:#185FA5">${rupee(bankBalance)}</div>
-        </div>
-        <div class="lg-card cash-open">
-          <div class="lg-card-label">💵 Opening Cash</div>
-          <div class="lg-card-val" style="color:#854F0B">${rupee(cashInHand)}</div>
-        </div>
-        <div class="lg-card total-inc">
-          <div class="lg-card-label"><i class="ti ti-trending-up" style="font-size:11px"></i> Total Income</div>
-          <div class="lg-card-val" style="color:#1D6B3E">${rupee(totalInc)}</div>
-        </div>
-        <div class="lg-card total-exp">
-          <div class="lg-card-label"><i class="ti ti-trending-down" style="font-size:11px"></i> Total Expense</div>
-          <div class="lg-card-val" style="color:#A32D2D">${rupee(totalExp)}</div>
-        </div>
-        <div class="lg-card bank-close">
-          <div class="lg-card-label">🏦 Closing Bank</div>
-          <div class="lg-card-val" style="color:#155230">${rupee(closingBank)}</div>
-        </div>
-        <div class="lg-card cash-close">
-          <div class="lg-card-label">💵 Closing Cash</div>
-          <div class="lg-card-val" style="color:#854F0B">${rupee(closingCash)}</div>
-        </div>
-        <div class="lg-card total-funds">
-          <div class="lg-card-label">💰 Total Available Funds</div>
-          <div class="lg-card-val">${rupee(totalFunds)}</div>
-        </div>
-      </div>
-
-      <!-- CONTROLS -->
-      <div class="lg-controls">
-        <input class="lg-search" placeholder="Search..." value="${bsSearch}" oninput="bsSearch=this.value;render()">
-        <div class="lg-month-nav">
-          <button onclick="bsChangeMonth(-1)">‹</button>
-          <span class="lg-month-label">${MN[bsMonth]} ${bsYear}</span>
-          <button onclick="bsChangeMonth(1)">›</button>
-        </div>
-      </div>
-
-      <!-- VIEW TABS -->
-      <div class="lg-tabs">
-        <button class="lg-tab ${bsView==='all'?'active':''}" onclick="bsSetView('all')">All</button>
-        <button class="lg-tab ${bsView==='income'?'active':''}" onclick="bsSetView('income')">Income</button>
-        <button class="lg-tab ${bsView==='expense'?'active':''}" onclick="bsSetView('expense')">Expense</button>
-        <button class="lg-tab ${bsView==='bank'?'active':''}" onclick="bsSetView('bank')">Bank</button>
-        <button class="lg-tab ${bsView==='cash'?'active':''}" onclick="bsSetView('cash')">Cash</button>
-      </div>
-    </div>
-
-    <div class="lg-body">
-      <!-- TRANSACTION TABLE -->
-      <div class="lg-table">
-        <div class="lg-th ${viewColor[bsView]}"><i class="ti ti-list"></i> ${viewLabel[bsView]} — ${MN[bsMonth]} ${bsYear}</div>
-        <div class="lg-colh lg-colh-5">
-          <span>Date</span><span>Particulars</span><span>Type</span><span>Mode</span><span>Amount</span>
-        </div>
-        ${entries.map(e=>txRow(e)).join('')}
-        ${autoRows()}
-        ${entries.length===0&&autoCashM===0&&autoBankM===0?`<div style="padding:24px;text-align:center;font-size:12px;color:#ABABA3;background:#fff">No transactions for ${MN[bsMonth]} ${bsYear}</div>`:''}
-        <div class="lg-add-row" onclick="openAddBSEntry('income','${monthKey}')">
-          <i class="ti ti-plus" style="font-size:13px"></i> Add Transaction
-        </div>
-        <div class="lg-tf ${viewColor[bsView]}">
-          <span>Net: ${rupee(netBal)}</span>
-          <span>${entries.length+(autoCashM>0?1:0)+(autoBankM>0?1:0)} entries</span>
-        </div>
-      </div>
-
-      <!-- BANK vs CASH SUMMARY -->
-      <div class="lg-summary-grid">
-        <div class="lg-sum-box">
-          <div class="lg-sum-header bnk">🏦 Bank Summary</div>
-          <div class="lg-sum-row"><span style="color:#6A6A65">Opening Balance</span><span style="font-weight:600">${rupee(bankBalance)}</span></div>
-          <div class="lg-sum-row"><span style="color:#1D6B3E">+ Bank Income</span><span style="font-weight:600;color:#1D6B3E">${rupee(bankIncTotal)}</span></div>
-          <div class="lg-sum-row"><span style="color:#A32D2D">- Bank Expense</span><span style="font-weight:600;color:#A32D2D">${rupee(bankExpTotal)}</span></div>
-          <div class="lg-sum-row closing"><span>Closing Balance</span><span style="color:#155230">${rupee(closingBank)}</span></div>
-        </div>
-        <div class="lg-sum-box">
-          <div class="lg-sum-header csh">💵 Cash Summary</div>
-          <div class="lg-sum-row"><span style="color:#6A6A65">Opening Balance</span><span style="font-weight:600">${rupee(cashInHand)}</span></div>
-          <div class="lg-sum-row"><span style="color:#1D6B3E">+ Cash Income</span><span style="font-weight:600;color:#1D6B3E">${rupee(cashIncTotal)}</span></div>
-          <div class="lg-sum-row"><span style="color:#A32D2D">- Cash Expense</span><span style="font-weight:600;color:#A32D2D">${rupee(cashExpTotal)}</span></div>
-          <div class="lg-sum-row closing csh"><span>Closing Balance</span><span style="color:#854F0B">${rupee(closingCash)}</span></div>
-        </div>
-      </div>
-
-      <!-- TOTAL AVAILABLE FUNDS -->
-      <div class="lg-sum-total">
-        <div class="lg-sum-total-label">Total Available Funds (Bank + Cash)</div>
-        <div class="lg-sum-total-val">${rupee(totalFunds)}</div>
-      </div>
-    </div>
-  </div>`;
-}
-
-window.bsSetView = function(view) { bsView = view; render(); };
-window.bsChangeMonth = function(dir) {
-  bsMonth+=dir;
-  if(bsMonth<0){bsMonth=11;bsYear--}
-  if(bsMonth>11){bsMonth=0;bsYear++}
-  bsSearch=''; bsView='all'; render();
-};
-
-window.openAddBSEntry = function(side, monthKey) {
-  document.getElementById('modal-root').innerHTML = `
-  <div class="modal-wrap" onclick="closeSheet(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">
-        <span><i class="ti ti-plus"></i> Add Transaction</span>
-        <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-      </div>
-      <div class="sheet-body">
-        <div class="field"><label>Date *</label>
-          <input type="text" id="bse-date" placeholder="e.g. 01-06-26" value="">
-        </div>
-        <div class="field"><label>Particulars / Description *</label>
-          <input type="text" id="bse-name" placeholder="e.g. Maintenance Collection, Electric Bill">
-        </div>
-        <div class="field"><label>Transaction Type *</label>
-          <div class="pay-mode-toggle">
-            <div class="pay-mode-btn ${side==='income'?'active':''}" id="bse-type-inc" onclick="selBSType('income')" style="border-color:#1D6B3E;${side==='income'?'background:#EAF3DE;color:#1D6B3E':''}"><i class="ti ti-trending-up"></i>Income</div>
-            <div class="pay-mode-btn ${side==='expense'?'active':''}" id="bse-type-exp" onclick="selBSType('expense')" style="border-color:#A32D2D;${side==='expense'?'background:#FCEBEB;color:#A32D2D':''}"><i class="ti ti-trending-down"></i>Expense</div>
-          </div>
-          <input type="hidden" id="bse-type" value="${side}">
-        </div>
-        <div class="field"><label>Payment Mode *</label>
-          <div class="pay-mode-toggle">
-            <div class="pay-mode-btn active" id="bse-mode-cash" onclick="selBSMode('cash')"><i class="ti ti-cash"></i>Cash</div>
-            <div class="pay-mode-btn" id="bse-mode-bank" onclick="selBSMode('bank')"><i class="ti ti-building-bank"></i>Bank</div>
-          </div>
-          <input type="hidden" id="bse-mode" value="cash">
-        </div>
-        <div class="field"><label>Category</label>
-          <select id="bse-cat">
-            ${CATEGORIES.map(c=>`<option>${c}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field"><label>Amount (₹) *</label>
-          <input type="number" id="bse-amt" inputmode="numeric" placeholder="0" style="font-size:20px;font-weight:600">
-        </div>
-        <div class="field"><label>Remarks / Notes</label>
-          <input type="text" id="bse-note" placeholder="Optional notes">
-        </div>
-        <div class="err" id="bse-err"></div>
-      </div>
-      <div class="sheet-footer">
-        <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-        <button class="btn primary" style="font-weight:600" onclick="saveBSEntry('${monthKey}')">Save Transaction</button>
-      </div>
-    </div>
-  </div>`;
-  setTimeout(()=>document.getElementById('bse-date')?.focus(),200);
-};
-
-window.selBSType = function(type) {
-  document.getElementById('bse-type').value=type;
-  const incBtn=document.getElementById('bse-type-inc');
-  const expBtn=document.getElementById('bse-type-exp');
-  incBtn.style.background=type==='income'?'#EAF3DE':'';
-  incBtn.style.color=type==='income'?'#1D6B3E':'';
-  incBtn.classList.toggle('active',type==='income');
-  expBtn.style.background=type==='expense'?'#FCEBEB':'';
-  expBtn.style.color=type==='expense'?'#A32D2D':'';
-  expBtn.classList.toggle('active',type==='expense');
-};
-window.selBSMode = function(mode) {
-  document.getElementById('bse-mode').value=mode;
-  document.getElementById('bse-mode-cash').classList.toggle('active',mode==='cash');
-  document.getElementById('bse-mode-bank').classList.toggle('active',mode==='bank');
-};
-
-window.saveBSEntry = async function(monthKey) {
-  const date=document.getElementById('bse-date').value.trim();
-  const name=document.getElementById('bse-name').value.trim();
-  const side=document.getElementById('bse-type').value;
-  const method=document.getElementById('bse-mode').value;
-  const cat=document.getElementById('bse-cat').value;
-  const amt=parseInt(document.getElementById('bse-amt').value);
-  const note=document.getElementById('bse-note').value.trim();
-  const err=document.getElementById('bse-err');
-  if(!date){err.textContent='Date is required';err.style.display='block';return}
-  if(!name){err.textContent='Description is required';err.style.display='block';return}
-  if(!side){err.textContent='Select Income or Expense';err.style.display='block';return}
-  if(!amt||amt<=0){err.textContent='Amount must be positive';err.style.display='block';return}
-  setSyncDot('syncing');
-  await setDoc(doc(db,'balanceEntries',newId('TX')),{
-    side,monthKey,name,date,dateLabel:date,amount:amt,category:cat,method,note,
-    sortOrder:balanceSheetEntries.filter(e=>e.monthKey===monthKey).length,
-    createdAt:new Date().toISOString()
-  });
-  setSyncDot('online');
-  closeSheetDirect();
-  showToast('Transaction saved ✓','success');
-};
-
-window.openBSEntryDetail = function(eid) {
-  const e=balanceSheetEntries.find(x=>x.id===eid);if(!e)return;
-  const isExp=e.side==='expense';
-  document.getElementById('modal-root').innerHTML=`
-  <div class="modal-wrap" onclick="closeSheet(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">Transaction #${e.id.slice(-6)}
-        <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-      </div>
-      <div class="sheet-body">
-        <div style="background:#F8F7F2;border-radius:12px;padding:16px;margin-bottom:14px">
-          <div style="font-size:17px;font-weight:600;margin-bottom:10px">${e.name}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:14px">
-            <div><span style="color:#6A6A65">Date:</span> ${e.date||'—'}</div>
-            <div><span style="color:#6A6A65">Type:</span> <span style="color:${isExp?'#A32D2D':'#1D6B3E'};font-weight:600">${isExp?'Expense':'Income'}</span></div>
-            <div><span style="color:#6A6A65">Mode:</span> ${e.method==='bank'?'🏦 Bank':'💵 Cash'}</div>
-            <div><span style="color:#6A6A65">Category:</span> ${e.category||'—'}</div>
-          </div>
-          ${e.note?`<div style="font-size:12px;color:#6A6A65;margin-bottom:14px;padding:8px;background:#fff;border-radius:6px">📝 ${e.note}</div>`:''}
-          <div style="font-size:26px;font-weight:700;color:${isExp?'#A32D2D':'#1D6B3E'}">${isExp?'- ':'+ '}${rupee(e.amount)}</div>
-        </div>
-      </div>
-      <div class="sheet-footer">
-        <button class="btn danger" onclick="deleteBSEntry('${eid}')"><i class="ti ti-trash"></i> Delete</button>
-        <button class="btn" onclick="editBSEntry('${eid}')"><i class="ti ti-edit"></i> Edit</button>
-        <button class="btn primary" onclick="closeSheetDirect()">Close</button>
-      </div>
-    </div>
-  </div>`;
-};
-
-window.editBSEntry = function(eid) {
-  const e=balanceSheetEntries.find(x=>x.id===eid);if(!e)return;
-  closeSheetDirect();
-  setTimeout(()=>{
-    document.getElementById('modal-root').innerHTML=`
-    <div class="modal-wrap" onclick="closeSheet(event)">
-      <div class="modal-sheet" onclick="event.stopPropagation()">
-        <div class="sheet-handle"></div>
-        <div class="sheet-title">Edit Transaction
-          <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-        </div>
-        <div class="sheet-body">
-          <div class="field"><label>Date</label><input type="text" id="ed-date" value="${e.date||''}"></div>
-          <div class="field"><label>Description</label><input type="text" id="ed-name" value="${(e.name||'').replace(/"/g,'&quot;')}"></div>
-          <div class="two-col">
-            <div class="field"><label>Type</label>
-              <select id="ed-type"><option value="income" ${e.side==='income'?'selected':''}>Income</option><option value="expense" ${e.side==='expense'?'selected':''}>Expense</option></select>
-            </div>
-            <div class="field"><label>Mode</label>
-              <select id="ed-mode"><option value="cash" ${(e.method||'cash')==='cash'?'selected':''}>Cash</option><option value="bank" ${e.method==='bank'?'selected':''}>Bank</option></select>
-            </div>
-          </div>
-          <div class="field"><label>Category</label>
-            <select id="ed-cat">${CATEGORIES.map(c=>`<option ${e.category===c?'selected':''}>${c}</option>`).join('')}</select>
-          </div>
-          <div class="field"><label>Amount (₹)</label><input type="number" id="ed-amt" inputmode="numeric" value="${e.amount}"></div>
-          <div class="field"><label>Notes</label><input type="text" id="ed-note" value="${(e.note||'').replace(/"/g,'&quot;')}"></div>
-          <div class="err" id="ed-err"></div>
-        </div>
-        <div class="sheet-footer">
-          <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-          <button class="btn primary" onclick="updateBSEntry('${eid}')">Save</button>
-        </div>
-      </div>
-    </div>`;
-  },100);
-};
-
-window.updateBSEntry = async function(eid) {
-  const date=document.getElementById('ed-date').value.trim();
-  const name=document.getElementById('ed-name').value.trim();
-  const side=document.getElementById('ed-type').value;
-  const method=document.getElementById('ed-mode').value;
-  const cat=document.getElementById('ed-cat').value;
-  const amt=parseInt(document.getElementById('ed-amt').value);
-  const note=document.getElementById('ed-note').value.trim();
-  const err=document.getElementById('ed-err');
-  if(!name){err.textContent='Description required';err.style.display='block';return}
-  if(!amt||amt<=0){err.textContent='Valid amount required';err.style.display='block';return}
-  setSyncDot('syncing');
-  const e=balanceSheetEntries.find(x=>x.id===eid);
-  await setDoc(doc(db,'balanceEntries',eid),{
-    ...e,side,name,date,dateLabel:date,amount:amt,category:cat,method,note
-  });
-  setSyncDot('online');
-  closeSheetDirect();
-  showToast('Transaction updated ✓','success');
-};
-
-window.deleteBSEntry = async function(eid) {
-  const e=balanceSheetEntries.find(x=>x.id===eid);
-  if(!confirm('Delete "'+e.name+'"?'))return;
-  setSyncDot('syncing');
-  await deleteDoc(doc(db,'balanceEntries',eid));
-  setSyncDot('online');
-  closeSheetDirect();
-  showToast('Deleted','error');
-};
-
-// ─── PAYMENT MODAL
-
-
-
-
-// ─── PAYMENT MODAL ────────────────────────────────
-window.openBankModal = window.openBankModal || function(){};
-window.openPaymentModal = function() { openPaymentModalFor(null,null); };
-window.openPaymentModalFor = function(memberId, month) {
-  const today = new Date().toISOString().split('T')[0];
-  currentAttachment = null;
-  const nxt = 270 + payments.length;
-  document.getElementById('modal-root').innerHTML = `
-  <div class="modal-wrap" onclick="closeSheet(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">Record payment <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
-      <div class="sheet-body">
-        <div class="field"><label>Member</label>
-          <select id="pm-m"><option value="">Select member...</option>
-            ${members.map(m=>`<option value="${m.id}"${memberId===m.id?' selected':''}>${m.name} - Flat ${m.flat}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field"><label>Payment mode</label>
-          <div class="pay-mode-toggle">
-            <div class="pay-mode-btn active" id="pm-mode-cash" onclick="selMode('cash')"><i class="ti ti-cash"></i>Cash</div>
-            <div class="pay-mode-btn" id="pm-mode-bank" onclick="selMode('bank')"><i class="ti ti-building-bank"></i>Bank Transfer</div>
-          </div>
-          <input type="hidden" id="pm-mode" value="cash">
-        </div>
-        <div class="two-col">
-          <div class="field"><label>Month</label>
-            <select id="pm-mo">
-              ${MONTHS.slice(0,CURRENT_MONTH).map((mo,i)=>`<option value="${i}"${(month===i||(month===null&&i===CURRENT_MONTH-1))?' selected':''}>${mo} 2026</option>`).join('')}
-            </select>
-          </div>
-          <div class="field"><label>Amount (\u20B9)</label><input type="number" id="pm-amt" value="${MONTHLY_AMT}" inputmode="numeric"></div>
-        </div>
-        <div class="two-col">
-          <div class="field"><label>Receipt no.</label><input type="text" id="pm-rec" value="${nxt}"></div>
-          <div class="field"><label>Date</label><input type="date" id="pm-dt" value="${today}"></div>
-        </div>
-        <div class="field"><label>Note (optional)</label><input type="text" id="pm-note" placeholder="e.g. Late payment"></div>
-        <div class="field"><label>Attachment (optional)</label>
-          <div class="attachment-zone" id="pm-att-zone" onclick="document.getElementById('pm-file').click()">
-            <i class="ti ti-camera-plus"></i>
-            <div style="font-size:13px;font-weight:500">Attach screenshot or photo</div>
-          </div>
-          <input type="file" id="pm-file" accept="image/*" style="display:none" onchange="handleAtt(event,'pm-att-zone')">
-        </div>
-        <div class="err" id="pm-err"></div>
-      </div>
-      <div class="sheet-footer">
-        <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-        <button class="btn primary" onclick="doSavePayment()">Save</button>
-      </div>
-    </div>
-  </div>`;
-};
-
-window.selMode = function(mode) {
-  document.getElementById('pm-mode').value=mode;
-  document.getElementById('pm-mode-cash').classList.toggle('active',mode==='cash');
-  document.getElementById('pm-mode-bank').classList.toggle('active',mode==='bank');
-};
-
-window.handleAtt = function(e, zoneId) {
-  const file=e.target.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    currentAttachment=ev.target.result;
-    const zone=document.getElementById(zoneId);
-    zone.classList.add('has-file');
-    zone.innerHTML=`<i class="ti ti-photo-check"></i><div style="font-size:13px;font-weight:500">Attached ✓</div><img src="${ev.target.result}" class="attachment-preview">`;
-  };
-  reader.readAsDataURL(file);
-};
-
-window.doSavePayment = async function() {
-  const mid=document.getElementById('pm-m').value;
-  const mo=parseInt(document.getElementById('pm-mo').value);
-  const amt=parseInt(document.getElementById('pm-amt').value);
-  const rec=document.getElementById('pm-rec').value.trim();
-  const dt=document.getElementById('pm-dt').value;
-  const mode=document.getElementById('pm-mode').value;
-  const note=document.getElementById('pm-note').value.trim();
-  const err=document.getElementById('pm-err');
-  if(!mid){err.textContent='Please select a member';err.style.display='block';return;}
-  if(!amt||amt<=0){err.textContent='Enter valid amount';err.style.display='block';return;}
-  if(payments.find(p=>p.memberId===mid&&p.month===mo)){err.textContent='Already recorded for this month';err.style.display='block';return;}
-  const pid=newId('P');
-  const newPay={id:pid,memberId:mid,month:mo,amount:amt,receipt:rec,date:dt,mode,note,attachment:currentAttachment};
-  if(mode==='bank'){bankBalance+=amt;await saveBankBalance(bankBalance);}
-  await savePaymentFS(newPay);
-  closeSheetDirect();
-  showToast('Payment saved \u2713','success');
-  setTimeout(()=>offerReceipt(pid),300);
-};
-
-function offerReceipt(pid) {
-  const p=payments.find(x=>x.id===pid)||{id:pid};
-  if(!p.memberId) return;
-  const m=getMember(p.memberId);
-  document.getElementById('modal-root').innerHTML=`
-  <div class="modal-wrap" onclick="closeSheet(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">Send receipt? <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
-      <div class="sheet-body">
-        <div style="text-align:center;padding:10px 0 16px">
-          <div style="display:inline-flex;width:60px;height:60px;border-radius:50%;background:#EAF3DE;align-items:center;justify-content:center;margin-bottom:10px"><i class="ti ti-circle-check" style="font-size:32px;color:#0F6E56"></i></div>
-          <div style="font-size:15px;font-weight:600;margin-bottom:4px">Payment recorded!</div>
-          <div style="font-size:13px;color:#6A6A65">${rupee(p.amount||MONTHLY_AMT)} from ${m?m.name:'Member'}</div>
-        </div>
-        ${!m?.phone?`<div class="err" style="display:block">⚠️ No phone saved for this member.</div>`:''}
-      </div>
-      <div class="sheet-footer">
-        <button class="btn" onclick="closeSheetDirect()">Skip</button>
-        <button class="btn whatsapp" onclick="sendReceipt('${pid}')"><i class="ti ti-brand-whatsapp"></i> Send Receipt</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-window.sendReceipt = function(pid) {
-  const p=payments.find(x=>x.id===pid); if(!p) return;
-  const m=getMember(p.memberId);
-  sendWA(m?.phone, buildReceiptMsg(p));
-  closeSheetDirect();
-};
-window.sendHistory = function(mid) { const m=getMember(mid); sendWA(m?.phone,buildHistoryMsg(mid)); };
-window.sendReminder = function(mid) { const m=getMember(mid); sendWA(m?.phone,buildReminderMsg(mid)); };
-window.sendOverdueWarn = function(mid) {
-  const m=getMember(mid);
-  if(!confirm(`Send water-cut warning to ${m.name}?`)) return;
-  sendWA(m?.phone,buildOverdueMsg(mid));
-};
-
-// ─── PAYMENT DETAIL ───────────────────────────────
-window.openPaymentDetail = function(pid) {
-  const p=getPayment(pid); const m=getMember(p.memberId);
-  document.getElementById('modal-root').innerHTML=`
-  <div class="modal-wrap" onclick="closeSheet(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">Payment details <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
-      <div class="sheet-body">
-        <div class="receipt-preview">
-          <div class="head">Receipt #${p.receipt}</div>
-          <div class="summary-row"><span style="color:#6A6A65">Member</span><span style="font-weight:500">${m?.name}</span></div>
-          <div class="summary-row"><span style="color:#6A6A65">Flat</span><span>${m?.flat}</span></div>
-          <div class="summary-row"><span style="color:#6A6A65">Period</span><span>${MONTHS[p.month]} 2026</span></div>
-          <div class="summary-row"><span style="color:#6A6A65">Date</span><span>${formatDate(p.date)}</span></div>
-          <div class="summary-row"><span style="color:#6A6A65">Mode</span><span class="pay-mode-tag ${p.mode||'cash'}">${(p.mode||'cash').toUpperCase()}</span></div>
-          ${p.note?`<div class="summary-row"><span style="color:#6A6A65">Note</span><span>${p.note}</span></div>`:''}
-          <div class="summary-row total"><span>Amount</span><span style="color:#0F6E56">${rupee(p.amount)}</span></div>
-        </div>
-        ${p.attachment?`<img src="${p.attachment}" style="width:100%;border-radius:10px;border:1px solid #E8E7E1">`:''} 
-      </div>
-      <div class="sheet-footer">
-        <button class="btn danger" onclick="doDeletePayment('${pid}')"><i class="ti ti-trash"></i></button>
-        <button class="btn whatsapp" onclick="sendReceipt('${pid}')"><i class="ti ti-brand-whatsapp"></i> Send</button>
-        <button class="btn primary" onclick="closeSheetDirect()">Close</button>
-      </div>
-    </div>
-  </div>`;
-};
-
-window.doDeletePayment = async function(pid) {
-  const p=getPayment(pid); const m=getMember(p.memberId);
-  if(!confirm(`Delete payment of ${rupee(p.amount)} from ${m?.name}?`)) return;
-  await deletePaymentFS(pid);
-  closeSheetDirect(); render(); showToast('Payment deleted','error');
-};
-
-// ─── MEMBER MODALS ────────────────────────────────
-window.openAddMember = function() {
-  document.getElementById('modal-root').innerHTML=`
-  <div class="modal-wrap" onclick="closeSheet(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">Add member <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
-      <div class="sheet-body">
-        <div class="field"><label>Full name *</label><input type="text" id="nm-name" placeholder="Member name"></div>
-        <div class="two-col">
-          <div class="field"><label>Flat no. *</label><input type="text" id="nm-flat" inputmode="numeric" placeholder="e.g. 313"></div>
-          <div class="field"><label>Phone (WhatsApp)</label><input type="tel" id="nm-ph" inputmode="tel" placeholder="10 digit"></div>
-        </div>
-        <div class="field"><label>Type *</label>
-          <div class="pay-mode-toggle">
-            <div class="pay-mode-btn active" id="nm-t-owner" onclick="selNMType('owner')"><i class="ti ti-home"></i>Owner</div>
-            <div class="pay-mode-btn" id="nm-t-rented" onclick="selNMType('rented')"><i class="ti ti-key"></i>Tenant</div>
-          </div>
-          <input type="hidden" id="nm-type" value="owner">
-        </div>
-        <div class="err" id="nm-err"></div>
-      </div>
-      <div class="sheet-footer">
-        <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-        <button class="btn primary" onclick="doSaveMember()">Add</button>
-      </div>
-    </div>
-  </div>`;
-  setTimeout(()=>document.getElementById('nm-name')?.focus(),250);
-};
-
-window.selNMType = function(t) {
-  document.getElementById('nm-type').value=t;
-  document.getElementById('nm-t-owner').classList.toggle('active',t==='owner');
-  document.getElementById('nm-t-rented').classList.toggle('active',t==='rented');
-};
-
-window.doSaveMember = async function() {
-  const name=document.getElementById('nm-name').value.trim();
-  const flat=document.getElementById('nm-flat').value.trim();
-  const ph=document.getElementById('nm-ph').value.trim();
-  const type=document.getElementById('nm-type').value;
-  const err=document.getElementById('nm-err');
-  if(!name){err.textContent='Name required';err.style.display='block';return;}
-  if(!flat){err.textContent='Flat number required';err.style.display='block';return;}
-  if(members.some(m=>m.flat===flat)){err.textContent='Flat '+flat+' already registered';err.style.display='block';return;}
-  const mid=newId('M');
-  await saveMemberFS({id:mid,name,flat,phone:ph,type});
-  closeSheetDirect(); showToast('Member added \u2713','success');
-};
-
-window.openMemberDetail = function(mid) {
-  const m=getMember(mid); const mp=getMemberPay(mid);
-  const totalPaid=mp.reduce((s,p)=>s+p.amount,0);
-  const due=getMemberDueMonths(mid);
-  document.getElementById('modal-root').innerHTML=`
-  <div class="modal-wrap" onclick="closeSheet(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title" style="padding-bottom:16px">
-        <div style="display:flex;align-items:center;gap:12px">
-          <div class="avatar ${m.type==='rented'?'rented':''}" style="width:42px;height:42px;font-size:14px">${initials(m.name)}</div>
-          <div><div style="font-size:15px;font-weight:600">${m.name}</div><div style="font-size:12px;color:#6A6A65">Flat ${m.flat} · <span class="badge ${m.type}">${m.type==='owner'?'Owner':'Tenant'}</span></div></div>
-        </div>
-        <div style="display:flex;gap:6px">
-          <button class="btn icon-only sm" onclick="openEditMember('${mid}')"><i class="ti ti-edit"></i></button>
-          <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button>
-        </div>
-      </div>
-      <div class="sheet-body">
-        <div class="stats-grid" style="margin-bottom:14px">
-          <div class="stat-card compact"><div class="stat-label">Total paid</div><div class="stat-val green">${rupee(totalPaid)}</div></div>
-          <div class="stat-card compact"><div class="stat-label">Pending</div><div class="stat-val ${due.length>0?'red':'green'}">${rupee(due.length*MONTHLY_AMT)}</div></div>
-        </div>
-        <div class="hmap-dots" style="margin-bottom:18px">
-          ${MONTHS.map((_,i)=>{
-            const future=i>=CURRENT_MONTH; const paid=mp.find(p=>p.month===i);
-            return `<div style="text-align:center"><div style="font-size:10px;color:#6A6A65;margin-bottom:3px">${MONTHS[i][0]}</div><div style="height:20px;border-radius:3px;background:${future?'#E8E7E1':paid?'#5DCAA5':'#F09595'}"></div></div>`;
-          }).join('')}
-        </div>
-        ${MONTHS.slice(0,CURRENT_MONTH).map((mo,i)=>{
-          const p=mp.find(x=>x.month===i);
-          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #F0EFE9">
-            <div><div style="font-size:14px;font-weight:500">${mo} 2026</div>
-            ${p?`<div style="font-size:11px;color:#6A6A65">#${p.receipt} · ${formatDate(p.date)} <span class="pay-mode-tag ${p.mode||'cash'}">${(p.mode||'cash').toUpperCase()}</span></div>`:'<div style="font-size:11px;color:#A32D2D">Pending</div>'}</div>
-            ${p?`<span style="font-size:15px;font-weight:600;color:#0F6E56">${rupee(p.amount)}</span>`:`<button class="btn sm primary" onclick="closeSheetDirect();openPaymentModalFor('${mid}',${i})">Collect</button>`}
-          </div>`;
-        }).join('')}
-        <div style="display:flex;justify-content:space-between;padding:14px 0 6px;font-size:14px">
-          <span style="color:#6A6A65">Total paid</span><span style="font-weight:600;color:#0F6E56;font-size:16px">${rupee(totalPaid)}</span>
-        </div>
-      </div>
-      <div class="sheet-footer">
-        <button class="btn whatsapp" onclick="sendHistory('${mid}')"><i class="ti ti-brand-whatsapp"></i> Summary</button>
-        <button class="btn primary" onclick="closeSheetDirect();openPaymentModalFor('${mid}')"><i class="ti ti-plus"></i> Record</button>
-      </div>
-    </div>
-  </div>`;
-};
-
-window.openEditMember = function(mid) {
-  const m=getMember(mid); closeSheetDirect();
-  setTimeout(()=>{
-    document.getElementById('modal-root').innerHTML=`
-    <div class="modal-wrap" onclick="closeSheet(event)">
-      <div class="modal-sheet" onclick="event.stopPropagation()">
-        <div class="sheet-handle"></div>
-        <div class="sheet-title">Edit member <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
-        <div class="sheet-body">
-          <div class="field"><label>Full name *</label><input type="text" id="em-name" value="${m.name.replace(/"/g,'&quot;')}"></div>
-          <div class="two-col">
-            <div class="field"><label>Flat no. *</label><input type="text" id="em-flat" value="${m.flat}" inputmode="numeric"></div>
-            <div class="field"><label>Phone</label><input type="tel" id="em-ph" value="${m.phone||''}" placeholder="WhatsApp number"></div>
-          </div>
-          <div class="field"><label>Type *</label>
-            <div class="pay-mode-toggle">
-              <div class="pay-mode-btn ${m.type==='owner'?'active':''}" id="em-t-owner" onclick="selEMType('owner')"><i class="ti ti-home"></i>Owner</div>
-              <div class="pay-mode-btn ${m.type==='rented'?'active':''}" id="em-t-rented" onclick="selEMType('rented')"><i class="ti ti-key"></i>Tenant</div>
-            </div>
-            <input type="hidden" id="em-type" value="${m.type}">
-          </div>
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #E8E7E1">
-            <button class="btn danger" style="width:100%" onclick="doDeleteMember('${mid}')"><i class="ti ti-trash"></i> Delete this member</button>
-            <div style="font-size:11px;color:#6A6A65;text-align:center;margin-top:6px">All payment history will be deleted</div>
-          </div>
-          <div class="err" id="em-err"></div>
-        </div>
-        <div class="sheet-footer">
-          <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-          <button class="btn primary" onclick="doUpdateMember('${mid}')">Save changes</button>
-        </div>
-      </div>
-    </div>`;
-  },100);
-};
-
-window.selEMType = function(t) {
-  document.getElementById('em-type').value=t;
-  document.getElementById('em-t-owner').classList.toggle('active',t==='owner');
-  document.getElementById('em-t-rented').classList.toggle('active',t==='rented');
-};
-
-window.doUpdateMember = async function(mid) {
-  const name=document.getElementById('em-name').value.trim();
-  const flat=document.getElementById('em-flat').value.trim();
-  const ph=document.getElementById('em-ph').value.trim();
-  const type=document.getElementById('em-type').value;
-  const err=document.getElementById('em-err');
-  if(!name){err.textContent='Name required';err.style.display='block';return;}
-  if(!flat){err.textContent='Flat required';err.style.display='block';return;}
-  if(members.some(x=>x.flat===flat&&x.id!==mid)){err.textContent='Flat '+flat+' already taken';err.style.display='block';return;}
-  await saveMemberFS({id:mid,name,flat,phone:ph,type});
-  closeSheetDirect(); showToast('Member updated \u2713','success');
-};
-
-window.doDeleteMember = async function(mid) {
-  const m=getMember(mid);
-  if(!confirm(`Delete ${m.name}?\n\nAll payment history will also be deleted.`)) return;
-  await deleteMemberFS(mid);
-  closeSheetDirect(); showToast('Member deleted','error');
-};
-
-// ─── EXPENSE MODALS ───────────────────────────────
-window.openExpenseModal = function() {
-  currentAttachment=null;
-  const today=new Date().toISOString().split('T')[0];
-  document.getElementById('modal-root').innerHTML=`
-  <div class="modal-wrap" onclick="closeSheet(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">Add expense <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
-      <div class="sheet-body">
-        <div class="field"><label>Title *</label><input type="text" id="ex-title" placeholder="e.g. Watchman salary - May"></div>
-        <div class="two-col">
-          <div class="field"><label>Category</label>
-            <select id="ex-cat">
-              <option>Salary</option><option>Cleaning</option><option>Electricity</option>
-              <option>Water</option><option>Repairs</option><option>Security</option><option>Other</option>
-            </select>
-          </div>
-          <div class="field"><label>Amount (\u20B9) *</label><input type="number" id="ex-amt" inputmode="numeric"></div>
-        </div>
-        <div class="two-col">
-          <div class="field"><label>Date</label><input type="date" id="ex-dt" value="${today}"></div>
-          <div class="field"><label>Paid from</label>
-            <select id="ex-src"><option value="cash">Cash</option><option value="bank">Bank</option></select>
-          </div>
-        </div>
-        <div class="field"><label>Note</label><textarea id="ex-note" placeholder="Additional details"></textarea></div>
-        <div class="field"><label>Receipt photo</label>
-          <div class="attachment-zone" id="ex-att-zone" onclick="document.getElementById('ex-file').click()">
-            <i class="ti ti-camera-plus"></i><div style="font-size:13px;font-weight:500">Attach receipt</div>
-          </div>
-          <input type="file" id="ex-file" accept="image/*" style="display:none" onchange="handleAtt(event,'ex-att-zone')">
-        </div>
-        <div class="err" id="ex-err"></div>
-      </div>
-      <div class="sheet-footer">
-        <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-        <button class="btn primary" onclick="doSaveExpense()">Save</button>
-      </div>
-    </div>
-  </div>`;
-};
-
-window.doSaveExpense = async function() {
-  const title=document.getElementById('ex-title').value.trim();
-  const cat=document.getElementById('ex-cat').value;
-  const amt=parseInt(document.getElementById('ex-amt').value);
-  const dt=document.getElementById('ex-dt').value;
-  const src=document.getElementById('ex-src').value;
-  const note=document.getElementById('ex-note').value.trim();
-  const err=document.getElementById('ex-err');
-  if(!title){err.textContent='Title required';err.style.display='block';return;}
-  if(!amt||amt<=0){err.textContent='Valid amount required';err.style.display='block';return;}
-  const iconMap={Salary:'wallet',Cleaning:'spray',Electricity:'bolt',Water:'droplet',Repairs:'tools',Security:'shield',Other:'cash'};
-  const eid=newId('E');
-  const exp={id:eid,title,category:cat,amount:amt,date:dt,source:src,note,attachment:currentAttachment,icon:iconMap[cat]||'cash'};
-  if(src==='bank'){bankBalance-=amt;await saveBankBalance(bankBalance);}
-  await saveExpenseFS(exp);
-  closeSheetDirect(); showToast('Expense saved \u2713','success');
-};
-
-window.openExpenseDetail = function(eid) {
-  const e=expenses.find(x=>x.id===eid);
-  document.getElementById('modal-root').innerHTML=`
-  <div class="modal-wrap" onclick="closeSheet(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">Expense <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
-      <div class="sheet-body">
-        <div class="receipt-preview">
-          <div class="head">${e.title}</div>
-          <div class="summary-row"><span style="color:#6A6A65">Category</span><span>${e.category}</span></div>
-          <div class="summary-row"><span style="color:#6A6A65">Date</span><span>${formatDate(e.date)}</span></div>
-          <div class="summary-row"><span style="color:#6A6A65">Paid from</span><span>${e.source==='cash'?'Cash':'Bank'}</span></div>
-          ${e.note?`<div class="summary-row"><span style="color:#6A6A65">Note</span><span>${e.note}</span></div>`:''}
-          <div class="summary-row total"><span>Amount</span><span style="color:#A32D2D">-${rupee(e.amount)}</span></div>
-        </div>
-        ${e.attachment?`<img src="${e.attachment}" style="width:100%;border-radius:10px;border:1px solid #E8E7E1">`:''} 
-      </div>
-      <div class="sheet-footer">
-        <button class="btn danger" style="flex:1" onclick="doDeleteExpense('${eid}')"><i class="ti ti-trash"></i> Delete</button>
-        <button class="btn primary" style="flex:1" onclick="closeSheetDirect()">Close</button>
-      </div>
-    </div>
-  </div>`;
-};
-
-window.doDeleteExpense = async function(eid) {
-  const e=expenses.find(x=>x.id===eid);
-  if(!confirm(`Delete "${e.title}"?`)) return;
-  if(e.source==='bank'){bankBalance+=e.amount;await saveBankBalance(bankBalance);}
-  await deleteExpenseFS(eid);
-  closeSheetDirect(); showToast('Expense deleted','error');
-};
-
-// ─── BANK MODAL ───────────────────────────────────
-window.openBankModal = function openBankModal(action) {
-  const titles={add:'Add to bank',subtract:'Withdraw from bank',set:'Set bank balance'};
-  document.getElementById('modal-root').innerHTML=`
-  <div class="modal-wrap" onclick="closeSheet(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-handle"></div>
-      <div class="sheet-title">${titles[action]} <button onclick="closeSheetDirect()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div>
-      <div class="sheet-body">
-        <div style="text-align:center;padding:8px 0 16px">
-          <div style="font-size:11px;color:#6A6A65;margin-bottom:4px">Current balance</div>
-          <div style="font-size:24px;font-weight:600;color:#0F6E56">${rupee(bankBalance)}</div>
-        </div>
-        <div class="field"><label>Amount (\u20B9) *</label><input type="number" id="bk-amt" inputmode="numeric" placeholder="0"></div>
-        <div class="field"><label>Note</label><input type="text" id="bk-note" placeholder="${action==='add'?'e.g. Cash deposit':action==='subtract'?'e.g. Withdrawal':'e.g. Opening balance'}"></div>
-        <div class="err" id="bk-err"></div>
-      </div>
-      <div class="sheet-footer">
-        <button class="btn" onclick="closeSheetDirect()">Cancel</button>
-        <button class="btn primary" onclick="doUpdateBank('${action}')">${action==='set'?'Set':action==='add'?'Add':'Withdraw'}</button>
-      </div>
-    </div>
-  </div>`;
-  setTimeout(()=>document.getElementById('bk-amt')?.focus(),250);
-};
-
-window.doUpdateBank = async function(action) {
-  const amt=parseInt(document.getElementById('bk-amt').value);
-  const err=document.getElementById('bk-err');
-  if(!amt||amt<0){err.textContent='Enter valid amount';err.style.display='block';return;}
-  if(action==='add') bankBalance+=amt;
-  else if(action==='subtract') bankBalance-=amt;
-  else if(action==='set') bankBalance=amt;
-  await saveBankBalance(bankBalance);
-  closeSheetDirect(); showToast('Balance updated \u2713','success');
-};
-
-// ─── BACKUP ───────────────────────────────────────
-window.exportBackup = function() {
-  const data={members,payments,expenses,bankBalance,exportedAt:new Date().toISOString()};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url; a.download=`ruby-society-backup-${new Date().toISOString().split('T')[0]}.json`;
-  a.click(); URL.revokeObjectURL(url);
-  showToast('Backup downloaded \u2713','success');
-};
-
-// ─── UTILS ────────────────────────────────────────
-window.closeSheet = function(e) { if(e.target===e.currentTarget) closeSheetDirect(); };
-window.closeSheetDirect = function() { document.getElementById('modal-root').innerHTML=''; };
-
-function showToast(msg, type) {
-  const root=document.getElementById('toast-root');
-  root.innerHTML=`<div class="toast ${type||''}">${msg}</div>`;
-  setTimeout(()=>root.innerHTML='',2200);
-}
-window.showToast = showToast;
-
-// ─── START ────────────────────────────────────────
+// MODALS
+window.openAddTx=function(){const mkey=mk(bsMonth,bsYear);document.getElementById('modal-root').innerHTML=`<div class="modal-wrap" onclick="closeSheet(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="sheet-handle"></div><div class="sheet-title"><span>Add Transaction</span><button onclick="closeM()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div><div class="sheet-body"><div class="field"><label>Date *</label><input type="date" id="tx-date" value="${bsYear}-${String(bsMonth+1).padStart(2,'0')}-${String(new Date().getDate()).padStart(2,'0')}"></div><div class="field"><label>Particulars *</label><input type="text" id="tx-name" placeholder="e.g. Maintenance, Electric Bill"></div><div class="field"><label>Type *</label><div class="pay-mode-toggle"><div class="pay-mode-btn active" id="tx-t-inc" onclick="selTxType('income')" style="border-color:#1D6B3E"><i class="ti ti-trending-up" style="color:#1D6B3E"></i>Income</div><div class="pay-mode-btn" id="tx-t-exp" onclick="selTxType('expense')" style="border-color:#A32D2D"><i class="ti ti-trending-down" style="color:#A32D2D"></i>Expense</div></div><input type="hidden" id="tx-type" value="income"></div><div class="field"><label>Mode *</label><div class="pay-mode-toggle"><div class="pay-mode-btn active" id="tx-m-cash" onclick="selTxMode('cash')"><i class="ti ti-cash"></i>Cash</div><div class="pay-mode-btn" id="tx-m-bank" onclick="selTxMode('bank')"><i class="ti ti-building-bank"></i>Bank</div></div><input type="hidden" id="tx-mode" value="cash"></div><div class="field"><label>Category</label><select id="tx-cat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></div><div class="field"><label>Amount (\u20B9) *</label><input type="number" id="tx-amt" inputmode="numeric" placeholder="0" style="font-size:20px;font-weight:600"></div><div class="field"><label>Remarks</label><input type="text" id="tx-note" placeholder="Optional"></div><div class="err" id="tx-err"></div></div><div class="sheet-footer"><button class="btn" onclick="closeM()">Cancel</button><button class="btn primary" onclick="saveTx('${mkey}')">Save</button></div></div></div>`};
+window.selTxType=function(t){document.getElementById('tx-type').value=t;const i=document.getElementById('tx-t-inc'),e=document.getElementById('tx-t-exp');i.classList.toggle('active',t==='income');i.style.background=t==='income'?'#EAF3DE':'';i.style.color=t==='income'?'#1D6B3E':'';e.classList.toggle('active',t==='expense');e.style.background=t==='expense'?'#FCEBEB':'';e.style.color=t==='expense'?'#A32D2D':''};
+window.selTxMode=function(m){document.getElementById('tx-mode').value=m;document.getElementById('tx-m-cash').classList.toggle('active',m==='cash');document.getElementById('tx-m-bank').classList.toggle('active',m==='bank')};
+window.saveTx=async function(mkey){const date=document.getElementById('tx-date').value,name=document.getElementById('tx-name').value.trim(),side=document.getElementById('tx-type').value,method=document.getElementById('tx-mode').value,cat=document.getElementById('tx-cat').value,amt=parseInt(document.getElementById('tx-amt').value),note=document.getElementById('tx-note').value.trim(),err=document.getElementById('tx-err');if(!date){err.textContent='Date required';err.style.display='block';return}if(!name){err.textContent='Description required';err.style.display='block';return}if(!amt||amt<=0){err.textContent='Amount must be positive';err.style.display='block';return}setSyncDot('syncing');await setDoc(doc(db,'balanceEntries',newId('TX')),{side,monthKey:mkey,name,date,amount:amt,category:cat,method,note,createdAt:new Date().toISOString()});setSyncDot('online');closeM();showToast('Saved \u2713','success')};
+window.openTxDetail=function(id){const t=transactions.find(x=>x.id===id);if(!t)return;const isE=t.side==='expense';document.getElementById('modal-root').innerHTML=`<div class="modal-wrap" onclick="closeSheet(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="sheet-handle"></div><div class="sheet-title">Transaction<button onclick="closeM()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div><div class="sheet-body"><div style="background:#F8F7F2;border-radius:12px;padding:16px"><div style="font-size:16px;font-weight:600;margin-bottom:8px">${t.name}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;margin-bottom:12px"><div><span style="color:#6A6A65">Date:</span> ${t.date||'\u2014'}</div><div><span style="color:#6A6A65">Type:</span> <span style="color:${isE?'#A32D2D':'#1D6B3E'};font-weight:600">${isE?'Expense':'Income'}</span></div><div><span style="color:#6A6A65">Mode:</span> ${t.method==='bank'?'🏦 Bank':'💵 Cash'}</div><div><span style="color:#6A6A65">Category:</span> ${t.category||'\u2014'}</div></div>${t.note?`<div style="font-size:12px;color:#6A6A65;padding:8px;background:#fff;border-radius:6px;margin-bottom:12px">\ud83d\udcdd ${t.note}</div>`:''}<div style="font-size:26px;font-weight:700;color:${isE?'#A32D2D':'#1D6B3E'}">${isE?'- ':'+ '}${rupee(t.amount)}</div></div></div><div class="sheet-footer"><button class="btn danger" onclick="deleteTx('${id}')"><i class="ti ti-trash"></i></button><button class="btn" onclick="editTx('${id}')"><i class="ti ti-edit"></i> Edit</button><button class="btn primary" onclick="closeM()">Close</button></div></div></div>`};
+window.editTx=function(id){const t=transactions.find(x=>x.id===id);if(!t)return;closeM();setTimeout(()=>{document.getElementById('modal-root').innerHTML=`<div class="modal-wrap" onclick="closeSheet(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="sheet-handle"></div><div class="sheet-title">Edit<button onclick="closeM()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div><div class="sheet-body"><div class="field"><label>Date</label><input type="date" id="ed-date" value="${t.date||''}"></div><div class="field"><label>Description</label><input type="text" id="ed-name" value="${(t.name||'').replace(/"/g,'&quot;')}"></div><div class="two-col"><div class="field"><label>Type</label><select id="ed-type"><option value="income" ${t.side==='income'?'selected':''}>Income</option><option value="expense" ${t.side==='expense'?'selected':''}>Expense</option></select></div><div class="field"><label>Mode</label><select id="ed-mode"><option value="cash" ${t.method!=='bank'?'selected':''}>Cash</option><option value="bank" ${t.method==='bank'?'selected':''}>Bank</option></select></div></div><div class="field"><label>Category</label><select id="ed-cat">${CATS.map(c=>`<option ${t.category===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label>Amount</label><input type="number" id="ed-amt" value="${t.amount}"></div><div class="field"><label>Notes</label><input type="text" id="ed-note" value="${(t.note||'').replace(/"/g,'&quot;')}"></div><div class="err" id="ed-err"></div></div><div class="sheet-footer"><button class="btn" onclick="closeM()">Cancel</button><button class="btn primary" onclick="updateTx('${id}')">Save</button></div></div></div>`},100)};
+window.updateTx=async function(id){const amt=parseInt(document.getElementById('ed-amt').value),name=document.getElementById('ed-name').value.trim(),err=document.getElementById('ed-err');if(!name||!amt||amt<=0){err.textContent='Fill required fields';err.style.display='block';return}const t=transactions.find(x=>x.id===id);setSyncDot('syncing');await setDoc(doc(db,'balanceEntries',id),{...t,date:document.getElementById('ed-date').value,name,side:document.getElementById('ed-type').value,method:document.getElementById('ed-mode').value,category:document.getElementById('ed-cat').value,amount:amt,note:document.getElementById('ed-note').value.trim()});setSyncDot('online');closeM();showToast('Updated \u2713','success')};
+window.deleteTx=async function(id){if(!confirm('Delete?'))return;setSyncDot('syncing');await deleteDoc(doc(db,'balanceEntries',id));setSyncDot('online');closeM();showToast('Deleted','error')};
+window.openBalModal=function(type,action){const isB=type==='bank',cur=isB?bankBalance:cashInHand,titles={add:'Add to '+(isB?'Bank':'Cash'),subtract:'Withdraw from '+(isB?'Bank':'Cash'),set:'Set '+(isB?'Bank':'Cash')};document.getElementById('modal-root').innerHTML=`<div class="modal-wrap" onclick="closeSheet(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="sheet-handle"></div><div class="sheet-title">${titles[action]}<button onclick="closeM()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div><div class="sheet-body"><div style="text-align:center;padding:8px 0 16px"><div style="font-size:11px;color:#6A6A65">Current</div><div style="font-size:24px;font-weight:700;color:${isB?'#185FA5':'#854F0B'}">${rupee(cur)}</div></div><div class="field"><label>Amount (\u20B9)</label><input type="number" id="bal-amt" inputmode="numeric" placeholder="0"></div><div class="err" id="bal-err"></div></div><div class="sheet-footer"><button class="btn" onclick="closeM()">Cancel</button><button class="btn primary" onclick="updateBal('${type}','${action}')">Save</button></div></div></div>`;setTimeout(()=>document.getElementById('bal-amt')?.focus(),200)};
+window.updateBal=async function(type,action){const amt=parseInt(document.getElementById('bal-amt').value),err=document.getElementById('bal-err');if(!amt||amt<0){err.textContent='Enter valid amount';err.style.display='block';return}if(type==='bank'){if(action==='add')bankBalance+=amt;else if(action==='subtract')bankBalance-=amt;else bankBalance=amt;await setDoc(doc(db,'settings','main'),{bankBalance},{merge:true})}else{if(action==='add')cashInHand+=amt;else if(action==='subtract')cashInHand-=amt;else cashInHand=amt;await setDoc(doc(db,'settings','main'),{cashInHand},{merge:true})}closeM();showToast('Updated \u2713','success')};
+window.toggleTick=async function(mid,mkey){const ex=transactions.find(t=>t.monthKey===mkey&&t.tickMemberId===mid);setSyncDot('syncing');if(ex){await deleteDoc(doc(db,'balanceEntries',ex.id))}else{const m=members.find(x=>x.id===mid);await setDoc(doc(db,'balanceEntries',newId('TK')),{monthKey:mkey,tickMemberId:mid,side:'income',method:'cash',name:'Maintenance - '+(m?.name||''),amount:MA,category:'Maintenance',date:new Date().toISOString().split('T')[0],createdAt:new Date().toISOString()})}setSyncDot('online')};
+window.openAddMember=function(){document.getElementById('modal-root').innerHTML=`<div class="modal-wrap" onclick="closeSheet(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="sheet-handle"></div><div class="sheet-title">Add Member<button onclick="closeM()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div><div class="sheet-body"><div class="field"><label>Name *</label><input type="text" id="nm-name" placeholder="Member name"></div><div class="two-col"><div class="field"><label>Flat *</label><input type="text" id="nm-flat" placeholder="301" inputmode="numeric"></div><div class="field"><label>Phone</label><input type="tel" id="nm-ph" placeholder="WhatsApp"></div></div><div class="field"><label>Type</label><div class="pay-mode-toggle"><div class="pay-mode-btn active" id="nm-t-own" onclick="selNmType('owner')"><i class="ti ti-home"></i>Owner</div><div class="pay-mode-btn" id="nm-t-ren" onclick="selNmType('rented')"><i class="ti ti-key"></i>Tenant</div></div><input type="hidden" id="nm-type" value="owner"></div><div class="err" id="nm-err"></div></div><div class="sheet-footer"><button class="btn" onclick="closeM()">Cancel</button><button class="btn primary" onclick="saveMember()">Add</button></div></div></div>`};
+window.selNmType=function(t){document.getElementById('nm-type').value=t;document.getElementById('nm-t-own').classList.toggle('active',t==='owner');document.getElementById('nm-t-ren').classList.toggle('active',t==='rented')};
+window.saveMember=async function(){const name=document.getElementById('nm-name').value.trim(),flat=document.getElementById('nm-flat').value.trim(),ph=document.getElementById('nm-ph').value.trim(),type=document.getElementById('nm-type').value,err=document.getElementById('nm-err');if(!name){err.textContent='Name required';err.style.display='block';return}if(!flat){err.textContent='Flat required';err.style.display='block';return}setSyncDot('syncing');await setDoc(doc(db,'members',newId('M')),{name,flat,phone:ph,type});setSyncDot('online');closeM();showToast('Added \u2713','success')};
+window.openEditMember=function(id){const m=members.find(x=>x.id===id);if(!m)return;document.getElementById('modal-root').innerHTML=`<div class="modal-wrap" onclick="closeSheet(event)"><div class="modal-sheet" onclick="event.stopPropagation()"><div class="sheet-handle"></div><div class="sheet-title">Edit Member<button onclick="closeM()" style="background:none;border:none;cursor:pointer;color:#6A6A65;padding:4px"><i class="ti ti-x" style="font-size:22px"></i></button></div><div class="sheet-body"><div class="field"><label>Name</label><input type="text" id="em-name" value="${m.name.replace(/"/g,'&quot;')}"></div><div class="two-col"><div class="field"><label>Flat</label><input type="text" id="em-flat" value="${m.flat}"></div><div class="field"><label>Phone</label><input type="tel" id="em-ph" value="${m.phone||''}"></div></div><div class="field"><label>Type</label><div class="pay-mode-toggle"><div class="pay-mode-btn ${m.type==='owner'?'active':''}" id="em-t-own" onclick="selEmType('owner')"><i class="ti ti-home"></i>Owner</div><div class="pay-mode-btn ${m.type==='rented'?'active':''}" id="em-t-ren" onclick="selEmType('rented')"><i class="ti ti-key"></i>Tenant</div></div><input type="hidden" id="em-type" value="${m.type}"></div><div style="margin-top:14px;padding-top:14px;border-top:1px solid #E8E7E1"><button class="btn danger" style="width:100%" onclick="delMember('${id}')"><i class="ti ti-trash"></i> Delete</button></div><div class="err" id="em-err"></div></div><div class="sheet-footer"><button class="btn" onclick="closeM()">Cancel</button><button class="btn primary" onclick="updateMember('${id}')">Save</button></div></div></div>`};
+window.selEmType=function(t){document.getElementById('em-type').value=t;document.getElementById('em-t-own').classList.toggle('active',t==='owner');document.getElementById('em-t-ren').classList.toggle('active',t==='rented')};
+window.updateMember=async function(id){const name=document.getElementById('em-name').value.trim(),flat=document.getElementById('em-flat').value.trim(),ph=document.getElementById('em-ph').value.trim(),type=document.getElementById('em-type').value;if(!name||!flat)return;setSyncDot('syncing');await setDoc(doc(db,'members',id),{name,flat,phone:ph,type});setSyncDot('online');closeM();showToast('Updated \u2713','success')};
+window.delMember=async function(id){if(!confirm('Delete this member?'))return;setSyncDot('syncing');await deleteDoc(doc(db,'members',id));setSyncDot('online');closeM();showToast('Deleted','error')};
+window.filterMembers=function(q){members.forEach(m=>{const r=document.getElementById('mr'+m.id);if(r)r.style.display=(m.name.toLowerCase().includes(q.toLowerCase())||m.flat.includes(q))?'':'none'})};
+window.bsNav=function(d){bsMonth+=d;if(bsMonth<0){bsMonth=11;bsYear--}if(bsMonth>11){bsMonth=0;bsYear++}bsSearch='';bsView='all';render()};
+window.bsSetView=function(v){bsView=v;render()};
+window.closeSheet=function(e){if(e.target===e.currentTarget)closeM()};
+window.closeM=function(){document.getElementById('modal-root').innerHTML=''};
+window.buildReminder=buildReminder;window.sendWA=sendWA;
 initFirebase();
 </script>
 </body>
